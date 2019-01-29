@@ -10,6 +10,7 @@
 *.ini
 SG7.*
 SANGO7.*
+*.lib
 
 cap/**
 Movie/**
@@ -18,3 +19,4 @@ Save/**
 Script/**
 Setting/**
 Shape/**
+.vs/**
