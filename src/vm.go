@@ -1,12 +1,12 @@
-package vm
+package js
 
 //#include '../deps/ChakraCore/Build/VcBuild/bin/x64_release'
 import (
 	"syscall"
 	"errors"
-	// "strconv"
 	"unsafe"
-	"fmt"
+  "runtime"
+  "fmt"
 )
 
 
@@ -20,7 +20,8 @@ const (
 		JsRuntimeAttributeEnableExperimentalFeatures = uintptr(0x00000020)
 		JsRuntimeAttributeDispatchSetExceptionsToDebugger = uintptr(0x00000040)
 		JsRuntimeAttributeDisableFatalOnOOM = uintptr(0x00000080)
-		JsRuntimeAttributeDisableExecutablePageAllocation = uintptr(0x00000100)
+    JsRuntimeAttributeDisableExecutablePageAllocation = uintptr(0x00000100)
+    JsErrorInvalidArgument = 0x10000 + 1
 )
 type JsRuntimeAttribute int
 const NULL = uintptr(0)
@@ -32,10 +33,24 @@ type JsRef struct {
 }
 
 
+type JsException struct {
+  JsRef
+}
+
+
+type JsFunction interface {  
+  Call(callee *JsRef, 
+       isConstructCall bool, 
+       arguments *JsRef,
+       argumentCount int) (*JsRef)
+}
+
+
 type VM struct {
 	js 									        	*syscall.DLL
 	context                       JsRef
-	runtime                       JsRef
+  runtime                       JsRef
+  Null                          JsRef
 	iJsCreateObject 		        	*syscall.Proc
 	iJsCreateFunction 	        	*syscall.Proc
 	iJsCreatePropertyId         	*syscall.Proc
@@ -58,6 +73,12 @@ type VM struct {
   iJsBooleanToBool              *syscall.Proc
   iJsCopyString                 *syscall.Proc
   iJsGetStringLength            *syscall.Proc
+  iJsRelease                    *syscall.Proc
+  iJsGetNullValue               *syscall.Proc
+  iJsGetAndClearException       *syscall.Proc
+  iJsHasException               *syscall.Proc
+  iJsConvertValueToString       *syscall.Proc
+  iJsGetProperty                *syscall.Proc
 }
 
 
@@ -76,7 +97,6 @@ func CreateVm() (*VM) {
 	vm.iJsCallFunction      				= js.MustFindProc("JsCallFunction")
 	vm.iJsSerialize									= js.MustFindProc("JsSerialize")
 	vm.iJsSerializeScript   				= js.MustFindProc("JsSerializeScript")
-	vm.iJsAddRef										= js.MustFindProc("JsAddRef")
 	vm.iJsCreateContext     				= js.MustFindProc("JsCreateContext")
 	vm.iJsCreateRuntime   					= js.MustFindProc("JsCreateRuntime")
 	vm.iJsSetCurrentContext 				= js.MustFindProc("JsSetCurrentContext")
@@ -86,6 +106,13 @@ func CreateVm() (*VM) {
   vm.iJsBooleanToBool             = js.MustFindProc("JsBooleanToBool")
   vm.iJsCopyString                = js.MustFindProc("JsCopyString")
   vm.iJsGetStringLength           = js.MustFindProc("JsGetStringLength")
+  vm.iJsAddRef                    = js.MustFindProc("JsAddRef")
+  vm.iJsRelease                   = js.MustFindProc("JsRelease")
+  vm.iJsGetNullValue              = js.MustFindProc("JsGetNullValue")
+  vm.iJsGetAndClearException      = js.MustFindProc("JsGetAndClearException")
+  vm.iJsHasException              = js.MustFindProc("JsHasException")
+  vm.iJsConvertValueToString      = js.MustFindProc("JsConvertValueToString")
+  vm.iJsGetProperty               = js.MustFindProc("JsGetProperty")
 	initVM(vm)
 	return vm
 }
@@ -105,32 +132,99 @@ func initVM(vm *VM) {
 	err = jsErr( vm.iJsSetCurrentContext.Call(vm.context.Addr()) )
 	if err != nil {
 		panic(err)
-	}
+  }
+  vm.iJsGetNullValue.Call(vm.Null.PointAddr())
 }
 
 
-func (v *VM) JsCreateObject() (*JsRef, error) {
-	ref := &JsRef{vm:v}
-	code, _, err := v.iJsCreateObject.Call(ref.p)
-	if err != nil {
-		return nil, err
-	}
-	if code != 0 {
-		return nil, errors.New(JsErrorStr(int(code)))
-	}
-	return ref, nil
+//
+// 创建一个 js 对象
+//
+func (v *VM) NewObject() (*JsRef) {
+  r := &JsRef{ vm: v }
+  err := jsErr(v.iJsCreateObject.Call(r.PointAddr()))
+  if err != nil {
+    panic(err)
+  }
+  r.Persistence()
+  return r
 }
 
 
+//
+// 执行代码
+//
 func (v *VM) Eval(jscode string) (*JsRef, error) {
-	ret := JsRef{vm:v}
-	url := "eval()"
-	err := jsErr( v.iJsRunScript.Call(
-      strPtr(jscode), v.context.Addr(), strPtr(url), ret.PointAddr()) )
+	ret   := &JsRef{ vm: v }
+  url,_ := syscall.UTF16FromString("Function eval()")
+  co,_  := syscall.UTF16FromString(jscode)
+  pu    := uintptr(unsafe.Pointer(&url[0]))
+  pc    := uintptr(unsafe.Pointer(&co[0]))
+
+	err := jsErr( v.iJsRunScript.Call(pc, v.context.Addr(), pu, ret.PointAddr()) )
 	if err != nil {
 		return nil, err
-	}
-	return &ret, nil
+  }
+  ret.Persistence()
+	return ret, nil
+}
+
+
+//
+// 创建一个函数对象
+//
+func (v *VM) Function(i interface{}) (*JsRef) {
+  f := &JsRef{ vm: v }
+  fp := native_function //!! 这里错误, 不能直接把 go 函数导出给 c++
+  v.iJsCreateFunction.Call(
+      uintptr(unsafe.Pointer(&fp)), 
+      uintptr(unsafe.Pointer(&i)), 
+      f.PointAddr())
+  f.Persistence()
+  return f
+}
+
+
+func native_function(c, i, a, ac, cs uintptr) (uintptr) {
+  // _ := (*JsFunction)(unsafe.Pointer(cs))
+  fmt.Println("native_function", c, i, a, ac, cs)
+  return NULL
+}
+
+
+//
+// 如果 JS 中抛出了异常, 则返回, 否则返回 nil
+// 异常将导致 js 无法继续运行, 必须调用一次.
+//
+func (v *VM) LastException() (*JsException) {
+  ex := &JsException{ JsRef{vm:v} }
+  code, _, _ := v.iJsGetAndClearException.Call(ex.PointAddr())
+  if code == JsErrorInvalidArgument {
+    return nil
+  }
+  ex.Persistence()
+  return ex
+}
+
+
+//
+// 如果虚拟机中有未处理的异常返回 true
+//
+func (v *VM) HasException() (bool) {
+  var has bool
+  v.iJsHasException.Call(uintptr(unsafe.Pointer(&has)))
+  return has
+}
+
+
+//
+// 设置全局变量
+//
+func (v *VM) Global() *JsRef {
+  g := &JsRef{ vm: v }
+  v.iJsGetGlobalObject.Call(g.PointAddr())
+  g.Persistence()
+  return g
 }
 
 
@@ -161,7 +255,7 @@ func (r *JsRef) Double() float64 {
 
 
 //
-// 返回被包装的布尔值, 如果数据不是数字返回 false
+// 返回被包装的布尔值, 如果数据不是布尔类型返回 false
 //
 func (r *JsRef) Bool() bool {
   var v bool = false
@@ -171,25 +265,58 @@ func (r *JsRef) Bool() bool {
 
 
 //
-// 返回被包装的字符串, 如果数据不是数字返回空字符串
+// 返回被包装的字符串, 如果数据不是字符串返回空字符串
 //
 func (r *JsRef) String() string {
   var v string = ""
   var l int32 = -1
-
-  err := jsErr( r.vm.iJsGetStringLength.Call(r.Addr(), uintptr(unsafe.Pointer(&l))) )
-  if err != nil {
-    fmt.Println(err)
-  }
-
+  r.vm.iJsGetStringLength.Call(r.Addr(), uintptr(unsafe.Pointer(&l)))
+  
   if l > 0 {
-    buf := make([]byte, l)
+    buf := make([]byte, l+1)
     err := jsErr( r.vm.iJsCopyString.Call(
                   r.Addr(), uintptr(unsafe.Pointer(&buf[0])), uintptr(l), NULL) )
     if err == nil {
       v = string(buf)
     }
   }
+  return v
+}
+
+
+//
+// 尝试将对象转换为字符串
+//
+func (r *JsRef) ToString() string {
+  str := &JsRef{vm : r.vm}
+  r.vm.iJsConvertValueToString.Call(r.Addr(), str.PointAddr())
+  return str.String()
+}
+
+
+//
+// 设置属性 name 为 value
+//
+func (r *JsRef) Put(name string, value *JsRef) {
+  id := JsRef{vm : r.vm}
+  buf := []byte(name)
+  pb := uintptr(unsafe.Pointer(&buf[0]))
+  r.vm.iJsCreatePropertyId.Call(pb, uintptr(len(buf)), id.PointAddr())
+  r.vm.iJsSetProperty.Call(r.Addr(), id.Addr(), value.Addr())
+}
+
+
+//
+// 返回属性 name 的值
+//
+func (r *JsRef) Get(name string) *JsRef {
+  id := JsRef{vm : r.vm}
+  buf := []byte(name)
+  pb := uintptr(unsafe.Pointer(&buf[0]))
+  r.vm.iJsCreatePropertyId.Call(pb, uintptr(len(name)), id.PointAddr())
+  v := &JsRef{ vm:r.vm } 
+  r.vm.iJsGetProperty.Call(r.Addr(), id.Addr(), v.PointAddr())
+  v.Persistence()
   return v
 }
 
@@ -210,6 +337,34 @@ func (r *JsRef) PointAddr() uintptr {
 }
 
 
+//
+// 持久化 js 对象的引用, 由垃圾 go 垃圾回收决定内存释放
+//
+func (r *JsRef) Persistence() {
+  r.vm.iJsAddRef.Call(r.Addr(), NULL)
+  runtime.SetFinalizer(r, _freeJsRef)
+}
+
+
+func (s *JsException) Stack() string {
+  st := s.Get("stack")
+  fmt.Println(st)
+  return st.ToString()
+}
+
+
+func (s *JsException) Message() string {
+  return s.Get("message").String()
+}
+
+
+func _freeJsRef(r *JsRef) {
+  if r.p != 0 {
+    r.vm.iJsRelease.Call(r.Addr(), NULL)
+  }
+}
+
+
 func jsErr(r1, r2 uintptr, err error) (error) {
 	if r1 != 0 {
 		str := JsErrorStr(int(r1))
@@ -219,17 +374,6 @@ func jsErr(r1, r2 uintptr, err error) (error) {
 		return errors.New(str)
 	}
 	return nil
-}
-
-
-func intPtr(n int) uintptr {
-	return uintptr(n)
-}
-
-
-func strPtr(s string) uintptr {
-  p, _ := syscall.UTF16PtrFromString(s)
-	return uintptr(unsafe.Pointer(p))
 }
 
 
