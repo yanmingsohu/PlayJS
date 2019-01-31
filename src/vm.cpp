@@ -1,4 +1,4 @@
-﻿#include "vm.h"
+#include "vm.h"
 #include "fs.h"
 
 #include <map>
@@ -134,8 +134,58 @@ int intValue(JsValueRef v, int defaultVal) {
 }
 
 
+bool isJsNumber(JsValueRef v) {
+    if (!v) return false;
+    JsValueType t = JsUndefined;
+    JsGetValueType(v, &t);
+    return t == JsNumber;
+}
+
+
 JsValueRef wrapJs(int i) {
     JsValueRef v = 0;
     JsIntToNumber(i, &v);
     return v;
+}
+
+
+JsValueRef wrapJs(double i) {
+    JsValueRef v = 0;
+    JsDoubleToNumber(i, &v);
+    return v;
+}
+
+
+std::string toString(JsValueRef str) {
+    size_t len = 0;
+    JsCopyString(str, 0, 0, &len);
+
+    if (len > 0) {
+        char *buf = new char[len + 1];
+        buf[len] = 0;
+        JsCopyString(str, buf, len, 0);
+        std::string s = std::string(buf);
+        delete[] buf;
+        return s;
+    }
+    return std::string();
+}
+
+
+void VM:: initModule() {
+    char desc[] = "bootstrap";
+    JsContextRef spec;
+    JsCreateString(desc, sizeof(desc), &spec);
+    JsModuleRecord root;
+    JsInitializeModuleRecord(NULL, spec, &root);
+
+    JsSetModuleHostInfo(root,
+        JsModuleHostInfo_FetchImportedModuleCallback,
+        &iFetchImportedModuleCallBack);
+    JsSetModuleHostInfo(root,
+        JsModuleHostInfo_FetchImportedModuleFromScriptCallback,
+        &iFetchImportedModuleFromScriptCallBack);
+    JsSetModuleHostInfo(root,
+        JsModuleHostInfo_NotifyModuleReadyCallback,
+        &iNotifyModuleReadyCallback);
 }

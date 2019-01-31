@@ -2,6 +2,7 @@
 
 #include "vm.h"
 
-void installConsole(VM* vm);
-void installFileSystem(VM *vm);
-void installUtf(VM *vm);
+void installConsole(VM*);
+void installFileSystem(VM*);
+void installUtf(VM*);
+void installThread(VM*);

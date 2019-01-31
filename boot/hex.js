@@ -12,9 +12,10 @@ for (var i=0; i<str.length; ++i) {
 }
 
 
-function printHex(b) {
+function printHex(b, lineC) {
+    if (!lineC) lineC = 16;
     for (var i = 0; i < b.length;) {
-        var a = Math.min(b.length - i, 16);
+        var a = Math.min(b.length - i, lineC);
         var s = b.slice(i, i + a);
         var line = [];
 
@@ -25,7 +26,7 @@ function printHex(b) {
             line[16 + j] = dict[s[j]] || '.';
         }
 
-        for (var j = a; j < 16; ++j) {
+        for (var j = a; j < lineC; ++j) {
             line[j] = '   ';
         }
 

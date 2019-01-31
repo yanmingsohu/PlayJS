@@ -1,19 +1,18 @@
 #pragma once
 
-#include <iostream>
+#include<iostream>
 #include<stdio.h>
 
 constexpr int FAILED = -1;
 
 
-class FileSystem {
-};
+//
+// è¯»å–æ–‡ä»¶æˆåŠŸè¿”å›ç¼“å†²åŒºé•¿åº¦, å¤±è´¥è¿”å› -1
+//
+int readFile(std::string& file, char **buf);
 
 
 //
-// ¶ÁÈ¡ÎÄ¼ş³É¹¦·µ»Ø»º³åÇø³¤¶È, Ê§°Ü·µ»Ø -1
+// è¯»å–æ–‡æœ¬æ–‡ä»¶(utf8)æˆåŠŸè¿”å›ç¼“å†²åŒºé•¿åº¦, å¤±è´¥è¿”å› -1
 //
-int readFile(std::string file, char **buf);
-
-
-int readTxtFile(std::string fileName, std::string &content);
+int readTxtFile(std::string& fileName, std::string& content);

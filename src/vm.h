@@ -1,4 +1,4 @@
-﻿#pragma once
+#pragma once
 
 #include "ChakraCore/lib/Jsrt/ChakraCore.h"
 #include "ChakraCore/lib/Jsrt/ChakraCommon.h"
@@ -26,6 +26,31 @@ JsErrorCode newModule(JsModuleRecord parent,
     std::string &script, 
     JsModuleRecord* moduleRet);
 
+//
+// 在 js 虚拟机中抛出异常
+//
+void pushException(std::string);
+
+//
+// 把 js 数字对象转换为 整数, 如果 r 不是数字或出错, 返回默认值
+//
+int intValue(JsValueRef r, int defaultVal = 0);
+
+//
+// 把 c++ 数据包装成 js 对象
+//
+JsValueRef wrapJs(int i);
+JsValueRef wrapJs(double i);
+
+//
+// 参数是数字类型返回 true
+//
+bool isJsNumber(JsValueRef v);
+
+//
+// 尝试把 js 对象输出为字符串(即使不是字符串对象)
+//
+std::string toString(JsValueRef str);
 
 //
 // 在局部变量上引用 js 对象, 自动对 js 对象增加外部引用计数
@@ -60,23 +85,7 @@ public:
         if (!jsv) return "null";
         JsValueRef str;
         JsConvertValueToString(jsv, &str);
-        return toString(str);
-    }
-
-
-    std::string toString(JsValueRef str) {
-        size_t len = 0;
-        JsCopyString(str, 0, 0, &len);
-
-        if (len > 0) {
-            char *buf = new char[len + 1];
-            buf[len] = 0;
-            JsCopyString(str, buf, len, 0);
-            std::string s = std::string(buf);
-            delete[] buf;
-            return s;
-        }
-        return std::string();
+        return ::toString(str);
     }
 
 
@@ -102,6 +111,14 @@ public:
 
     bool notNull() {
         return jsv != 0;
+    }
+
+    //
+    // 返回 js 对象的句柄, 返回的句柄如果超出 LocalVal 生命周期,
+    // 该句柄有可能被 js 虚拟机垃圾回收.
+    //
+    JsValueRef js() {
+        return jsv;
     }
 };
 
@@ -134,28 +151,28 @@ public:
         init();
     }
 
-    BYTE* buffer() {
-        return _buf;
+    inline char* buffer() {
+        return (char*)_buf;
     }
 
     //
     // 数组的长度, 总字节数
     //
-    unsigned int length() {
+    inline unsigned int length() {
         return _len;
     }
 
     //
     // 每个元素的长度, 单位字节
     //
-    int unitLen() {
+    inline int unitLen() {
         return _byteLen;
     }
 
     //
     // 底层数组类型
     //
-    JsTypedArrayType type() {
+    inline JsTypedArrayType type() {
         return _type;
     }
 };
@@ -168,23 +185,7 @@ private:
 	unsigned currentSourceContext;
 
 
-    void initModule() {
-        char desc[] = "bootstrap";
-        JsContextRef spec;
-        JsCreateString(desc, sizeof(desc), &spec);
-        JsModuleRecord root;
-        JsInitializeModuleRecord(NULL, spec, &root);
-
-        JsSetModuleHostInfo(root, 
-            JsModuleHostInfo_FetchImportedModuleCallback,
-            &iFetchImportedModuleCallBack);
-        JsSetModuleHostInfo(root, 
-            JsModuleHostInfo_FetchImportedModuleFromScriptCallback,
-            &iFetchImportedModuleFromScriptCallBack);
-        JsSetModuleHostInfo(root, 
-            JsModuleHostInfo_NotifyModuleReadyCallback,
-            &iNotifyModuleReadyCallback);
-    }
+    void initModule();
 
 public:
 
@@ -265,6 +266,3 @@ public:
 
 
 std::ostream& operator<<(std::ostream& a, LocalVal& b);
-void pushException(std::string);
-int intValue(JsValueRef r, int defaultVal = 0);
-JsValueRef wrapJs(int i);

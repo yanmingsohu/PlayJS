@@ -8,9 +8,13 @@
 *.dat
 *.txt
 *.ini
+*.lib
+*.iobj
+*.ipdb
+*.pdb
+
 SG7.*
 SANGO7.*
-*.lib
 
 cap/**
 Movie/**
