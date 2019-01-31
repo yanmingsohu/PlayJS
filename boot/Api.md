@@ -40,7 +40,7 @@ mode可以是 'w' 写文件, 'r' 读文件等.
 
 调试控制台, 以下方法都可以输出日志到命令行(如果有)
 输出格式:  
-19:08:53 #10C INF. PlayJS Game Engine.
+19:08:53 #10C INF| PlayJS Game Engine.
 -------- ---- ---- -------------------
 ^        ^    ^    ^
 |        |    |    |
@@ -86,6 +86,10 @@ mode可以是 'w' 写文件, 'r' 读文件等.
 
 线程库.
 
+## int id()
+
+返回当前线程的 id
+
 ## int run(script_file_path)
 
 在新的线程中启动脚本, 没有错误该方法会立即返回线程 id.
@@ -119,7 +123,7 @@ mode可以是 'w' 写文件, 'r' 读文件等.
 消息总线, 在多个线程间通信.
 
 PlayJS 并不是按照 EventLoop 来设计的, 如果使用消息, 
-脚本需要自行处理 EventLoop 循环.
+每个线程在必须要时需要自行处理 EventLoop 循环.
 
 除了特殊说明的消息, 所有的消息都在多个线程间路由.
 
@@ -136,7 +140,9 @@ events.on('error', function(err) {
 	console.error(err.stack);
 });
 events.emit("opendoor", door);
-
+//
+// 必须有消息循环
+//
 while (events.getMessage()) {
 	events.dispatchMessage();
 }

@@ -1,0 +1,15 @@
+-------------------------------
+PlayJS Game Engine
+===============================
+2019               Jing.Yanming
+-------------------------------
+
+
+
+本软件分为不同的模块, 其授权许可形式以模块目录中的 LICENSE 文件为准.
+
+
+
+The software is divided into different modules, 
+and the license form is based on the LICENSE file 
+in the module directory.

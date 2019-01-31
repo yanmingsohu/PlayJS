@@ -71,7 +71,7 @@ public:
     }
 
     ~Welcome() {
-        std::cout << "\n\n"
+        std::cout << "\n"
 << "\n<<<<<<<<<<<<<<<<<<<<<<<<<<<< PlayJS Exit >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>" 
 << std::endl;
     }

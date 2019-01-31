@@ -104,7 +104,7 @@ void joinAll() {
 
 
 static JsValueRef js_run(JsValueRef callee, JsValueRef *args, unsigned short ac,
-                         JsNativeFunctionInfo *info, void *level) 
+                         JsNativeFunctionInfo *info, void *d) 
 {
     if (ac != 2) {
         pushException("bad arguments, run(scriptFilePath)");
@@ -118,7 +118,7 @@ static JsValueRef js_run(JsValueRef callee, JsValueRef *args, unsigned short ac,
 
 
 static JsValueRef js_sleep(JsValueRef callee, JsValueRef *args, unsigned short ac,
-                           JsNativeFunctionInfo *info, void *level)
+                           JsNativeFunctionInfo *info, void *d)
 {
     if (ac != 2) {
         pushException("bad arguments, sleep(ms)");
@@ -134,7 +134,7 @@ static JsValueRef js_sleep(JsValueRef callee, JsValueRef *args, unsigned short a
 
 
 static JsValueRef js_running(JsValueRef callee, JsValueRef *args, unsigned short ac,
-                             JsNativeFunctionInfo *info, void *level)
+                             JsNativeFunctionInfo *info, void *d)
 {
     if (ac != 2) {
         pushException("bad arguments, get(threadid)");
@@ -145,9 +145,18 @@ static JsValueRef js_running(JsValueRef callee, JsValueRef *args, unsigned short
 }
 
 
+static JsValueRef js_id(JsValueRef callee, JsValueRef *args, unsigned short ac,
+    JsNativeFunctionInfo *info, void *id)
+{
+    return wrapJs((threadId)id);
+}
+
+
 void installThread(VM* vm) {
     LocalVal thread = vm->createObject();
     vm->getGlobal().put("thread", thread);
+    void * id = (void*) vm->thread();
+    thread.put("id",      vm->createFunction(&js_id,      "id", id));
     thread.put("run",     vm->createFunction(&js_run,     "run"));
     thread.put("sleep",   vm->createFunction(&js_sleep,   "sleep"));
     thread.put("running", vm->createFunction(&js_running, "running"));
