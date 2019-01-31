@@ -13,6 +13,7 @@ using namespace experimental::filesystem::v1;
 static map<JsModuleRecord, string> modMap;
 //
 // {完整绝对路径:模块} 模块缓存
+// 模块可以在多个 js runtime 里面运行, 支持多线程
 //
 static map<string, JsModuleRecord> loaded;
 
@@ -152,6 +153,13 @@ JsValueRef wrapJs(int i) {
 JsValueRef wrapJs(double i) {
     JsValueRef v = 0;
     JsDoubleToNumber(i, &v);
+    return v;
+}
+
+
+JsValueRef wrapJs(bool b) {
+    JsValueRef v = 0;
+    JsBoolToBoolean(b, &v);
     return v;
 }
 

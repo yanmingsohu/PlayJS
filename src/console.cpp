@@ -8,22 +8,22 @@
 #include <string>
 #include <mutex>
 
-static char head_buf[20];
+static char head_buf[25];
 static std::mutex log_lock;
 
-const void *LINFO  = (void*)1;
-const void *LERROR = (void*)2;
-const void *LWARN  = (void*)3;
-const void *LDEBUG = (void*)4;
-const void *LFATAL = (void*)5;
+const int LINFO  = 1;
+const int LERROR = 2;
+const int LWARN  = 3;
+const int LDEBUG = 4;
+const int LFATAL = 5;
 
 const char* prefix[] = {
-    " ",
-    " INFO.", 
-    "ERROR.", 
-    " WARN.", 
-    "DEBUG.", 
-    "FATAL.",
+    0,
+    "INF", 
+    "ERR", 
+    "WAN", 
+    "DBG", 
+    "FTL",
 };
 
 static unsigned int codePage;
@@ -59,34 +59,33 @@ static void sys_out(const char *out) {
 #endif
 
 
-static void update_time(const void *level) {
+static void update_time(const int level, threadId id=0) {
     time_t now = time(0);
     tm t;
     localtime_s(&t, &now);
-    sprintf_s(head_buf, sizeof(head_buf), "%02d:%02d:%02d %s", 
-        t.tm_hour, t.tm_min, t.tm_sec, prefix[int(level)]);
+    sprintf_s(head_buf, sizeof(head_buf), "%02d:%02d:%02d #%02X %s|", 
+        t.tm_hour, t.tm_min, t.tm_sec, id, prefix[level]);
 }
 
 
-void println(const char *out) {
+void println(const char *out, threadId id) {
     std::lock_guard<std::mutex> lock(log_lock);
-    update_time(LINFO);
+    update_time(LINFO, id);
     sys_out(out);
 }
 
 
-void println(const std::string str) {
+void println(const std::string str, threadId id) {
     std::lock_guard<std::mutex> lock(log_lock);
-    update_time(LINFO);
+    update_time(LINFO, id);
     sys_out(str.c_str());
 }
 
 
-static JsValueRef logfunc(JsValueRef callee, JsValueRef *args, unsigned short ac,
-                          JsNativeFunctionInfo *info, void *level) 
+static JsValueRef logfunc(JsValueRef *args, unsigned short ac, int level, threadId id) 
 {
     std::lock_guard<std::mutex> lock(log_lock);
-    update_time(level);
+    update_time(level, id);
     static char content_buf[2000];
     int buf_off = 0;
 
@@ -114,14 +113,49 @@ static JsValueRef logfunc(JsValueRef callee, JsValueRef *args, unsigned short ac
 }
 
 
+static JsValueRef js_info(JsValueRef callee, JsValueRef *args, unsigned short ac,
+                          JsNativeFunctionInfo *info, void *_vm)
+{
+    return logfunc(args, ac, LINFO, ((VM*)_vm)->thread());
+}
+
+
+static JsValueRef js_warn(JsValueRef callee, JsValueRef *args, unsigned short ac,
+                          JsNativeFunctionInfo *info, void *_vm)
+{
+    return logfunc(args, ac, LWARN, ((VM*)_vm)->thread());
+}
+
+
+static JsValueRef js_error(JsValueRef callee, JsValueRef *args, unsigned short ac,
+                           JsNativeFunctionInfo *info, void *_vm)
+{
+    return logfunc(args, ac, LERROR, ((VM*)_vm)->thread());
+}
+
+
+static JsValueRef js_debug(JsValueRef callee, JsValueRef *args, unsigned short ac,
+                           JsNativeFunctionInfo *info, void *_vm)
+{
+    return logfunc(args, ac, LDEBUG, ((VM*)_vm)->thread());
+}
+
+
+static JsValueRef js_fatal(JsValueRef callee, JsValueRef *args, unsigned short ac,
+                           JsNativeFunctionInfo *info, void *_vm)
+{
+    return logfunc(args, ac, LFATAL, ((VM*)_vm)->thread());
+}
+
+
 void installConsole(VM* vm) {
     checkCodePage();
     LocalVal console = vm->createObject();
     vm->getGlobal().put("console", console);
-    console.put("log",   vm->createFunction(&logfunc, "info",  LINFO));
-    console.put("info",  vm->createFunction(&logfunc, "info",  LINFO));
-    console.put("warn",  vm->createFunction(&logfunc, "warn",  LWARN));
-    console.put("error", vm->createFunction(&logfunc, "error", LERROR));
-    console.put("debug", vm->createFunction(&logfunc, "debug", LINFO));
-    console.put("fatal", vm->createFunction(&logfunc, "fatal", LFATAL));
+    console.put("log",   vm->createFunction(&js_info,  "info",  vm));
+    console.put("info",  vm->createFunction(&js_info,  "info",  vm));
+    console.put("warn",  vm->createFunction(&js_warn,  "warn",  vm));
+    console.put("error", vm->createFunction(&js_error, "error", vm));
+    console.put("debug", vm->createFunction(&js_debug, "debug", vm));
+    console.put("fatal", vm->createFunction(&js_fatal, "fatal", vm));
 }

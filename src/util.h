@@ -2,6 +2,7 @@
 
 #include <string>
 #include <iostream>
+#include "threads.h"
 
 
 //
@@ -15,8 +16,8 @@ void gbk2utf8(char* from, int fromLenth, std::string &out);
 // 输出字符串到控制台, 可以正确处理中文编码
 // 实现在 console.cpp
 //
-void println(const char *src_str);
-void println(const std::string str);
+void println(const char *src_str, threadId id = 0);
+void println(const std::string str, threadId id = 0);
 
 
 //

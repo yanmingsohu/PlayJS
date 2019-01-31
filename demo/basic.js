@@ -59,3 +59,5 @@ console.log(filename, "size:", fs.fileSize(filename));
 // 启动线程
 //
 thread.run('./demo/pi.js');
+thread.run('./demo/pi.js');
+thread.run('./demo/pi.js');

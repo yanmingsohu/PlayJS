@@ -1,6 +1,5 @@
 #pragma once
 
-#include "vm.h"
 #include <thread>
 
 typedef int threadId;

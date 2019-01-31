@@ -5,6 +5,7 @@
 
 #include <string>
 #include <iostream>
+#include "threads.h"
 
 JsErrorCode iFetchImportedModuleCallBack(
     _In_ JsModuleRecord referencingModule,
@@ -41,6 +42,7 @@ int intValue(JsValueRef r, int defaultVal = 0);
 //
 JsValueRef wrapJs(int i);
 JsValueRef wrapJs(double i);
+JsValueRef wrapJs(bool b);
 
 //
 // 参数是数字类型返回 true
@@ -183,13 +185,13 @@ private:
 	JsRuntimeHandle runtime;
 	JsContextRef context;
 	unsigned currentSourceContext;
-
+    threadId _tid;
 
     void initModule();
 
 public:
 
-	VM() : currentSourceContext(0) {
+	VM(threadId& tid) : currentSourceContext(0), _tid(tid) {
 		JsCreateRuntime(JsRuntimeAttributeNone, nullptr, &runtime);
 		JsCreateContext(runtime, &context);
 		JsSetCurrentContext(context);
@@ -261,6 +263,14 @@ public:
         JsValueRef jf = 0;
         JsCreateEnhancedFunction(f, meta, (void*)d, &jf);
         return jf;
+    }
+
+
+    //
+    // 返回当前 vm 所在线程的 ID
+    //
+    threadId thread() {
+        return _tid;
     }
 };
 

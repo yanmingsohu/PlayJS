@@ -3,11 +3,14 @@
 // PlayJS: 1000000000 耗时 13.598 seconds
 // Nodejs: 1000000000 耗时 13.089 seconds
 //
-calculate(200000000);
+var a = Math.random();
+console.log("PI start, Handle", a);
+calculate(200000000 + parseInt(a*1000));
 
 
 function calculate(num) {
     //var num = document.myForm.num.value;
+    console.log("calculate", num);
     var pi = 4, top = 4, bot = 3, minus = true;
     next(pi, top, bot, minus, num);
 }
@@ -15,7 +18,7 @@ function calculate(num) {
 
 function next(pi, top, bot, minus, num) {
     var cur_time = Date.now();
-    var sh = num / 10;
+    var sh = parseInt(num / 10);
 
     for (var i = 0; i < num; i++) {
         pi += (minus == true) ? -(top / bot) : (top / bot);
@@ -37,6 +40,7 @@ function next(pi, top, bot, minus, num) {
 
     console.log("Count", num, "PI", pi);
     console.log("Result calculated in: " + total_time + "...");
+    console.log("Handle", a);
 }
 
 

@@ -30,7 +30,7 @@ void gbk2utf8(char* from, int fromLenth, string &out) {
 
 
 static JsValueRef js_utf8string(JsValueRef callee, JsValueRef *args, unsigned short ac,
-                              JsNativeFunctionInfo *info, void *d)
+                                JsNativeFunctionInfo *info, void *d)
 {
     if (ac != 2 && ac != 3) {
         pushException("bad arguments, toUtf8String(TypedArray, length)");

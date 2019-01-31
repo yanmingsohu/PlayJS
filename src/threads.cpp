@@ -2,6 +2,7 @@
 #include "export-js.h"
 #include "fs.h"
 #include "util.h"
+#include "vm.h"
 
 #include <map>
 #include <mutex>
@@ -14,7 +15,7 @@ using std::lock_guard;
 
 typedef map<threadId, thread*> ThreadMap;
 
-static int nextId = 100;
+static int nextId = 0x10;
 static mutex lock_map;
 static ThreadMap tmap;
 
@@ -33,15 +34,15 @@ static string& operator+(string& s, int i) {
 
 void loadScript(string& filename, threadId id) {
     LocalResource<threadId> freeThreadHandle((threadId*)id, freeThread);
-    println("Start Script '"+ filename +"' on thread [id:"+ id +"]");
+    println("Start Script '"+ filename +"'", id);
 
     std::string code;
     if (FAILED == readTxtFile(filename, code)) {
-        println("Read '"+ filename +"' error");
+        println("Read '"+ filename +"' error", id);
         return;
     }
 
-    VM vm;
+    VM vm(id);
     installConsole(&vm);
     installFileSystem(&vm);
     installUtf(&vm);
@@ -49,20 +50,20 @@ void loadScript(string& filename, threadId id) {
 
     JsErrorCode r = vm.loadModule(0, filename, code);
     if (r) {
-        println("Load Module '"+ filename +"' failed code: "+ r);
+        println("Load Module '"+ filename +"' failed code: "+ r, id);
     }
 
     LocalVal err = vm.checkError();
     if (err.notNull()) {
         LocalVal st = err.get("stack");
         if (st.notNull()) {
-            println("Exit on failed: "+ st.toString());
+            println("Exit on failed: "+ st.toString(), id);
         }
         else {
-            println("Exit on failed: "+ err.toString());
+            println("Exit on failed: "+ err.toString(), id);
         }
     }
-    println("Script '"+ filename+ "' on Thread [id:"+ int(id) +"] Exit");
+    println("Script '"+ filename+ "' Exit", id);
 }
 
 
@@ -87,11 +88,18 @@ thread* getThread(threadId i) {
 
 void joinAll() {
     println(string("Running Thread: ")+ tmap.size());
+    lock_map.lock();
 
     for (auto it = tmap.begin(); it != tmap.end(); ++it) {
+        //
+        // 当线程运行时可能会启动新的线程, 交叉锁可以防止死锁.
+        //
+        lock_map.unlock();
         println(std::string("Wait thread [id:")+ (it->first) +"]");
         it->second->join();
+        lock_map.lock();
     }
+    lock_map.unlock();
 }
 
 
@@ -125,9 +133,22 @@ static JsValueRef js_sleep(JsValueRef callee, JsValueRef *args, unsigned short a
 }
 
 
+static JsValueRef js_running(JsValueRef callee, JsValueRef *args, unsigned short ac,
+                             JsNativeFunctionInfo *info, void *level)
+{
+    if (ac != 2) {
+        pushException("bad arguments, get(threadid)");
+        return 0;
+    }
+    int id = intValue(args[1]);
+    return wrapJs(0 != getThread(id));
+}
+
+
 void installThread(VM* vm) {
     LocalVal thread = vm->createObject();
     vm->getGlobal().put("thread", thread);
-    thread.put("run",   vm->createFunction(&js_run,   "run"));
-    thread.put("sleep", vm->createFunction(&js_sleep, "sleep"));
+    thread.put("run",     vm->createFunction(&js_run,     "run"));
+    thread.put("sleep",   vm->createFunction(&js_sleep,   "sleep"));
+    thread.put("running", vm->createFunction(&js_running, "running"));
 }
