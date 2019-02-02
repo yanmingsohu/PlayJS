@@ -42,16 +42,16 @@ var a3 = new Uint8Array(10);
 for (var i=0; i<10; ++i) {
     a3[i] = 0x41 + i;
 }
-hex.printHex(a3, 10);
+hex.printHex(a3);
 fd = fs.open(filename, "wb+");
 fs.write(fd, a3, 0, 2, 10);
 
 var a4 = new Uint8Array(20);
 fs.read(fd, a4, 0, 20, 0);
-hex.printHex(a4, 13);
+hex.printHex(a4);
 
 fs.read(fd, a4, 0, 20, 10);
-hex.printHex(a4, 13);
+hex.printHex(a4);
 fs.close(fd);
 console.log(filename, "size:", fs.fileSize(filename));
 

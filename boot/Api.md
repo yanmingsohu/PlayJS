@@ -38,7 +38,11 @@ mode可以是 'w' 写文件, 'r' 读文件等.
 
 # console
 
-调试控制台, 以下方法都可以输出日志到命令行(如果有)
+调试控制台, 以下方法都可以输出日志到命令行(如果有),
+一次调用输出方法的字符串不要超过 1000(有可能变化) 字符, 
+过长的部分将被截断.
+
+```txt
 输出格式:  
 19:08:53 #10C INF| PlayJS Game Engine.
 -------- ---- ---- -------------------
@@ -48,6 +52,7 @@ mode可以是 'w' 写文件, 'r' 读文件等.
 |        |    日志级别
 |        线程 ID
 日志输出的时间
+```
 
 ## void debug(...)
 
@@ -102,6 +107,39 @@ mode可以是 'w' 写文件, 'r' 读文件等.
 
 当前线程休眠 ms 毫秒.
 
+## ? createSharedBuffer() *未实现
+
+创建线程间共享缓冲区, 该缓冲区可以发送到其他线程, 
+安全且没有多余的复制操作.
+
+创建Javascript ArrayBuffer对象以访问外部存储器。
+-----------------------------------------------
+
+句法
+	STDAPI_(JsErrorCode)
+		JsCreateExternalArrayBuffer(
+		_Pre_maybenull_ _Pre_writable_byte_size_(byteLength) void *data,
+		_In_ unsigned int byteLength,
+		_In_opt_ JsFinalizeCallback finalizeCallback,
+		_In_opt_ void *callbackState,
+		_Out_ JsValueRef *result);
+
+使用来自JsGetSharedArrayBufferContent的共享内容get创建Javascript SharedArrayBuffer对象。
+----------------------------------------------------------------------------------------
+句法
+CHAKRA_API
+    JsCreateSharedArrayBufferWithSharedContent(
+        _In_ JsSharedArrayBufferContentHandle sharedContents,
+        _Out_ JsValueRef *result);
+
+从SharedArrayBuffer获取存储对象。
+----------------------------------
+句法
+CHAKRA_API
+    JsGetSharedArrayBufferContent(
+        _In_ JsValueRef sharedArrayBuffer,
+        _Out_ JsSharedArrayBufferContentHandle *sharedContents);
+
 
 # Unicode
 
@@ -121,17 +159,9 @@ mode可以是 'w' 写文件, 'r' 读文件等.
 # events
 
 消息总线, 在多个线程间通信.
-
 PlayJS 并不是按照 EventLoop 来设计的, 如果使用消息, 
-每个线程在必须要时需要自行处理 EventLoop 循环.
-
+每个线程在必要时需要自行处理 EventLoop 循环.
 除了特殊说明的消息, 所有的消息都在多个线程间路由.
-
-`error` 是个特殊的消息, 该消息只在自身线程中传递.
-线程应该注册 `error` 消息的处理回调, 否则该消息将被 getMessage() 直接抛出.
-
-`exit` 是个特殊消息, 发出该消息说明程序进入退出进程, 所有线程
-都应该妥善处理数据, 任何线程也可以发出该消息.
 
 通常的用法:
 
@@ -148,13 +178,32 @@ while (events.getMessage()) {
 }
 ```
 
-## on(messagename, callback) *未实现
+
+## 特殊消息定义
+
+`error` 是个特殊的消息, 该消息只在自身线程中传递.
+线程应该注册 `error` 消息的处理回调, 否则该消息将被 getMessage() 直接抛出.
+
+`exit` 是个特殊消息, 发出该消息说明程序进入退出进程, 所有线程
+都应该妥善处理数据, 任何线程也可以发出该消息.
+
+
+## void on(messagename, callback) *未实现
 
 在消息总线上注册消息监听器, 一旦事件被触发, callback 会被回调, 
 callback 第一个参数是消息附带的数据对象; 在 callback 中抛出的
 异常将被发送到消息总线的 `error` 事件上
 
-## emit(messagename, object) *未实现
+`Function callback(value)`
+
+## int off(messagename[, callback) *未实现
+
+删除监听器, 如果 callback 为空则删除当前线程上的所有 name 指定的
+消息监听器, 否则只删除对应监听器的函数, 返回删除监听器函数的数量.
+
+`Function callback(value)`
+
+## void emit(messagename, value) *未实现
 
 发送一个消息, 这条消息将被所有感兴趣的监听器(所有线程)抓取, 方法返回后,
 消息不是立即发出, 而是在 dispatchMessage 中被处理的.
@@ -162,7 +211,8 @@ callback 第一个参数是消息附带的数据对象; 在 callback 中抛出�
 ## bool getMessage() *未实现
 
 当前线程必须有一个消息循环来调用该方法, 否则 `on` 注册的监听器
-无法获取任何消息. 如果 `exit` 消息被发出, 该方法返回 false.
+无法获取任何消息. 如果 `exit` 消息被发出, 该方法立即返回 false.
+如果消息队列为空, 该方法会一直阻塞.
 
 ## void dispatchMessage() *未实现
 

@@ -152,6 +152,7 @@ void installConsole(VM* vm) {
     checkCodePage();
     LocalVal console = vm->createObject();
     vm->getGlobal().put("console", console);
+
     console.put("log",   vm->createFunction(&js_info,  "info",  vm));
     console.put("info",  vm->createFunction(&js_info,  "info",  vm));
     console.put("warn",  vm->createFunction(&js_warn,  "warn",  vm));

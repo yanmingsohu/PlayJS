@@ -55,6 +55,12 @@ bool isJsNumber(JsValueRef v);
 std::string toString(JsValueRef str);
 
 //
+// 检查 js 虚拟机异常状态, 如果有异常返回异常句柄, 否则返回 0;
+// 虚拟机中的异常必须处理后方可继续运行.
+//
+JsValueRef checkError();
+
+//
 // 在局部变量上引用 js 对象, 自动对 js 对象增加外部引用计数
 //
 class LocalVal {
@@ -107,6 +113,26 @@ public:
     }
 
 
+    //
+    // jsv 是个函数, 使用参数调用之,
+    // 该方法之有一个参数
+    //
+    LocalVal call(LocalVal arg) const {
+        JsValueRef undef  = undefined();
+        JsValueRef args[] = { undef, arg.jsv };
+        JsValueRef result = 0;
+        JsCallFunction(jsv, args, 2, &result);
+        return result;
+    }
+
+
+    JsValueRef undefined() const {
+        JsValueRef undef = 0;
+        JsGetUndefinedValue(&undef);
+        return undef;
+    }
+
+
     bool isNull() {
         return jsv == 0;
     }
@@ -121,6 +147,16 @@ public:
     //
     JsValueRef js() {
         return jsv;
+    }
+
+
+    bool operator==(const LocalVal& right) const {
+        return jsv == right.jsv;
+    }
+
+
+    bool operator<(const LocalVal& right) const {
+        return jsv < right.jsv;
     }
 };
 
@@ -230,14 +266,7 @@ public:
 
 
 	JsValueRef checkError() {
-		bool hasErr = false;
-		JsHasException(&hasErr);
-		if (hasErr) {
-			JsValueRef result = 0;
-			JsGetAndClearException(&result);
-			return result;
-		}
-		return 0;
+        return ::checkError();
 	}
 
 

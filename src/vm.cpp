@@ -164,6 +164,18 @@ JsValueRef wrapJs(bool b) {
 }
 
 
+JsValueRef checkError() {
+    bool hasErr = false;
+    JsHasException(&hasErr);
+    if (hasErr) {
+        JsValueRef result = 0;
+        JsGetAndClearException(&result);
+        return result;
+    }
+    return 0;
+}
+
+
 std::string toString(JsValueRef str) {
     size_t len = 0;
     JsCopyString(str, 0, 0, &len);
