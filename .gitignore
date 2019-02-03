@@ -25,7 +25,10 @@ Setting/**
 Shape/**
 .vs/**
 vs/**
+deps/**
 
 !LICENSE.txt
 !COPYING.LESSER
 !sanguo7.5
+!deps/*.cmd
+!deps/*.sh

@@ -8,3 +8,4 @@ void installUtf(VM*);
 void installThread(VM*);
 void installEvents(VM* vm);
 void destoryEvents(VM* vm);
+void installShared(VM* vm);

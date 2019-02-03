@@ -136,10 +136,15 @@ int intValue(JsValueRef v, int defaultVal) {
 
 
 bool isJsNumber(JsValueRef v) {
-    if (!v) return false;
+    return getJsType(v) == JsNumber;
+}
+
+
+JsValueType getJsType(JsValueRef v) {
+    if (!v) return JsUndefined;
     JsValueType t = JsUndefined;
     JsGetValueType(v, &t);
-    return t == JsNumber;
+    return t;
 }
 
 
@@ -165,14 +170,19 @@ JsValueRef wrapJs(bool b) {
 
 
 JsValueRef checkError() {
-    bool hasErr = false;
-    JsHasException(&hasErr);
-    if (hasErr) {
+    if (hasThrowException()) {
         JsValueRef result = 0;
         JsGetAndClearException(&result);
         return result;
     }
     return 0;
+}
+
+
+bool hasThrowException() {
+    bool hasErr = false;
+    JsHasException(&hasErr);
+    return hasErr;
 }
 
 
@@ -208,4 +218,167 @@ void VM:: initModule() {
     JsSetModuleHostInfo(root,
         JsModuleHostInfo_NotifyModuleReadyCallback,
         &iNotifyModuleReadyCallback);
+}
+
+
+const char const* parseJsErrCode(JsErrorCode c) {
+    switch (c) {
+    case JsNoError: return 0;
+    default: return "Unknow error";
+
+    case JsErrorCategoryUsage:  return 
+    "Category of errors that relates to incorrect usage of the API itself.";
+
+    case JsErrorInvalidArgument: return
+    "An argument to a hosting API was invalid.";
+
+    case JsErrorNullArgument: return
+    "An argument to a hosting API was null in a context where null is not allowed.";
+
+    case JsErrorNoCurrentContext: return
+    "The hosting API requires that a context be current, but there is no current context.";
+
+    case JsErrorInExceptionState: return
+    "The engine is in an exception state and no APIs can \
+    be called until the exception is cleared.";
+
+    case JsErrorNotImplemented: return
+    "A hosting API is not yet implemented.";
+
+    case JsErrorWrongThread: return 
+    "A hosting API was called on the wrong thread.";
+
+    case JsErrorRuntimeInUse: return
+    "A runtime that is still in use cannot be disposed.";
+
+    case JsErrorBadSerializedScript: return
+    "A bad serialized script was used, or the serialized script was serialized by a \
+    different version of the Chakra engine.";
+
+    case JsErrorInDisabledState: return
+    "The runtime is in a disabled state.";
+
+    case JsErrorCannotDisableExecution: return
+    "Runtime does not support reliable script interruption.";
+
+    case JsErrorHeapEnumInProgress: return
+    "A heap enumeration is currently underway in the script context.";
+
+    case JsErrorArgumentNotObject: return
+    "A hosting API that operates on object values was called with a non-object value.";
+
+    case JsErrorInProfileCallback: return 
+    "A script context is in the middle of a profile callback.";
+
+    case JsErrorInThreadServiceCallback: return
+    "A thread service callback is currently underway.";
+
+    case JsErrorCannotSerializeDebugScript: return
+    "Scripts cannot be serialized in debug contexts.";
+
+    case JsErrorAlreadyDebuggingContext: return
+    "The context cannot be put into a debug state because it is already in a debug state.";
+
+    case JsErrorAlreadyProfilingContext: return
+    "The context cannot start profiling because it is already profiling.";
+
+    case JsErrorIdleNotEnabled: return
+    "Idle notification given when the host did not enable idle processing.";
+
+    case JsCannotSetProjectionEnqueueCallback: return
+    "The context did not accept the enqueue callback.";
+
+    case JsErrorCannotStartProjection: return 
+    "Failed to start projection.";
+
+    case JsErrorInObjectBeforeCollectCallback: return
+    "The operation is not supported in an object before collect callback.";
+
+    case JsErrorObjectNotInspectable: return
+    "Object cannot be unwrapped to IInspectable pointer.";
+
+    case JsErrorPropertyNotSymbol: return
+    "A hosting API that operates on symbol property ids but was called with \
+    a non-symbol property id. The error code is returned by \
+    JsGetSymbolFromPropertyId if the function is called with non-symbol property id.";
+
+    case JsErrorPropertyNotString: return
+    "A hosting API that operates on string property ids but was called with \
+    a non-string property id. The error code is returned by existing \
+    JsGetPropertyNamefromId if the function is called with non-string property id.";
+
+    case JsErrorInvalidContext: return
+    "Module evaluation is called in wrong context.";
+
+    case JsInvalidModuleHostInfoKind: return
+    "The Module HostInfoKind provided was invalid.";
+
+    case JsErrorModuleParsed: return
+    "Module was parsed already when JsParseModuleSource is called.";
+
+    case JsNoWeakRefRequired: return
+    "Argument passed to JsCreateWeakReference is a primitive that is not managed by the GC.\
+    No weak reference is required, the value will never be collected.";
+
+    case JsErrorPromisePending: return
+    "The [Promise] object is still in the pending state.";
+
+    case JsErrorModuleNotEvaluated: return
+    "Module was not yet evaluated when JsGetModuleNamespace was called.";
+
+    case JsErrorCategoryEngine: return
+    "Category of errors that relates to errors occurring within the engine itself.";
+
+    case JsErrorOutOfMemory: return
+    "The Chakra engine has run out of memory.";
+
+    case JsErrorBadFPUState: return
+    "The Chakra engine failed to set the Floating Point Unit state.";
+
+    case JsErrorCategoryScript: return
+    "Category of errors that relates to errors in a script.";
+
+    case JsErrorScriptException: return
+    "A JavaScript exception occurred while running a script.";
+
+    case JsErrorScriptCompile: return
+    "JavaScript failed to compile.";
+
+    case JsErrorScriptTerminated: return
+    "A script was terminated due to a request to suspend a runtime.";
+
+    case JsErrorScriptEvalDisabled: return
+    "A script was terminated because it tried to use [eval] or [function] \
+    and eval was disabled.";
+
+    case JsErrorCategoryFatal: return
+    "Category of errors that are fatal and signify failure of the engine.";
+
+    case JsErrorFatal: return
+    "A fatal error in the engine has occurred.";
+
+    case JsErrorWrongRuntime: return
+    "A hosting API was called with object created on different javascript runtime.";
+
+    case JsErrorCategoryDiagError: return
+    "Category of errors that are related to failures during diagnostic operations.";
+
+    case JsErrorDiagAlreadyInDebugMode: return
+    "The object for which the debugging API was called was not found";
+
+    case JsErrorDiagNotInDebugMode: return
+    "The debugging API can only be called when VM is in debug mode";
+
+    case JsErrorDiagNotAtBreak: return
+    "The debugging API can only be called when VM is at a break";
+
+    case JsErrorDiagInvalidHandle: return
+    "Debugging API was called with an invalid handle.";
+
+    case JsErrorDiagObjectNotFound: return
+    "The object for which the debugging API was called was not found";
+
+    case JsErrorDiagUnableToPerformAction: return
+    "VM was unable to perform the request action";
+    }
 }

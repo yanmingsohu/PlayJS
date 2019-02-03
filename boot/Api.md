@@ -78,11 +78,11 @@ mode可以是 'w' 写文件, 'r' 读文件等.
 
 消息级别: FTL
 
-## void show() *TODO: 未完成
+## void show() *TODO: 未完成**
 
 调用后立即显示控制台窗口, 如果控制台已经显示则什么都不做.
 
-## void hide() *TODO: 未完成
+## void hide() *TODO: 未完成**
 
 调用后立即隐藏控制台窗口, 如果控制太已经隐藏则什么都不做.
 
@@ -106,39 +106,6 @@ mode可以是 'w' 写文件, 'r' 读文件等.
 ## void sleep(ms)
 
 当前线程休眠 ms 毫秒.
-
-## ? createSharedBuffer() *未实现
-
-创建线程间共享缓冲区, 该缓冲区可以发送到其他线程, 
-安全且没有多余的复制操作.
-
-创建Javascript ArrayBuffer对象以访问外部存储器。
------------------------------------------------
-
-句法
-	STDAPI_(JsErrorCode)
-		JsCreateExternalArrayBuffer(
-		_Pre_maybenull_ _Pre_writable_byte_size_(byteLength) void *data,
-		_In_ unsigned int byteLength,
-		_In_opt_ JsFinalizeCallback finalizeCallback,
-		_In_opt_ void *callbackState,
-		_Out_ JsValueRef *result);
-
-使用来自JsGetSharedArrayBufferContent的共享内容get创建Javascript SharedArrayBuffer对象。
-----------------------------------------------------------------------------------------
-句法
-CHAKRA_API
-    JsCreateSharedArrayBufferWithSharedContent(
-        _In_ JsSharedArrayBufferContentHandle sharedContents,
-        _Out_ JsValueRef *result);
-
-从SharedArrayBuffer获取存储对象。
-----------------------------------
-句法
-CHAKRA_API
-    JsGetSharedArrayBufferContent(
-        _In_ JsValueRef sharedArrayBuffer,
-        _Out_ JsSharedArrayBufferContentHandle *sharedContents);
 
 
 # Unicode
@@ -173,22 +140,22 @@ events.emit("opendoor", door);
 //
 // 必须有消息循环
 //
-while (events.getMessage()) {
+do {
 	events.dispatchMessage();
-}
+} while (events.getMessage());
 ```
 
 
 ## 特殊消息定义
 
-`error` 是个特殊的消息, 该消息只在自身线程中传递.
+`error` 该消息只在自身线程中传递.
 线程应该注册 `error` 消息的处理回调, 否则该消息将被 getMessage() 直接抛出.
 
-`exit` 是个特殊消息, 发出该消息说明程序进入退出进程, 所有线程
-都应该妥善处理数据, 任何线程也可以发出该消息.
+`exit` 发出该消息说明程序进入退出进程, 所有线程
+都应该妥善处理数据, 任何线程也可以发出该消息. *TODO未实现*
 
 
-## void on(messagename, callback) *未实现
+## void on(messagename, callback) 
 
 在消息总线上注册消息监听器, 一旦事件被触发, callback 会被回调, 
 callback 第一个参数是消息附带的数据对象; 在 callback 中抛出的
@@ -196,26 +163,63 @@ callback 第一个参数是消息附带的数据对象; 在 callback 中抛出�
 
 `Function callback(value)`
 
-## int off(messagename[, callback) *未实现
+## int off(messagename[, callback) 
 
 删除监听器, 如果 callback 为空则删除当前线程上的所有 name 指定的
 消息监听器, 否则只删除对应监听器的函数, 返回删除监听器函数的数量.
 
 `Function callback(value)`
 
-## void emit(messagename, value) *未实现
+## void emit(messagename, value) 
 
 发送一个消息, 这条消息将被所有感兴趣的监听器(所有线程)抓取, 方法返回后,
 消息不是立即发出, 而是在 dispatchMessage 中被处理的.
 
-## bool getMessage() *未实现
+## bool getMessage()
 
 当前线程必须有一个消息循环来调用该方法, 否则 `on` 注册的监听器
 无法获取任何消息. 如果 `exit` 消息被发出, 该方法立即返回 false.
 如果消息队列为空, 该方法会一直阻塞.
 
-## void dispatchMessage() *未实现
+## void dispatchMessage() 
 
 当前线程必须有一个消息循环来调用该法, 否则当前线程 `emit` 创建
 的消息都不会发布.
 
+
+# shared
+
+线程共享对象.
+
+
+## ? createSharedBuffer() *未实现
+
+创建线程间共享缓冲区, 该缓冲区可以发送到其他线程, 
+安全且没有多余的复制操作.
+
+### 创建Javascript ArrayBuffer对象以访问外部存储器。
+
+句法
+	STDAPI_(JsErrorCode)
+		JsCreateExternalArrayBuffer(
+		_Pre_maybenull_ _Pre_writable_byte_size_(byteLength) void *data,
+		_In_ unsigned int byteLength,
+		_In_opt_ JsFinalizeCallback finalizeCallback,
+		_In_opt_ void *callbackState,
+		_Out_ JsValueRef *result);
+
+### 使用来自JsGetSharedArrayBufferContent的共享内容get创建Javascript SharedArrayBuffer对象。
+
+句法
+CHAKRA_API
+    JsCreateSharedArrayBufferWithSharedContent(
+        _In_ JsSharedArrayBufferContentHandle sharedContents,
+        _Out_ JsValueRef *result);
+
+### 从SharedArrayBuffer获取存储对象。
+
+句法
+CHAKRA_API
+    JsGetSharedArrayBufferContent(
+        _In_ JsValueRef sharedArrayBuffer,
+        _Out_ JsSharedArrayBufferContentHandle *sharedContents);

@@ -32,16 +32,18 @@ static string& operator+(string& s, int i) {
 }
 
 
-static void installJsLibrary(VM& vm) {
-    installConsole(&vm);
-    installFileSystem(&vm);
-    installUtf(&vm);
-    installThread(&vm);
+static void installJsLibrary(VM* vm) {
+    installConsole(vm);
+    installFileSystem(vm);
+    installUtf(vm);
+    installThread(vm);
+    installEvents(vm);
+    installShared(vm);
 }
 
 
-static void unstallJsLIbrary(VM& vm) {
-    destoryEvents(&vm);
+static void unstallJsLIbrary(VM* vm) {
+    destoryEvents(vm);
 }
 
 
@@ -56,7 +58,7 @@ void loadScript(string& filename, threadId id) {
     }
 
     VM vm(id);
-    installJsLibrary(vm);
+    installJsLibrary(&vm);
 
     JsErrorCode r = vm.loadModule(0, filename, code);
     if (r) {
@@ -73,7 +75,7 @@ void loadScript(string& filename, threadId id) {
             println("Exit on failed: "+ err.toString(), id);
         }
     }
-    unstallJsLIbrary(vm);
+    unstallJsLIbrary(&vm);
     println("Script '"+ filename+ "' Exit", id);
 }
 

@@ -50,6 +50,11 @@ JsValueRef wrapJs(bool b);
 bool isJsNumber(JsValueRef v);
 
 //
+// 返回 js 对象句柄指向数据类型的枚举
+//
+JsValueType getJsType(JsValueRef v);
+
+//
 // 尝试把 js 对象输出为字符串(即使不是字符串对象)
 //
 std::string toString(JsValueRef str);
@@ -61,11 +66,21 @@ std::string toString(JsValueRef str);
 JsValueRef checkError();
 
 //
+// 在脚本中有抛出的异常(非虚拟机错误, 如脚本解析错误)
+//
+bool hasThrowException();
+
+//
+// 解析 js 错误代码为字符串
+//
+const char const* parseJsErrCode(JsErrorCode c);
+
+//
 // 在局部变量上引用 js 对象, 自动对 js 对象增加外部引用计数
 //
 class LocalVal {
 protected:
-    const JsValueRef jsv;
+    JsValueRef jsv;
 
 private:
     void add() {
@@ -115,13 +130,17 @@ public:
 
     //
     // jsv 是个函数, 使用参数调用之,
-    // 该方法之有一个参数
+    // 该方法只有一个参数; 如果函数调用失败, 会生成 js 异常.
     //
     LocalVal call(LocalVal arg) const {
         JsValueRef undef  = undefined();
         JsValueRef args[] = { undef, arg.jsv };
         JsValueRef result = 0;
-        JsCallFunction(jsv, args, 2, &result);
+        if (JsErrorCode c = JsCallFunction(jsv, args, 2, &result)) {
+            if (! hasThrowException()) {
+                pushException(parseJsErrCode(c));
+            }
+        }
         return result;
     }
 
@@ -139,6 +158,10 @@ public:
 
     bool notNull() {
         return jsv != 0;
+    }
+
+    bool isFunction() {
+        return getJsType(jsv) == JsFunction;
     }
 
     //
