@@ -29,8 +29,10 @@ class InnerEvent;
 typedef std::pair<threadId, InnerEvent*> EventOnThread;
 typedef LocalVal JSMessageCallback;
 
+static const string EXIT_EVENT = "exit";
 static map<threadId, InnerEvent*> all_thread;
 static shared_mutex all_thread_locker;
+static bool running = true;
 
 
 class EventData {
@@ -54,7 +56,6 @@ public:
 
 class InnerEvent {
 private:
-    bool running;
     threadId tid;
     //
     // 在当前线程上注册的监听器
@@ -81,6 +82,7 @@ private:
         }
     }
 
+
     bool dispatchError(JsValueRef err) {
         bool hasErr = false;
         auto err_it = listener.find("error");
@@ -103,19 +105,21 @@ private:
         return true;
     }
 
+
     void newMessageReady() {
         wait_new_message.notify_one();
     }
 
+
     void waitNewMessage() {
         unique_lock<mutex> luck(message_mx);
-        if (recv.size_approx() < 1) {
+        if (running && recv.size_approx() < 1) {
             wait_new_message.wait(luck);
         }
     }
 
 public:
-    InnerEvent(threadId _tid) : tid(_tid), running(true) {
+    InnerEvent(threadId _tid) : tid(_tid) {
     }
 
 
@@ -156,6 +160,9 @@ public:
 
 
     bool emit(string& name, LocalVal data) {
+        if (running && name == EXIT_EVENT) {
+            running = false;
+        }
         EventData ed(name, data, tid);
         if (! ed.fail()) {
             send.push_front(EventData(name, data, tid));

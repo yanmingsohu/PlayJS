@@ -5,7 +5,7 @@
 //    10000             12              
 //    1000              1               
 //
-var benchmark_count = 1000;
+var benchmark_count = 10000;
 
 
 events.on('error', function(e) {

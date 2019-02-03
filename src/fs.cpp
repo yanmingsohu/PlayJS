@@ -7,6 +7,9 @@
 namespace fs = std::experimental::filesystem::v1;
 
 
+//
+// TODO: 如果 external 中的指针不是 FILE 怎么办 ???
+//
 #define GET_FD_FROM_JS(_name_, _js_obj_) \
     FILE* _name_ = 0; \
     if (JsGetExternalData(_js_obj_, (void**)&_name_)) { \
