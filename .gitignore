@@ -23,8 +23,10 @@ Save/**
 Script/**
 Setting/**
 Shape/**
-.vs/**
-vs/**
+**/.vs/**
+vs/x64/**
+vs/x86/**
+
 deps/**
 
 !LICENSE.txt
@@ -32,3 +34,7 @@ deps/**
 !sanguo7.5
 !deps/*.cmd
 !deps/*.sh
+!*.sln
+!*.vcxproj
+!*.filters
+!*.user

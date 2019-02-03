@@ -1,0 +1,103 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="..\src\console.cpp">
+      <Filter>core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\fs.cpp">
+      <Filter>core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\main.cpp">
+      <Filter>core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\utf.cpp">
+      <Filter>core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\vm.cpp">
+      <Filter>core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\util.cpp">
+      <Filter>core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\threads.cpp">
+      <Filter>core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\events.cpp">
+      <Filter>core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\shared.cpp">
+      <Filter>core</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\src\export-js.h">
+      <Filter>core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\fs.h">
+      <Filter>core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\vm.h">
+      <Filter>core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\util.h">
+      <Filter>core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\threads.h">
+      <Filter>core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\shared.h">
+      <Filter>core</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\boot\index.js">
+      <Filter>boot</Filter>
+    </None>
+    <None Include="..\boot\hex.js">
+      <Filter>boot</Filter>
+    </None>
+    <None Include="..\demo\basic.js">
+      <Filter>demo</Filter>
+    </None>
+    <None Include="..\demo\bl.js">
+      <Filter>demo</Filter>
+    </None>
+    <None Include="..\demo\pi.js">
+      <Filter>demo</Filter>
+    </None>
+    <None Include="..\boot\Api.md">
+      <Filter>boot</Filter>
+    </None>
+    <None Include="..\sanguo7.5\pck.js">
+      <Filter>sango7.5</Filter>
+    </None>
+    <None Include="..\sanguo7.5\README.md">
+      <Filter>sango7.5</Filter>
+    </None>
+    <None Include="..\sanguo7.5\反编译分析.md">
+      <Filter>sango7.5</Filter>
+    </None>
+    <None Include="..\README.md">
+      <Filter>core</Filter>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="core">
+      <UniqueIdentifier>{1a3c3e9e-c89c-480f-b437-216019f2554a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="boot">
+      <UniqueIdentifier>{f289075e-8aa5-41b8-aaca-7278b37b4a77}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="demo">
+      <UniqueIdentifier>{6cb019ac-2543-4596-a87f-a2f6ad404412}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="sango7.5">
+      <UniqueIdentifier>{961bf3c6-2caa-442d-9388-f7016d59890e}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="..\sanguo7.5\SHP文件格式分析.jpg">
+      <Filter>sango7.5</Filter>
+    </Image>
+  </ItemGroup>
+</Project>
