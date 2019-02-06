@@ -22,7 +22,7 @@ static ThreadMap tmap;
 
 static void freeThread(threadId* _id) {
     lock_guard<mutex> guard(lock_map);
-    threadId id = (threadId) _id;
+    threadId id = reinterpret_cast<threadId>(_id);
     tmap.erase((threadId)id);
 }
 
@@ -50,7 +50,7 @@ static void unstallJsLIbrary(VM* vm) {
 
 
 void loadScript(string& filename, threadId id) {
-    LocalResource<threadId> freeThreadHandle((threadId*)id, freeThread);
+    LocalResource<threadId> freeThreadHandle(reinterpret_cast<threadId*>(id), freeThread);
     println("Start Script '"+ filename +"'", id);
 
     std::string code;
@@ -163,14 +163,14 @@ static JsValueRef js_running(JsValueRef callee, JsValueRef *args, unsigned short
 static JsValueRef js_id(JsValueRef callee, JsValueRef *args, unsigned short ac,
     JsNativeFunctionInfo *info, void *id)
 {
-    return wrapJs((threadId)id);
+    return wrapJs(reinterpret_cast<threadId>(id));
 }
 
 
 void installThread(VM* vm) {
     LocalVal thread = vm->createObject();
     vm->getGlobal().put("thread", thread);
-    void * id = (void*) vm->thread();
+    void * id = reinterpret_cast<void*>(vm->thread());
 
     DEF_JS_FUNC(vm, id, thread, id,      js_id);
     DEF_JS_FUNC(vm, 0,  thread, run,     js_run);

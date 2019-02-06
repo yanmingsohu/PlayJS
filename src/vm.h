@@ -44,6 +44,7 @@ JsValueRef wrapJs(int i);
 JsValueRef wrapJs(double i);
 JsValueRef wrapJs(bool b);
 JsValueRef wrapJs(const char* str);
+JsValueRef wrapJs(size_t i);
 
 //
 // 参数是数字类型返回 true
@@ -74,7 +75,7 @@ bool hasThrowException();
 //
 // 解析 js 错误代码为字符串
 //
-const char const* parseJsErrCode(JsErrorCode c);
+const char* const parseJsErrCode(JsErrorCode c);
 
 //
 // 在 obj(LocalVal) 对象上绑定名字为 name 的方法 func_ptr(本地cpp函数指针)

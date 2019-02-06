@@ -16,7 +16,7 @@ template<class T> class SharedPool;
 //
 CppVal* wrapCppVal(LocalVal& js);
 template<class T> int make_shared_handle(T* resource);
-template<class T> int release_shared_resource(int handle); 
+template<class T> size_t release_shared_resource(int handle);
 template<class T> std::shared_ptr<T> get_shared_resource(int handle);
 template<class T> SharedPool<T>& getSharedPool();
 
@@ -61,9 +61,7 @@ public:
 //
 // T 类型的删除器, 必须针对每个类型特化这个类模板, 否则编译出错.
 //
-template<class T>
-class SharedResourceDeleter {
-public:
+template<class T> struct SharedResourceDeleter {
     virtual void operator()(T* res) = 0;
 };
 
@@ -112,14 +110,14 @@ private:
     //
     // 释放对句柄的引用, 内存由智能指针负责释放.
     //
-    int release(int handle) {
+    size_t release(int handle) {
         std::unique_lock lock(m);
         return map.erase(handle);
     }
 
 
 friend int make_shared_handle<T>(T* resource);
-friend int release_shared_resource<T>(int);
+friend size_t release_shared_resource<T>(int);
 friend SharedPool<T>& getSharedPool<T>();
 friend SharedResource get_shared_resource<T>(int handle);
 };
@@ -185,7 +183,7 @@ std::shared_ptr<T> get_shared_resource(JsValueRef jshandle) {
 // 失败返回 0, 否则返回 1.
 //
 template<class T>
-int release_shared_resource(int handle) {
+size_t release_shared_resource(int handle) {
     if (!handle) return 0;
     auto& pool = getSharedPool<T>();
     return pool.release(handle);

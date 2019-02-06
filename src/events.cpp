@@ -61,7 +61,7 @@ private:
     // 在当前线程上注册的监听器
     //
     map<string, set<JSMessageCallback>> listener;
-    sf::safe_ptr<map<string, int>> listener_count;
+    sf::safe_ptr<map<string, size_t>> listener_count;
     //
     // 等待发送到全局的消息队列.
     // 访问 send 的过程始终在当前线程上, 不需要多线程保护.
@@ -128,8 +128,8 @@ public:
     }
 
 
-    int off(string& name) {
-        int removed = 0;
+    size_t off(string& name) {
+        size_t removed = 0;
         auto it = listener.find(name);
         if (it != listener.end()) {
             removed = it->second.size();
@@ -140,8 +140,8 @@ public:
     }
 
 
-    int off(string& name, LocalVal func) {
-        int removed = 0;
+    size_t off(string& name, LocalVal func) {
+        size_t removed = 0;
         auto it = listener.find(name);
         if (it != listener.end()) {
             removed = it->second.erase(func);

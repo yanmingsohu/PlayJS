@@ -37,7 +37,7 @@ static JsValueRef js_utf8string(JsValueRef callee, JsValueRef *args, unsigned sh
         return 0;
     }
     LocalArray arr(args[1]);
-    int len = intValue(args[2], arr.length());
+    size_t len = intValue(args[2], arr.length());
     JsValueRef str;
     JsCreateString(arr.buffer(), min(arr.length(), len), &str);
     return str;
@@ -52,7 +52,7 @@ static JsValueRef js_gbkstring(JsValueRef callee, JsValueRef *args, unsigned sho
         return 0;
     }
     LocalArray arr(args[1]);
-    int len = intValue(args[2], arr.length());
+    size_t len = intValue(args[2], arr.length());
     JsValueRef str = 0;
     string utf8_str;
     gbk2utf8(arr.buffer(), min(len, arr.length()), utf8_str);

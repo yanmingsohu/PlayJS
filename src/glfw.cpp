@@ -1,9 +1,7 @@
 #include "gl.h"
 
 
-template<>
-class SharedResourceDeleter<GLFWwindow> {
-public:
+template<> struct SharedResourceDeleter<GLFWwindow> {
     virtual void operator()(GLFWwindow* w) {
         println("GLFWwindow closed", 0, LDEBUG);
         glfwDestroyWindow(w);
@@ -11,9 +9,7 @@ public:
 };
 
 
-template<>
-class SharedResourceDeleter<GLFWmonitor> {
-public:
+template<> struct SharedResourceDeleter<GLFWmonitor> {
     virtual void operator()(GLFWmonitor* w) {/* Do nothing */ }
 };
 

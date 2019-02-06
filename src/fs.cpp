@@ -4,6 +4,8 @@
 #include "shared.h"
 
 #include <filesystem>
+#include <iostream>
+#include <stdio.h>
 
 namespace fs = std::experimental::filesystem::v1;
 
@@ -20,7 +22,7 @@ namespace fs = std::experimental::filesystem::v1;
     }
 
 
-int readFile(std::string& file, char **buf) {
+size_t readFile(std::string& file, char **buf) {
     FILE* fd = 0;
     if (fopen_s(&fd, file.c_str(), "rb")) {
         return FAILED;
@@ -32,14 +34,14 @@ int readFile(std::string& file, char **buf) {
     fseek(fd, 0, SEEK_SET);
 
     *buf = new char[len];
-    int rlen = fread(*buf, sizeof(char), len, fd);
+    size_t rlen = fread(*buf, sizeof(char), len, fd);
     return rlen;
 }
 
 
-int readTxtFile(std::string& fileName, std::string &content) {
+size_t readTxtFile(std::string& fileName, std::string &content) {
     char *buf = 0;
-    int len = readFile(fileName, &buf);
+    size_t len = readFile(fileName, &buf);
     if (len > 0) {
         content.append(buf, len);
     }
@@ -94,8 +96,8 @@ JS_FUNC_TPL(js_read, c, args, ac, info, d) {
     }
     GET_FD_FROM_JS(fd, args[1]);
     LocalArray arr(args[2]);
-    int b_offset = intValue(args[3], 0);
-    int b_length = intValue(args[4], arr.length());
+    unsigned int b_offset = intValue(args[3], 0);
+    unsigned int b_length = intValue(args[4], arr.length());
 
     b_offset = max(0, min(b_offset, arr.length()));
     b_length = max(0, min(arr.length() - b_offset, b_length));
@@ -116,8 +118,8 @@ JS_FUNC_TPL(js_write, c, args, ac, info, d) {
     }
     GET_FD_FROM_JS(fd, args[1]);
     LocalArray arr(args[2]);
-    int b_offset = intValue(args[3]);
-    int b_length = intValue(args[4]);
+    unsigned int b_offset = intValue(args[3]);
+    unsigned int b_length = intValue(args[4]);
 
     b_offset = max(0, min(b_offset, arr.length()));
     b_length = max(0, min(arr.length() - b_offset, b_length));

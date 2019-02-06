@@ -5,7 +5,7 @@
 #include <filesystem>
 
 using namespace std;
-using namespace experimental::filesystem::v1;
+using namespace experimental::filesystem::v1; 
 
 //
 // {模块:完整路径} (不包括文件名)
@@ -153,6 +153,11 @@ JsValueType getJsType(JsValueRef v) {
 }
 
 
+JsValueRef wrapJs(size_t i) {
+    return wrapJs(static_cast<int>(i));
+}
+
+
 JsValueRef wrapJs(int i) {
     JsValueRef v = 0;
     JsIntToNumber(i, &v);
@@ -234,7 +239,7 @@ void VM:: initModule() {
 }
 
 
-const char const* parseJsErrCode(JsErrorCode c) {
+const char* const parseJsErrCode(JsErrorCode c) {
     switch (c) {
     case JsNoError: return 0;
     default: return "Unknow error";
