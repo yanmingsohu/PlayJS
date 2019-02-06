@@ -4,14 +4,21 @@
 #include "vm.h"
 
 #include <memory>
+#include <map>
+#include <shared_mutex>
 
 class CppVal;
+template<class T> class SharedPool;
 
 //
 // 把 vm 对象转换为本机对象.
 // 如果出错返回 0 并把错误消息发送到 vm.
 //
 CppVal* wrapCppVal(LocalVal& js);
+template<class T> int make_shared_handle(T* resource);
+template<class T> int release_shared_resource(int handle); 
+template<class T> std::shared_ptr<T> get_shared_resource(int handle);
+template<class T> SharedPool<T>& getSharedPool();
 
 
 class CppVal {
@@ -49,3 +56,116 @@ public:
         return cpp.get() == 0;
     }
 };
+
+
+//
+// T 类型的删除器, 必须针对每个类型特化这个类模板, 否则编译出错.
+//
+template<class T>
+class SharedResourceDeleter {
+public:
+    virtual void operator()(T* res) = 0;
+};
+
+
+//
+// 每个类型都有自己的资源句柄池, 生成的资源句柄值可以相同, 
+// 在语义上给予类型安全; 线程安全; 可以在多线程间共享数据.
+//
+template<class T>
+class SharedPool {
+public:
+    typedef std::shared_ptr<T> SharedResource;
+    typedef std::map<int, SharedResource> SharedMap;
+    typedef std::pair<int, SharedResource> SharedPair;
+
+private:
+    std::shared_mutex m;
+    SharedMap map;
+    int id;
+
+    SharedPool() : id(0) {}
+
+    //
+    // 保存指针并返回对应的句柄
+    //
+    int insert(T* p) {
+        SharedResource sr(p, SharedResourceDeleter<T>());
+        std::unique_lock lock(m);
+        int handle = ++id;
+        map.insert(SharedPair(handle, sr));
+        return handle;
+    }
+
+    //
+    // 用句柄换指针, 如果指针不存在返回 0
+    //
+    SharedResource get(int handle) {
+        std::shared_lock lock(m);
+        auto it = map.find(handle);
+        if (it == map.end()) 
+            return 0;
+        return it->second;
+    }
+
+    //
+    // 释放对句柄的引用, 内存由智能指针负责释放.
+    //
+    int release(int handle) {
+        std::unique_lock lock(m);
+        return map.erase(handle);
+    }
+
+
+friend int make_shared_handle<T>(T* resource);
+friend int release_shared_resource<T>(int);
+friend SharedPool<T>& getSharedPool<T>();
+friend SharedResource get_shared_resource<T>(int handle);
+};
+
+
+//
+// 每种类型都会生成对应的对象池
+//
+template<class T> 
+SharedPool<T>& getSharedPool() {
+    static SharedPool<T> pool;
+    return pool;
+}
+
+
+//
+// 创建资源的句柄, 句柄永远 > 0; 线程安全.
+// 指针指向的资源不要在外部释放, 而是由模块内部管理.
+//
+template<class T>
+int make_shared_handle(T* resource) {
+    auto& pool = getSharedPool<T>();
+    return pool.insert(resource);
+}
+
+
+//
+// 返回句柄指向的资源, 资源可能已经删除, 需要对返回做 bool 操作以判断空值.
+// 线程安全.
+//
+template<class T>
+std::shared_ptr<T> get_shared_resource(int handle) {
+    if (!handle) return 0;
+    auto& pool = getSharedPool<T>();
+    return pool.get(handle);
+}
+
+
+//
+// 释放句柄指向的资源, 资源可能不会立即被删除, 
+// 而是等待所有对资源的引用都释放后资源才被删除,
+// 资源被删除时将调用 SharedResourceDeleter 的特化版本.
+// 失败返回 0, 否则返回 1.
+//
+template<class T>
+int release_shared_resource(int handle) {
+    if (!handle) return 0;
+    auto& pool = getSharedPool<T>();
+    return pool.release(handle);
+}

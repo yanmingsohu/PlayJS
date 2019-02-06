@@ -11,11 +11,6 @@
 static char head_buf[25];
 static std::mutex log_lock;
 
-const int LINFO  = 1;
-const int LERROR = 2;
-const int LWARN  = 3;
-const int LDEBUG = 4;
-const int LFATAL = 5;
 
 const char* prefix[] = {
     0,
@@ -68,17 +63,15 @@ static void update_time(const int level, threadId id=0) {
 }
 
 
-void println(const char *out, threadId id) {
+void println(const char *out, threadId id, int level) {
     std::lock_guard<std::mutex> lock(log_lock);
-    update_time(LINFO, id);
+    update_time(level, id);
     sys_out(out);
 }
 
 
-void println(const std::string str, threadId id) {
-    std::lock_guard<std::mutex> lock(log_lock);
-    update_time(LINFO, id);
-    sys_out(str.c_str());
+void println(const std::string str, threadId id, int level) {
+    println(str.c_str(), id, level);
 }
 
 
@@ -93,15 +86,16 @@ static JsValueRef logfunc(JsValueRef *args, unsigned short ac, int level, thread
         LocalVal v(args[i]);
         std::string str = v.toString();
 
-        int wlen = min(sizeof(content_buf)-buf_off, str.length());
+        int wlen = min(sizeof(content_buf)-buf_off-1, str.length());
         memcpy(content_buf + buf_off, str.c_str(), wlen);
         buf_off += wlen;
-        content_buf[buf_off++] = ' ';
 
         if (buf_off > sizeof(content_buf)/2) {
             content_buf[buf_off] = 0;
             sys_out(content_buf);
             buf_off = 0;
+        } else {
+            content_buf[buf_off++] = ' ';
         }
     }
     
@@ -113,37 +107,27 @@ static JsValueRef logfunc(JsValueRef *args, unsigned short ac, int level, thread
 }
 
 
-static JsValueRef js_info(JsValueRef callee, JsValueRef *args, unsigned short ac,
-                          JsNativeFunctionInfo *info, void *_vm)
-{
+JS_FUNC_TPL(js_info, c, args, ac, info, _vm) {
     return logfunc(args, ac, LINFO, ((VM*)_vm)->thread());
 }
 
 
-static JsValueRef js_warn(JsValueRef callee, JsValueRef *args, unsigned short ac,
-                          JsNativeFunctionInfo *info, void *_vm)
-{
+JS_FUNC_TPL(js_warn, c, args, ac, info, _vm) {
     return logfunc(args, ac, LWARN, ((VM*)_vm)->thread());
 }
 
 
-static JsValueRef js_error(JsValueRef callee, JsValueRef *args, unsigned short ac,
-                           JsNativeFunctionInfo *info, void *_vm)
-{
+JS_FUNC_TPL(js_error, c, args, ac, info, _vm) {
     return logfunc(args, ac, LERROR, ((VM*)_vm)->thread());
 }
 
 
-static JsValueRef js_debug(JsValueRef callee, JsValueRef *args, unsigned short ac,
-                           JsNativeFunctionInfo *info, void *_vm)
-{
+JS_FUNC_TPL(js_debug, c, args, ac, info, _vm) {
     return logfunc(args, ac, LDEBUG, ((VM*)_vm)->thread());
 }
 
 
-static JsValueRef js_fatal(JsValueRef callee, JsValueRef *args, unsigned short ac,
-                           JsNativeFunctionInfo *info, void *_vm)
-{
+JS_FUNC_TPL(js_fatal, c, args, ac, info, _vm) {
     return logfunc(args, ac, LFATAL, ((VM*)_vm)->thread());
 }
 
@@ -153,10 +137,10 @@ void installConsole(VM* vm) {
     LocalVal console = vm->createObject();
     vm->getGlobal().put("console", console);
 
-    console.put("log",   vm->createFunction(&js_info,  "info",  vm));
-    console.put("info",  vm->createFunction(&js_info,  "info",  vm));
-    console.put("warn",  vm->createFunction(&js_warn,  "warn",  vm));
-    console.put("error", vm->createFunction(&js_error, "error", vm));
-    console.put("debug", vm->createFunction(&js_debug, "debug", vm));
-    console.put("fatal", vm->createFunction(&js_fatal, "fatal", vm));
+    DEF_JS_FUNC(vm, vm, console, log,   js_info);
+    DEF_JS_FUNC(vm, vm, console, info,  js_info);
+    DEF_JS_FUNC(vm, vm, console, warn,  js_warn);
+    DEF_JS_FUNC(vm, vm, console, error, js_error);
+    DEF_JS_FUNC(vm, vm, console, debug, js_debug);
+    DEF_JS_FUNC(vm, vm, console, fatal, js_fatal);
 }

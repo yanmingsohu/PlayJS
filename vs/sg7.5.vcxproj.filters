@@ -28,6 +28,9 @@
     <ClCompile Include="..\src\shared.cpp">
       <Filter>core</Filter>
     </ClCompile>
+    <ClCompile Include="..\src\gl.cpp">
+      <Filter>core</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\src\export-js.h">
@@ -80,6 +83,18 @@
     <None Include="..\README.md">
       <Filter>core</Filter>
     </None>
+    <None Include="..\demo\event.js">
+      <Filter>demo</Filter>
+    </None>
+    <None Include="..\demo\event-peer.js">
+      <Filter>demo</Filter>
+    </None>
+    <None Include="..\demo\file.js">
+      <Filter>demo</Filter>
+    </None>
+    <None Include="..\demo\thread.js">
+      <Filter>demo</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="core">
@@ -99,5 +114,10 @@
     <Image Include="..\sanguo7.5\SHP文件格式分析.jpg">
       <Filter>sango7.5</Filter>
     </Image>
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="..\demo\test.txt">
+      <Filter>demo</Filter>
+    </Text>
   </ItemGroup>
 </Project>

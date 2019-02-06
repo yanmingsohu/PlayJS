@@ -1,20 +1,22 @@
 #include "fs.h"
 #include "vm.h"
 #include "util.h"
+#include "shared.h"
 
 #include <filesystem>
 
 namespace fs = std::experimental::filesystem::v1;
 
 
-//
-// TODO: 如果 external 中的指针不是 FILE 怎么办 ???
-//
 #define GET_FD_FROM_JS(_name_, _js_obj_) \
     FILE* _name_ = 0; \
-    if (JsGetExternalData(_js_obj_, (void**)&_name_)) { \
-        pushException("is not file handle"); \
+    int _handle = intValue(_js_obj_); \
+    auto _s_ptr = get_shared_resource<FILE>(_handle); \
+    if (!_s_ptr) { \
+        pushException("Not file handle"); \
         return 0; \
+    } else { \
+        _name_ = _s_ptr.get(); \
     }
 
 
@@ -46,17 +48,17 @@ int readTxtFile(std::string& fileName, std::string &content) {
 }
 
 
-static void finalFile(void * data) {
-    FILE* fd = (FILE*) data;
-    if (fd) {
+template<>
+class SharedResourceDeleter<FILE> {
+public:
+    virtual void operator()(FILE* fd) {
+        println("FILE closed", 0, LDEBUG);
         fclose(fd);
     }
-}
+};
 
 
-static JsValueRef js_open(JsValueRef callee, JsValueRef *args, unsigned short ac,
-                          JsNativeFunctionInfo *info, void *d)
-{
+JS_FUNC_TPL(js_open, c, args, ac, info, d) {
     if (ac != 3) {
         pushException("bad arguments length, open(path, mode)");
         return 0;
@@ -69,28 +71,23 @@ static JsValueRef js_open(JsValueRef callee, JsValueRef *args, unsigned short ac
         pushException("open file fail "+ path.toString());
         return 0;
     }
-    JsValueRef handle = 0;
-    JsCreateExternalObject(fd, &finalFile, &handle);
-    return handle;
+    int handle = make_shared_handle(fd);
+    return wrapJs(handle);
 }
 
 
-static JsValueRef js_close(JsValueRef callee, JsValueRef *args, unsigned short ac,
-                           JsNativeFunctionInfo *info, void *d) 
-{
+JS_FUNC_TPL(js_close, c, args, ac, info, d) {
     if (ac != 2) {
         pushException("bad arguments length, close(fd)");
         return 0;
     }
     GET_FD_FROM_JS(fd, args[1]);
-    fclose(fd);
+    release_shared_resource<FILE>(_handle);
     return 0;
 }
 
 
-static JsValueRef js_read(JsValueRef callee, JsValueRef *args, unsigned short ac,
-                          JsNativeFunctionInfo *info, void *d) 
-{
+JS_FUNC_TPL(js_read, c, args, ac, info, d) {
     if (ac != 6 && ac != 5) {
         pushException("bad arguments, read(fd, buffer, b_offset, b_length, f_pos)");
         return 0;
@@ -112,9 +109,7 @@ static JsValueRef js_read(JsValueRef callee, JsValueRef *args, unsigned short ac
 }
 
 
-static JsValueRef js_write(JsValueRef callee, JsValueRef *args, unsigned short ac,
-                           JsNativeFunctionInfo *info, void *d)
-{
+JS_FUNC_TPL(js_write, c, args, ac, info, d) {
     if (ac != 6 && ac != 5) {
         pushException("bad arguments, write(fd, buffer, b_offset, b_length, f_pos)");
         return 0;
@@ -136,9 +131,7 @@ static JsValueRef js_write(JsValueRef callee, JsValueRef *args, unsigned short a
 }
 
 
-static JsValueRef js_file_size(JsValueRef callee, JsValueRef *args, unsigned short ac,
-                               JsNativeFunctionInfo *info, void *d)
-{
+JS_FUNC_TPL(js_file_size, c, args, ac, info, d) {
     if (ac != 2) {
         pushException("bad arguments, fileSize(filename)");
         return 0;
@@ -148,9 +141,7 @@ static JsValueRef js_file_size(JsValueRef callee, JsValueRef *args, unsigned sho
 }
 
 
-static JsValueRef js_fpos(JsValueRef callee, JsValueRef *args, unsigned short ac,
-                          JsNativeFunctionInfo *info, void *d)
-{
+JS_FUNC_TPL(js_fpos, c, args, ac, info, d) {
     if (ac != 2) {
         pushException("bad arguments, fpos(fd)");
         return 0;
@@ -185,10 +176,9 @@ void installFileSystem(VM *vm) {
     fs.put("write", write);
     fs.put("writeSync", write);
 
-    LocalVal file_size = vm->createFunction(&js_file_size, "fileSize", vm);
-    fs.put("fileSize", file_size);
-
     LocalVal fpos = vm->createFunction(&js_fpos, "fpos", vm);
     fs.put("fpos", fpos);
     fs.put("fposSync", fpos);
+
+    DEF_JS_FUNC(vm, vm, fs, fileSize, js_file_size);
 }

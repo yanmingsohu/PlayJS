@@ -32,7 +32,7 @@ typedef LocalVal JSMessageCallback;
 static const string EXIT_EVENT = "exit";
 static map<threadId, InnerEvent*> all_thread;
 static shared_mutex all_thread_locker;
-static bool running = true;
+static volatile bool running = true;
 
 
 class EventData {
@@ -110,14 +110,6 @@ private:
         wait_new_message.notify_one();
     }
 
-
-    void waitNewMessage() {
-        unique_lock<mutex> luck(message_mx);
-        if (running && recv.size_approx() < 1) {
-            wait_new_message.wait(luck);
-        }
-    }
-
 public:
     InnerEvent(threadId _tid) : tid(_tid) {
     }
@@ -172,9 +164,7 @@ public:
     }
 
 
-    bool getMessage() {
-        waitNewMessage();
-
+    void getMessage() {
         EventData data;
         bool found;
 
@@ -191,12 +181,11 @@ public:
                 JsValueRef exception = checkError();
                 if (exception) {
                     if (!dispatchError(exception)) {
-                        return running;
+                        return;
                     }
                 }
             }
         }
-        return running;
     }
 
     //
@@ -222,6 +211,15 @@ public:
             it_thread->second->newMessageReady();
         }
         send.clear();
+    }
+
+    bool waitMessage(int ms) {
+        unique_lock<mutex> luck(message_mx);
+        if (running && recv.size_approx() < 1) {
+            wait_new_message.wait_for(luck, 
+                std::chrono::duration<int, std::milli>(ms));
+        }
+        return running;
     }
 };
 
@@ -292,8 +290,8 @@ static JsValueRef js_getm(JsValueRef callee, JsValueRef *args, unsigned short ac
                           JsNativeFunctionInfo *info, void *_ie) 
 {
     InnerEvent* ie = (InnerEvent*)_ie;
-    bool r = ie->getMessage();
-    return wrapJs(r);
+    ie->getMessage();
+    return 0;
 }
 
 
@@ -306,23 +304,29 @@ static JsValueRef js_dispatch(JsValueRef callee, JsValueRef *args, unsigned shor
 }
 
 
+static JsValueRef js_wait(JsValueRef callee, JsValueRef *args, unsigned short ac,
+                          JsNativeFunctionInfo *info, void *_ie)
+{
+    int ms = ac > 1 ? intValue(args[1], 20) : 20;
+    InnerEvent* ie = (InnerEvent*)_ie;
+    return wrapJs(ie->waitMessage(ms));
+}
+
+
 void installEvents(VM* vm) {
     threadId tid = vm->thread();
     InnerEvent *ie = new InnerEvent(tid);
     std::unique_lock<shared_mutex> _lock(all_thread_locker);
     all_thread.insert(EventOnThread(tid, ie));
 
-    LocalVal events = vm->createObject();
-    vm->getGlobal().put("events", events);
+    DEF_GLOBAL(vm, events);
 
-    events.put("on",   vm->createFunction(&js_on,   "on",   ie));
-    events.put("off",  vm->createFunction(&js_off,  "off",  ie));
-    events.put("emit", vm->createFunction(&js_emit, "emit", ie));
-
-    events.put("getMessage", 
-        vm->createFunction(&js_getm, "getMessage", ie));
-    events.put("dispatchMessage", 
-        vm->createFunction(&js_dispatch, "dispatchMessage", ie));
+    DEF_JS_FUNC(vm, ie, events, on,              js_on);
+    DEF_JS_FUNC(vm, ie, events, off,             js_off);
+    DEF_JS_FUNC(vm, ie, events, emit,            js_emit);
+    DEF_JS_FUNC(vm, ie, events, getMessage,      js_getm);
+    DEF_JS_FUNC(vm, ie, events, dispatchMessage, js_dispatch);
+    DEF_JS_FUNC(vm, ie, events, waitMessage,     js_wait);
 }
 
 

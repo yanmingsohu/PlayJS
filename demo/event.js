@@ -40,5 +40,6 @@ thread.run('./demo/event-peer.js');
 
 
 do {
-  events.dispatchMessage();
-} while (events.getMessage());
+    events.dispatchMessage();
+    events.getMessage();
+} while (events.waitMessage());

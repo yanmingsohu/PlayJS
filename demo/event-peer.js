@@ -58,4 +58,5 @@ function startBench() {
 
 do {
   events.dispatchMessage();
-} while (events.getMessage());
+  events.getMessage();
+} while (events.waitMessage());

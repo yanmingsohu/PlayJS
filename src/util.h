@@ -4,6 +4,14 @@
 #include <iostream>
 #include "threads.h"
 
+//
+// log levels
+//
+const int LINFO = 1;
+const int LERROR = 2;
+const int LWARN = 3;
+const int LDEBUG = 4;
+const int LFATAL = 5;
 
 //
 // 将输入的 gbk 字节序列串转换为 utf8 字符串
@@ -16,8 +24,8 @@ void gbk2utf8(char* from, int fromLenth, std::string &out);
 // 输出字符串到控制台, 可以正确处理中文编码
 // 实现在 console.cpp
 //
-void println(const char *src_str, threadId id = 0);
-void println(const std::string str, threadId id = 0);
+void println(const char *src_str, threadId id = 0, int level = LINFO);
+void println(const std::string str, threadId id = 0, int level = LINFO);
 
 
 //

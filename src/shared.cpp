@@ -121,16 +121,6 @@ LocalVal& SharedValue::js() {
 static JsValueRef js_primitive(JsValueRef callee, JsValueRef *args, unsigned short ac,
                                JsNativeFunctionInfo *info, void *_vm)
 {
-    if (ac != 2) {
-        pushException("bad arguments, primitive(Object)");
-        return 0;
-    }
-    VM* vm = (VM*) _vm;
-    LocalVal lv(args[1]);
-    SharedValue sv(vm->thread(), lv);
-    if (! sv.empty()) {
-        //.....
-    }
     return 0;
 }
 
@@ -139,5 +129,5 @@ void installShared(VM* vm) {
     LocalVal shared = vm->createObject();
     vm->getGlobal().put("shared", shared);
 
-    shared.put("primitive", vm->createFunction(&js_primitive, "primitive", vm));
+    DEF_JS_FUNC(vm, vm, shared, primitive, js_primitive);
 }

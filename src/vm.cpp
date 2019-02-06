@@ -118,11 +118,16 @@ JsErrorCode newModule(JsModuleRecord parent,
 }
 
 
-void pushException(std::string msg) {
+void pushException(std::string msg, int code) {
     JsValueRef ex=0, err=0;
     JsCreateString(msg.c_str(), msg.length(), &ex);
     JsCreateError(ex, &err);
-    JsSetException(ex);
+    if (code) {
+        JsPropertyIdRef id;
+        JsCreatePropertyId("code", 4, &id);
+        JsSetProperty(err, id, wrapJs(code), true);
+    }
+    JsSetException(err);
 }
 
 

@@ -15,7 +15,7 @@ using std::lock_guard;
 
 typedef map<threadId, thread*> ThreadMap;
 
-static int nextId = 0x10;
+static volatile int nextId = 0x10;
 static mutex lock_map;
 static ThreadMap tmap;
 
@@ -39,11 +39,13 @@ static void installJsLibrary(VM* vm) {
     installThread(vm);
     installEvents(vm);
     installShared(vm);
+    installGL(vm);
 }
 
 
 static void unstallJsLIbrary(VM* vm) {
     destoryEvents(vm);
+    unstallGL(vm);
 }
 
 
@@ -139,8 +141,8 @@ static JsValueRef js_sleep(JsValueRef callee, JsValueRef *args, unsigned short a
     }
     int time = intValue(args[1]);
     if (time > 0) {
-        std::chrono::duration<int, std::milli> t(time);
-        std::this_thread::sleep_for(t);
+        std::this_thread::sleep_for(
+            std::chrono::duration<int, std::milli>(time));
     }
     return 0;
 }
@@ -169,8 +171,9 @@ void installThread(VM* vm) {
     LocalVal thread = vm->createObject();
     vm->getGlobal().put("thread", thread);
     void * id = (void*) vm->thread();
-    thread.put("id",      vm->createFunction(&js_id,      "id", id));
-    thread.put("run",     vm->createFunction(&js_run,     "run"));
-    thread.put("sleep",   vm->createFunction(&js_sleep,   "sleep"));
-    thread.put("running", vm->createFunction(&js_running, "running"));
+
+    DEF_JS_FUNC(vm, id, thread, id,      js_id);
+    DEF_JS_FUNC(vm, 0,  thread, run,     js_run);
+    DEF_JS_FUNC(vm, 0,  thread, sleep,   js_sleep);
+    DEF_JS_FUNC(vm, 0,  thread, running, js_running);
 }
