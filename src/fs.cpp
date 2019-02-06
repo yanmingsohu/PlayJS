@@ -157,8 +157,7 @@ JS_FUNC_TPL(js_fpos, c, args, ac, info, d) {
 
 
 void installFileSystem(VM *vm) {
-    LocalVal fs = vm->createObject();
-    vm->getGlobal().put("fs", fs);
+    DEF_GLOBAL(vm, fs);
 
     LocalVal open = vm->createFunction(&js_open, "open");
     fs.put("open", open);

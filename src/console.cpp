@@ -134,8 +134,7 @@ JS_FUNC_TPL(js_fatal, c, args, ac, info, _vm) {
 
 void installConsole(VM* vm) {
     checkCodePage();
-    LocalVal console = vm->createObject();
-    vm->getGlobal().put("console", console);
+    DEF_GLOBAL(vm, console);
 
     DEF_JS_FUNC(vm, vm, console, log,   js_info);
     DEF_JS_FUNC(vm, vm, console, info,  js_info);

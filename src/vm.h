@@ -43,6 +43,7 @@ int intValue(JsValueRef r, int defaultVal = 0);
 JsValueRef wrapJs(int i);
 JsValueRef wrapJs(double i);
 JsValueRef wrapJs(bool b);
+JsValueRef wrapJs(const char* str);
 
 //
 // 参数是数字类型返回 true
@@ -91,6 +92,7 @@ const char const* parseJsErrCode(JsErrorCode c);
 
 //
 // 生成 js 本机方法函数头.
+// args[0] 是 this, args[1] 是第一个参数.
 //
 #define JS_FUNC_TPL(name, callee, args, argc, info, vm) \
     static JsValueRef name( \
@@ -189,8 +191,14 @@ public:
     //
     // 返回 js 对象的句柄, 返回的句柄如果超出 LocalVal 生命周期,
     // 该句柄有可能被 js 虚拟机垃圾回收.
+    // (本对象可以自动转换为 JsValueRef, 可以直接赋值给 JsValueRef 变量)
     //
     JsValueRef js() {
+        return jsv;
+    }
+
+
+    operator JsValueRef() {
         return jsv;
     }
 

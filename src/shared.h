@@ -45,12 +45,12 @@ public:
         cpp.reset(wrapCppVal(js));
     }
 
-
     SharedValue() : src_tid(0), v(0), cpp(0) {}
 
-
+    //
+    // 返回本机对象对应的 js 对象
+    //
     LocalVal& js();
-
 
     bool empty() {
         return cpp.get() == 0;
@@ -89,7 +89,8 @@ private:
     //
     // 保存指针并返回对应的句柄
     //
-    int insert(T* p) {
+    int insert(T* p) { 
+        // 如果编译报错, 检查 T 类型是否特化了 SharedResourceDeleter
         SharedResource sr(p, SharedResourceDeleter<T>());
         std::unique_lock lock(m);
         int handle = ++id;
@@ -146,14 +147,34 @@ int make_shared_handle(T* resource) {
 
 
 //
+// 直接把句柄包装为 js 对象
+//
+template<class T>
+JsValueRef make_shared_js_handle(T* resource) {
+    int handle = make_shared_handle(resource);
+    return wrapJs(handle);
+}
+
+
+//
 // 返回句柄指向的资源, 资源可能已经删除, 需要对返回做 bool 操作以判断空值.
-// 线程安全.
+// 如果句柄为 0 一定返回 0. 线程安全.
 //
 template<class T>
 std::shared_ptr<T> get_shared_resource(int handle) {
     if (!handle) return 0;
     auto& pool = getSharedPool<T>();
     return pool.get(handle);
+}
+
+
+//
+// jshandle 应该是个整数句柄. 如果句柄为 0 一定返回 0.
+//
+template<class T>
+std::shared_ptr<T> get_shared_resource(JsValueRef jshandle) {
+    if (!jshandle) return 0;
+    return get_shared_resource<T>(intValue(jshandle));
 }
 
 
@@ -168,4 +189,14 @@ int release_shared_resource(int handle) {
     if (!handle) return 0;
     auto& pool = getSharedPool<T>();
     return pool.release(handle);
+}
+
+
+//
+// jshandle 应该是个整数句柄. 如果句柄为 0 一定返回 0.
+//
+template<class T>
+JsValueRef release_shared_resource(JsValueRef jshandle) {
+    if (!jshandle) return 0;
+    return wrapJs(release_shared_resource<T>(intValue(jshandle)));
 }

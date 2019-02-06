@@ -118,16 +118,12 @@ LocalVal& SharedValue::js() {
 }
 
 
-static JsValueRef js_primitive(JsValueRef callee, JsValueRef *args, unsigned short ac,
-                               JsNativeFunctionInfo *info, void *_vm)
-{
+JS_FUNC_TPL(js_primitive, callee, args, ac, info, _vm) {
     return 0;
 }
 
 
 void installShared(VM* vm) {
-    LocalVal shared = vm->createObject();
-    vm->getGlobal().put("shared", shared);
-
+    DEF_GLOBAL(vm, shared);
     DEF_JS_FUNC(vm, vm, shared, primitive, js_primitive);
 }

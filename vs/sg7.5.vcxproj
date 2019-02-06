@@ -172,6 +172,7 @@
   <ItemGroup>
     <ClInclude Include="..\src\export-js.h" />
     <ClInclude Include="..\src\fs.h" />
+    <ClInclude Include="..\src\gl.h" />
     <ClInclude Include="..\src\shared.h" />
     <ClInclude Include="..\src\threads.h" />
     <ClInclude Include="..\src\util.h" />
@@ -182,6 +183,8 @@
     <ClCompile Include="..\src\events.cpp" />
     <ClCompile Include="..\src\fs.cpp" />
     <ClCompile Include="..\src\gl.cpp" />
+    <ClCompile Include="..\src\glconst.cpp" />
+    <ClCompile Include="..\src\glcore.cpp" />
     <ClCompile Include="..\src\main.cpp" />
     <ClCompile Include="..\src\shared.cpp" />
     <ClCompile Include="..\src\threads.cpp" />
@@ -200,6 +203,9 @@
     <None Include="..\demo\file.js" />
     <None Include="..\demo\pi.js" />
     <None Include="..\demo\thread.js" />
+    <None Include="..\doc\Api.md" />
+    <None Include="..\doc\console.md" />
+    <None Include="..\doc\fs.md" />
     <None Include="..\README.md" />
     <None Include="..\sanguo7.5\pck.js" />
     <None Include="..\sanguo7.5\README.md" />

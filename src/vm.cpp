@@ -174,6 +174,14 @@ JsValueRef wrapJs(bool b) {
 }
 
 
+JsValueRef wrapJs(const char* str) {
+    if (!str) return 0;
+    JsValueRef s = 0;
+    JsCreateString(str, strlen(str), &s);
+    return s;
+}
+
+
 JsValueRef checkError() {
     if (hasThrowException()) {
         JsValueRef result = 0;

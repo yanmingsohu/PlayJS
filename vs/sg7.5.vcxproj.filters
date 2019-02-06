@@ -31,6 +31,12 @@
     <ClCompile Include="..\src\gl.cpp">
       <Filter>core</Filter>
     </ClCompile>
+    <ClCompile Include="..\src\glcore.cpp">
+      <Filter>core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\glconst.cpp">
+      <Filter>core</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\src\export-js.h">
@@ -49,6 +55,9 @@
       <Filter>core</Filter>
     </ClInclude>
     <ClInclude Include="..\src\shared.h">
+      <Filter>core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\gl.h">
       <Filter>core</Filter>
     </ClInclude>
   </ItemGroup>
@@ -95,6 +104,15 @@
     <None Include="..\demo\thread.js">
       <Filter>demo</Filter>
     </None>
+    <None Include="..\doc\Api.md">
+      <Filter>文档</Filter>
+    </None>
+    <None Include="..\doc\console.md">
+      <Filter>文档</Filter>
+    </None>
+    <None Include="..\doc\fs.md">
+      <Filter>文档</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="core">
@@ -108,6 +126,9 @@
     </Filter>
     <Filter Include="sango7.5">
       <UniqueIdentifier>{961bf3c6-2caa-442d-9388-f7016d59890e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="文档">
+      <UniqueIdentifier>{6f62718a-3943-460b-94b3-f2c211f38e80}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>

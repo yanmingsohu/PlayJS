@@ -175,5 +175,6 @@ void installThread(VM* vm) {
     DEF_JS_FUNC(vm, id, thread, id,      js_id);
     DEF_JS_FUNC(vm, 0,  thread, run,     js_run);
     DEF_JS_FUNC(vm, 0,  thread, sleep,   js_sleep);
+    DEF_JS_FUNC(vm, 0,  thread, wait,    js_sleep);
     DEF_JS_FUNC(vm, 0,  thread, running, js_running);
 }
