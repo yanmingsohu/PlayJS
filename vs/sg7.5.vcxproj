@@ -170,6 +170,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="..\src-auto\glauto.h" />
     <ClInclude Include="..\src\export-js.h" />
     <ClInclude Include="..\src\fs.h" />
     <ClInclude Include="..\src\gl.h" />
@@ -179,12 +180,16 @@
     <ClInclude Include="..\src\vm.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\src-auto\const.cc" />
+    <ClCompile Include="..\src-auto\GL.h.cc" />
+    <ClCompile Include="..\src-auto\glfw3.h.cc" />
     <ClCompile Include="..\src\console.cpp" />
     <ClCompile Include="..\src\events.cpp" />
     <ClCompile Include="..\src\fs.cpp" />
     <ClCompile Include="..\src\gl.cpp" />
     <ClCompile Include="..\src\glconst.cpp" />
     <ClCompile Include="..\src\glcore.cpp" />
+    <ClCompile Include="..\src\glfw.cpp" />
     <ClCompile Include="..\src\main.cpp" />
     <ClCompile Include="..\src\shared.cpp" />
     <ClCompile Include="..\src\threads.cpp" />
@@ -210,6 +215,7 @@
     <None Include="..\sanguo7.5\pck.js" />
     <None Include="..\sanguo7.5\README.md" />
     <None Include="..\sanguo7.5\反编译分析.md" />
+    <None Include="..\src-auto\generate-gl-code.js" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="..\sanguo7.5\SHP文件格式分析.jpg" />

@@ -12,6 +12,7 @@
 *.iobj
 *.ipdb
 *.pdb
+*.tmp
 
 SG7.*
 SANGO7.*

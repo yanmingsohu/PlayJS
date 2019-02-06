@@ -1,5 +1,6 @@
 //
 // 这个文件不要被非 gl 库所包含
+// 宏定义是一整套的约定, 可以简化编码; 宏定义的约定互相依赖.
 //
 #pragma once
 
@@ -21,7 +22,7 @@
 
 
 //
-// 方便类型转换
+// 方便访问变量
 //
 #define JVM ((VM*)_vm)
 
@@ -53,5 +54,16 @@
     }
 
 
+//
+// GL 常量绑定到 js 对象上
+//
+#define GL_INT_ENUM(name) _const.put(#name, wrapJs((int)name));
+
+
+LocalVal wrapJs(VM* vm, const GLFWvidmode* mode);
+LocalVal wrapJs(VM* vm, int width, int height);
+
+
 void installGLFWConst(VM* vm, LocalVal& _const);
 void installGLCore(VM* vm, LocalVal& gl);
+void installGLFW(VM*vm, LocalVal& gl);

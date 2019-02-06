@@ -7,9 +7,9 @@
 //
 // log levels
 //
-const int LINFO = 1;
+const int LINFO  = 1;
 const int LERROR = 2;
-const int LWARN = 3;
+const int LWARN  = 3;
 const int LDEBUG = 4;
 const int LFATAL = 5;
 

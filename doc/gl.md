@@ -78,6 +78,6 @@ CPP 参考中的各种指针, 在 js 中都是整数(句柄).
 
 # const
 
-gl.const 来引用这些常量
+gl.const.[const-name] 来引用这些常量
 
 ## GLFW_RESIZABLE
