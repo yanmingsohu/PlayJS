@@ -50,7 +50,7 @@ function pushFunc(retType, fname, argDef, argCall) {
   newfile('Bind CONST to js');
   var pp = pushFunc('void', 'auto_gl_Const', 
                     "(VM* vm, LocalVal& _const)", '(vm, _const)');
-  append('\r\n\r\n'+ pp +' {');
+  append(EE+ pp +' {');
   heades.forEach(parseConst);
   append('}');
 })();
@@ -109,7 +109,7 @@ function checkFunc(file, skipFunc) {
     var b = line.indexOf(end, a);
     if (a >=0 && b > a) {
       var fn = line.substring(a+find.length, b);
-      console.log(fn);
+      console.log('跳过生成', fn, '(...)');
       skipFunc[fn] = 1;
     }
   });
@@ -137,7 +137,7 @@ function parseFunction(file, skipFunc) {
   var bname = path.basename(file).replace('.', '_');
   var pp = pushFunc('void', 'auto_bind_'+ bname, 
                     '(VM*vm, LocalVal& gl)', '(vm, gl)');
-  append('\r\n\r\n'+ pp +' {');
+  append(EE+ pp +' {');
 
   funcBind.forEach(function(b) {
     if (skipFunc[b]) {
@@ -211,7 +211,7 @@ function parseFunction(file, skipFunc) {
     return '\r\n\r\n'+
 `${st}GL_FUNC(${funcName}, args, ac) {
 ${st}${TAB}GL_CHK_ARG(${argCount}, ${funcName}(${argsStr}));
-${st}${TAB}pushException("Unimplement function ${funcName}(...)");
+${st}${TAB}pushException("Not implemented function ${funcName}(...)");
 ${st}${TAB}return 0;
 ${st}}`;
   }

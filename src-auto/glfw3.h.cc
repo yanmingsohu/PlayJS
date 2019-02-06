@@ -1,5 +1,5 @@
 //
-// 2019-02-06 21:29:41
+// 2019-02-06 21:35:52
 // create from D:\game\sanguo7\src-auto\generate-gl-code.js 
 //
 // D:\game\sanguo7\deps\glfw\include\GLFW\glfw3.h
@@ -8,819 +8,819 @@
 
 GL_FUNC(glfwInit, args, ac) {
     GL_CHK_ARG(0, glfwInit());
-    pushException("Unimplement function glfwInit(...)");
+    pushException("Not implemented function glfwInit(...)");
     return 0;
 }
 
 
 GL_FUNC(glfwTerminate, args, ac) {
     GL_CHK_ARG(0, glfwTerminate());
-    pushException("Unimplement function glfwTerminate(...)");
+    pushException("Not implemented function glfwTerminate(...)");
     return 0;
 }
 
 
 GL_FUNC(glfwInitHint, args, ac) {
     GL_CHK_ARG(2, glfwInitHint(hint, value));
-    pushException("Unimplement function glfwInitHint(...)");
+    pushException("Not implemented function glfwInitHint(...)");
     return 0;
 }
 
 
 // GL_FUNC(glfwGetVersion, args, ac) {
 //     GL_CHK_ARG(3, glfwGetVersion(major, minor, rev));
-//     pushException("Unimplement function glfwGetVersion(...)");
+//     pushException("Not implemented function glfwGetVersion(...)");
 //     return 0;
 // }
 
 
 // GL_FUNC(glfwGetVersionString, args, ac) {
 //     GL_CHK_ARG(0, glfwGetVersionString());
-//     pushException("Unimplement function glfwGetVersionString(...)");
+//     pushException("Not implemented function glfwGetVersionString(...)");
 //     return 0;
 // }
 
 
 GL_FUNC(glfwGetError, args, ac) {
     GL_CHK_ARG(1, glfwGetError(description));
-    pushException("Unimplement function glfwGetError(...)");
+    pushException("Not implemented function glfwGetError(...)");
     return 0;
 }
 
 
 GL_FUNC(glfwSetErrorCallback, args, ac) {
     GL_CHK_ARG(1, glfwSetErrorCallback(cbfun));
-    pushException("Unimplement function glfwSetErrorCallback(...)");
+    pushException("Not implemented function glfwSetErrorCallback(...)");
     return 0;
 }
 
 
 GL_FUNC(glfwGetMonitors, args, ac) {
     GL_CHK_ARG(1, glfwGetMonitors(count));
-    pushException("Unimplement function glfwGetMonitors(...)");
+    pushException("Not implemented function glfwGetMonitors(...)");
     return 0;
 }
 
 
 // GL_FUNC(glfwGetPrimaryMonitor, args, ac) {
 //     GL_CHK_ARG(0, glfwGetPrimaryMonitor());
-//     pushException("Unimplement function glfwGetPrimaryMonitor(...)");
+//     pushException("Not implemented function glfwGetPrimaryMonitor(...)");
 //     return 0;
 // }
 
 
 GL_FUNC(glfwGetMonitorPos, args, ac) {
     GL_CHK_ARG(3, glfwGetMonitorPos(monitor, xpos, ypos));
-    pushException("Unimplement function glfwGetMonitorPos(...)");
+    pushException("Not implemented function glfwGetMonitorPos(...)");
     return 0;
 }
 
 
 GL_FUNC(glfwGetMonitorPhysicalSize, args, ac) {
     GL_CHK_ARG(3, glfwGetMonitorPhysicalSize(monitor, widthMM, heightMM));
-    pushException("Unimplement function glfwGetMonitorPhysicalSize(...)");
+    pushException("Not implemented function glfwGetMonitorPhysicalSize(...)");
     return 0;
 }
 
 
 GL_FUNC(glfwGetMonitorContentScale, args, ac) {
     GL_CHK_ARG(3, glfwGetMonitorContentScale(monitor, xscale, yscale));
-    pushException("Unimplement function glfwGetMonitorContentScale(...)");
+    pushException("Not implemented function glfwGetMonitorContentScale(...)");
     return 0;
 }
 
 
 GL_FUNC(glfwGetMonitorName, args, ac) {
     GL_CHK_ARG(1, glfwGetMonitorName(monitor));
-    pushException("Unimplement function glfwGetMonitorName(...)");
+    pushException("Not implemented function glfwGetMonitorName(...)");
     return 0;
 }
 
 
 GL_FUNC(glfwSetMonitorUserPointer, args, ac) {
     GL_CHK_ARG(2, glfwSetMonitorUserPointer(monitor, pointer));
-    pushException("Unimplement function glfwSetMonitorUserPointer(...)");
+    pushException("Not implemented function glfwSetMonitorUserPointer(...)");
     return 0;
 }
 
 
 GL_FUNC(glfwGetMonitorUserPointer, args, ac) {
     GL_CHK_ARG(1, glfwGetMonitorUserPointer(monitor));
-    pushException("Unimplement function glfwGetMonitorUserPointer(...)");
+    pushException("Not implemented function glfwGetMonitorUserPointer(...)");
     return 0;
 }
 
 
 GL_FUNC(glfwSetMonitorCallback, args, ac) {
     GL_CHK_ARG(1, glfwSetMonitorCallback(cbfun));
-    pushException("Unimplement function glfwSetMonitorCallback(...)");
+    pushException("Not implemented function glfwSetMonitorCallback(...)");
     return 0;
 }
 
 
 GL_FUNC(glfwGetVideoModes, args, ac) {
     GL_CHK_ARG(2, glfwGetVideoModes(monitor, count));
-    pushException("Unimplement function glfwGetVideoModes(...)");
+    pushException("Not implemented function glfwGetVideoModes(...)");
     return 0;
 }
 
 
 // GL_FUNC(glfwGetVideoMode, args, ac) {
 //     GL_CHK_ARG(1, glfwGetVideoMode(monitor));
-//     pushException("Unimplement function glfwGetVideoMode(...)");
+//     pushException("Not implemented function glfwGetVideoMode(...)");
 //     return 0;
 // }
 
 
 GL_FUNC(glfwSetGamma, args, ac) {
     GL_CHK_ARG(2, glfwSetGamma(monitor, gamma));
-    pushException("Unimplement function glfwSetGamma(...)");
+    pushException("Not implemented function glfwSetGamma(...)");
     return 0;
 }
 
 
 GL_FUNC(glfwGetGammaRamp, args, ac) {
     GL_CHK_ARG(1, glfwGetGammaRamp(monitor));
-    pushException("Unimplement function glfwGetGammaRamp(...)");
+    pushException("Not implemented function glfwGetGammaRamp(...)");
     return 0;
 }
 
 
 GL_FUNC(glfwSetGammaRamp, args, ac) {
     GL_CHK_ARG(2, glfwSetGammaRamp(monitor, ramp));
-    pushException("Unimplement function glfwSetGammaRamp(...)");
+    pushException("Not implemented function glfwSetGammaRamp(...)");
     return 0;
 }
 
 
 GL_FUNC(glfwDefaultWindowHints, args, ac) {
     GL_CHK_ARG(0, glfwDefaultWindowHints());
-    pushException("Unimplement function glfwDefaultWindowHints(...)");
+    pushException("Not implemented function glfwDefaultWindowHints(...)");
     return 0;
 }
 
 
 GL_FUNC(glfwWindowHint, args, ac) {
     GL_CHK_ARG(2, glfwWindowHint(hint, value));
-    pushException("Unimplement function glfwWindowHint(...)");
+    pushException("Not implemented function glfwWindowHint(...)");
     return 0;
 }
 
 
 GL_FUNC(glfwWindowHintString, args, ac) {
     GL_CHK_ARG(2, glfwWindowHintString(hint, value));
-    pushException("Unimplement function glfwWindowHintString(...)");
+    pushException("Not implemented function glfwWindowHintString(...)");
     return 0;
 }
 
 
 // GL_FUNC(glfwCreateWindow, args, ac) {
 //     GL_CHK_ARG(5, glfwCreateWindow(width, height, title, monitor, share));
-//     pushException("Unimplement function glfwCreateWindow(...)");
+//     pushException("Not implemented function glfwCreateWindow(...)");
 //     return 0;
 // }
 
 
 // GL_FUNC(glfwDestroyWindow, args, ac) {
 //     GL_CHK_ARG(1, glfwDestroyWindow(window));
-//     pushException("Unimplement function glfwDestroyWindow(...)");
+//     pushException("Not implemented function glfwDestroyWindow(...)");
 //     return 0;
 // }
 
 
 // GL_FUNC(glfwWindowShouldClose, args, ac) {
 //     GL_CHK_ARG(1, glfwWindowShouldClose(window));
-//     pushException("Unimplement function glfwWindowShouldClose(...)");
+//     pushException("Not implemented function glfwWindowShouldClose(...)");
 //     return 0;
 // }
 
 
 GL_FUNC(glfwSetWindowShouldClose, args, ac) {
     GL_CHK_ARG(2, glfwSetWindowShouldClose(window, value));
-    pushException("Unimplement function glfwSetWindowShouldClose(...)");
+    pushException("Not implemented function glfwSetWindowShouldClose(...)");
     return 0;
 }
 
 
 // GL_FUNC(glfwSetWindowTitle, args, ac) {
 //     GL_CHK_ARG(2, glfwSetWindowTitle(window, title));
-//     pushException("Unimplement function glfwSetWindowTitle(...)");
+//     pushException("Not implemented function glfwSetWindowTitle(...)");
 //     return 0;
 // }
 
 
 GL_FUNC(glfwSetWindowIcon, args, ac) {
     GL_CHK_ARG(3, glfwSetWindowIcon(window, count, images));
-    pushException("Unimplement function glfwSetWindowIcon(...)");
+    pushException("Not implemented function glfwSetWindowIcon(...)");
     return 0;
 }
 
 
 GL_FUNC(glfwGetWindowPos, args, ac) {
     GL_CHK_ARG(3, glfwGetWindowPos(window, xpos, ypos));
-    pushException("Unimplement function glfwGetWindowPos(...)");
+    pushException("Not implemented function glfwGetWindowPos(...)");
     return 0;
 }
 
 
 // GL_FUNC(glfwSetWindowPos, args, ac) {
 //     GL_CHK_ARG(3, glfwSetWindowPos(window, xpos, ypos));
-//     pushException("Unimplement function glfwSetWindowPos(...)");
+//     pushException("Not implemented function glfwSetWindowPos(...)");
 //     return 0;
 // }
 
 
 // GL_FUNC(glfwGetWindowSize, args, ac) {
 //     GL_CHK_ARG(3, glfwGetWindowSize(window, width, height));
-//     pushException("Unimplement function glfwGetWindowSize(...)");
+//     pushException("Not implemented function glfwGetWindowSize(...)");
 //     return 0;
 // }
 
 
 GL_FUNC(glfwSetWindowSizeLimits, args, ac) {
     GL_CHK_ARG(5, glfwSetWindowSizeLimits(window, minwidth, minheight, maxwidth, maxheight));
-    pushException("Unimplement function glfwSetWindowSizeLimits(...)");
+    pushException("Not implemented function glfwSetWindowSizeLimits(...)");
     return 0;
 }
 
 
 // GL_FUNC(glfwSetWindowAspectRatio, args, ac) {
 //     GL_CHK_ARG(3, glfwSetWindowAspectRatio(window, numer, denom));
-//     pushException("Unimplement function glfwSetWindowAspectRatio(...)");
+//     pushException("Not implemented function glfwSetWindowAspectRatio(...)");
 //     return 0;
 // }
 
 
 // GL_FUNC(glfwSetWindowSize, args, ac) {
 //     GL_CHK_ARG(3, glfwSetWindowSize(window, width, height));
-//     pushException("Unimplement function glfwSetWindowSize(...)");
+//     pushException("Not implemented function glfwSetWindowSize(...)");
 //     return 0;
 // }
 
 
 // GL_FUNC(glfwGetFramebufferSize, args, ac) {
 //     GL_CHK_ARG(3, glfwGetFramebufferSize(window, width, height));
-//     pushException("Unimplement function glfwGetFramebufferSize(...)");
+//     pushException("Not implemented function glfwGetFramebufferSize(...)");
 //     return 0;
 // }
 
 
 GL_FUNC(glfwGetWindowFrameSize, args, ac) {
     GL_CHK_ARG(5, glfwGetWindowFrameSize(window, left, top, right, bottom));
-    pushException("Unimplement function glfwGetWindowFrameSize(...)");
+    pushException("Not implemented function glfwGetWindowFrameSize(...)");
     return 0;
 }
 
 
 GL_FUNC(glfwGetWindowContentScale, args, ac) {
     GL_CHK_ARG(3, glfwGetWindowContentScale(window, xscale, yscale));
-    pushException("Unimplement function glfwGetWindowContentScale(...)");
+    pushException("Not implemented function glfwGetWindowContentScale(...)");
     return 0;
 }
 
 
 GL_FUNC(glfwGetWindowOpacity, args, ac) {
     GL_CHK_ARG(1, glfwGetWindowOpacity(window));
-    pushException("Unimplement function glfwGetWindowOpacity(...)");
+    pushException("Not implemented function glfwGetWindowOpacity(...)");
     return 0;
 }
 
 
 GL_FUNC(glfwSetWindowOpacity, args, ac) {
     GL_CHK_ARG(2, glfwSetWindowOpacity(window, opacity));
-    pushException("Unimplement function glfwSetWindowOpacity(...)");
+    pushException("Not implemented function glfwSetWindowOpacity(...)");
     return 0;
 }
 
 
 GL_FUNC(glfwIconifyWindow, args, ac) {
     GL_CHK_ARG(1, glfwIconifyWindow(window));
-    pushException("Unimplement function glfwIconifyWindow(...)");
+    pushException("Not implemented function glfwIconifyWindow(...)");
     return 0;
 }
 
 
 GL_FUNC(glfwRestoreWindow, args, ac) {
     GL_CHK_ARG(1, glfwRestoreWindow(window));
-    pushException("Unimplement function glfwRestoreWindow(...)");
+    pushException("Not implemented function glfwRestoreWindow(...)");
     return 0;
 }
 
 
 GL_FUNC(glfwMaximizeWindow, args, ac) {
     GL_CHK_ARG(1, glfwMaximizeWindow(window));
-    pushException("Unimplement function glfwMaximizeWindow(...)");
+    pushException("Not implemented function glfwMaximizeWindow(...)");
     return 0;
 }
 
 
 GL_FUNC(glfwShowWindow, args, ac) {
     GL_CHK_ARG(1, glfwShowWindow(window));
-    pushException("Unimplement function glfwShowWindow(...)");
+    pushException("Not implemented function glfwShowWindow(...)");
     return 0;
 }
 
 
 GL_FUNC(glfwHideWindow, args, ac) {
     GL_CHK_ARG(1, glfwHideWindow(window));
-    pushException("Unimplement function glfwHideWindow(...)");
+    pushException("Not implemented function glfwHideWindow(...)");
     return 0;
 }
 
 
 GL_FUNC(glfwFocusWindow, args, ac) {
     GL_CHK_ARG(1, glfwFocusWindow(window));
-    pushException("Unimplement function glfwFocusWindow(...)");
+    pushException("Not implemented function glfwFocusWindow(...)");
     return 0;
 }
 
 
 GL_FUNC(glfwRequestWindowAttention, args, ac) {
     GL_CHK_ARG(1, glfwRequestWindowAttention(window));
-    pushException("Unimplement function glfwRequestWindowAttention(...)");
+    pushException("Not implemented function glfwRequestWindowAttention(...)");
     return 0;
 }
 
 
 // GL_FUNC(glfwGetWindowMonitor, args, ac) {
 //     GL_CHK_ARG(1, glfwGetWindowMonitor(window));
-//     pushException("Unimplement function glfwGetWindowMonitor(...)");
+//     pushException("Not implemented function glfwGetWindowMonitor(...)");
 //     return 0;
 // }
 
 
 // GL_FUNC(glfwSetWindowMonitor, args, ac) {
 //     GL_CHK_ARG(7, glfwSetWindowMonitor(window, monitor, xpos, ypos, width, height, refreshRate));
-//     pushException("Unimplement function glfwSetWindowMonitor(...)");
+//     pushException("Not implemented function glfwSetWindowMonitor(...)");
 //     return 0;
 // }
 
 
 GL_FUNC(glfwGetWindowAttrib, args, ac) {
     GL_CHK_ARG(2, glfwGetWindowAttrib(window, attrib));
-    pushException("Unimplement function glfwGetWindowAttrib(...)");
+    pushException("Not implemented function glfwGetWindowAttrib(...)");
     return 0;
 }
 
 
 GL_FUNC(glfwSetWindowAttrib, args, ac) {
     GL_CHK_ARG(3, glfwSetWindowAttrib(window, attrib, value));
-    pushException("Unimplement function glfwSetWindowAttrib(...)");
+    pushException("Not implemented function glfwSetWindowAttrib(...)");
     return 0;
 }
 
 
 GL_FUNC(glfwSetWindowUserPointer, args, ac) {
     GL_CHK_ARG(2, glfwSetWindowUserPointer(window, pointer));
-    pushException("Unimplement function glfwSetWindowUserPointer(...)");
+    pushException("Not implemented function glfwSetWindowUserPointer(...)");
     return 0;
 }
 
 
 GL_FUNC(glfwGetWindowUserPointer, args, ac) {
     GL_CHK_ARG(1, glfwGetWindowUserPointer(window));
-    pushException("Unimplement function glfwGetWindowUserPointer(...)");
+    pushException("Not implemented function glfwGetWindowUserPointer(...)");
     return 0;
 }
 
 
 GL_FUNC(glfwSetWindowPosCallback, args, ac) {
     GL_CHK_ARG(2, glfwSetWindowPosCallback(window, cbfun));
-    pushException("Unimplement function glfwSetWindowPosCallback(...)");
+    pushException("Not implemented function glfwSetWindowPosCallback(...)");
     return 0;
 }
 
 
 GL_FUNC(glfwSetWindowSizeCallback, args, ac) {
     GL_CHK_ARG(2, glfwSetWindowSizeCallback(window, cbfun));
-    pushException("Unimplement function glfwSetWindowSizeCallback(...)");
+    pushException("Not implemented function glfwSetWindowSizeCallback(...)");
     return 0;
 }
 
 
 GL_FUNC(glfwSetWindowCloseCallback, args, ac) {
     GL_CHK_ARG(2, glfwSetWindowCloseCallback(window, cbfun));
-    pushException("Unimplement function glfwSetWindowCloseCallback(...)");
+    pushException("Not implemented function glfwSetWindowCloseCallback(...)");
     return 0;
 }
 
 
 GL_FUNC(glfwSetWindowRefreshCallback, args, ac) {
     GL_CHK_ARG(2, glfwSetWindowRefreshCallback(window, cbfun));
-    pushException("Unimplement function glfwSetWindowRefreshCallback(...)");
+    pushException("Not implemented function glfwSetWindowRefreshCallback(...)");
     return 0;
 }
 
 
 GL_FUNC(glfwSetWindowFocusCallback, args, ac) {
     GL_CHK_ARG(2, glfwSetWindowFocusCallback(window, cbfun));
-    pushException("Unimplement function glfwSetWindowFocusCallback(...)");
+    pushException("Not implemented function glfwSetWindowFocusCallback(...)");
     return 0;
 }
 
 
 GL_FUNC(glfwSetWindowIconifyCallback, args, ac) {
     GL_CHK_ARG(2, glfwSetWindowIconifyCallback(window, cbfun));
-    pushException("Unimplement function glfwSetWindowIconifyCallback(...)");
+    pushException("Not implemented function glfwSetWindowIconifyCallback(...)");
     return 0;
 }
 
 
 GL_FUNC(glfwSetWindowMaximizeCallback, args, ac) {
     GL_CHK_ARG(2, glfwSetWindowMaximizeCallback(window, cbfun));
-    pushException("Unimplement function glfwSetWindowMaximizeCallback(...)");
+    pushException("Not implemented function glfwSetWindowMaximizeCallback(...)");
     return 0;
 }
 
 
 GL_FUNC(glfwSetFramebufferSizeCallback, args, ac) {
     GL_CHK_ARG(2, glfwSetFramebufferSizeCallback(window, cbfun));
-    pushException("Unimplement function glfwSetFramebufferSizeCallback(...)");
+    pushException("Not implemented function glfwSetFramebufferSizeCallback(...)");
     return 0;
 }
 
 
 GL_FUNC(glfwSetWindowContentScaleCallback, args, ac) {
     GL_CHK_ARG(2, glfwSetWindowContentScaleCallback(window, cbfun));
-    pushException("Unimplement function glfwSetWindowContentScaleCallback(...)");
+    pushException("Not implemented function glfwSetWindowContentScaleCallback(...)");
     return 0;
 }
 
 
 // GL_FUNC(glfwPollEvents, args, ac) {
 //     GL_CHK_ARG(0, glfwPollEvents());
-//     pushException("Unimplement function glfwPollEvents(...)");
+//     pushException("Not implemented function glfwPollEvents(...)");
 //     return 0;
 // }
 
 
 // GL_FUNC(glfwWaitEvents, args, ac) {
 //     GL_CHK_ARG(0, glfwWaitEvents());
-//     pushException("Unimplement function glfwWaitEvents(...)");
+//     pushException("Not implemented function glfwWaitEvents(...)");
 //     return 0;
 // }
 
 
 // GL_FUNC(glfwWaitEventsTimeout, args, ac) {
 //     GL_CHK_ARG(1, glfwWaitEventsTimeout(timeout));
-//     pushException("Unimplement function glfwWaitEventsTimeout(...)");
+//     pushException("Not implemented function glfwWaitEventsTimeout(...)");
 //     return 0;
 // }
 
 
 GL_FUNC(glfwPostEmptyEvent, args, ac) {
     GL_CHK_ARG(0, glfwPostEmptyEvent());
-    pushException("Unimplement function glfwPostEmptyEvent(...)");
+    pushException("Not implemented function glfwPostEmptyEvent(...)");
     return 0;
 }
 
 
 GL_FUNC(glfwGetInputMode, args, ac) {
     GL_CHK_ARG(2, glfwGetInputMode(window, mode));
-    pushException("Unimplement function glfwGetInputMode(...)");
+    pushException("Not implemented function glfwGetInputMode(...)");
     return 0;
 }
 
 
 GL_FUNC(glfwSetInputMode, args, ac) {
     GL_CHK_ARG(3, glfwSetInputMode(window, mode, value));
-    pushException("Unimplement function glfwSetInputMode(...)");
+    pushException("Not implemented function glfwSetInputMode(...)");
     return 0;
 }
 
 
 GL_FUNC(glfwGetKeyName, args, ac) {
     GL_CHK_ARG(2, glfwGetKeyName(key, scancode));
-    pushException("Unimplement function glfwGetKeyName(...)");
+    pushException("Not implemented function glfwGetKeyName(...)");
     return 0;
 }
 
 
 GL_FUNC(glfwGetKeyScancode, args, ac) {
     GL_CHK_ARG(1, glfwGetKeyScancode(key));
-    pushException("Unimplement function glfwGetKeyScancode(...)");
+    pushException("Not implemented function glfwGetKeyScancode(...)");
     return 0;
 }
 
 
 GL_FUNC(glfwGetKey, args, ac) {
     GL_CHK_ARG(2, glfwGetKey(window, key));
-    pushException("Unimplement function glfwGetKey(...)");
+    pushException("Not implemented function glfwGetKey(...)");
     return 0;
 }
 
 
 GL_FUNC(glfwGetMouseButton, args, ac) {
     GL_CHK_ARG(2, glfwGetMouseButton(window, button));
-    pushException("Unimplement function glfwGetMouseButton(...)");
+    pushException("Not implemented function glfwGetMouseButton(...)");
     return 0;
 }
 
 
 GL_FUNC(glfwGetCursorPos, args, ac) {
     GL_CHK_ARG(3, glfwGetCursorPos(window, xpos, ypos));
-    pushException("Unimplement function glfwGetCursorPos(...)");
+    pushException("Not implemented function glfwGetCursorPos(...)");
     return 0;
 }
 
 
 GL_FUNC(glfwSetCursorPos, args, ac) {
     GL_CHK_ARG(3, glfwSetCursorPos(window, xpos, ypos));
-    pushException("Unimplement function glfwSetCursorPos(...)");
+    pushException("Not implemented function glfwSetCursorPos(...)");
     return 0;
 }
 
 
 GL_FUNC(glfwCreateCursor, args, ac) {
     GL_CHK_ARG(3, glfwCreateCursor(image, xhot, yhot));
-    pushException("Unimplement function glfwCreateCursor(...)");
+    pushException("Not implemented function glfwCreateCursor(...)");
     return 0;
 }
 
 
 GL_FUNC(glfwCreateStandardCursor, args, ac) {
     GL_CHK_ARG(1, glfwCreateStandardCursor(shape));
-    pushException("Unimplement function glfwCreateStandardCursor(...)");
+    pushException("Not implemented function glfwCreateStandardCursor(...)");
     return 0;
 }
 
 
 GL_FUNC(glfwDestroyCursor, args, ac) {
     GL_CHK_ARG(1, glfwDestroyCursor(cursor));
-    pushException("Unimplement function glfwDestroyCursor(...)");
+    pushException("Not implemented function glfwDestroyCursor(...)");
     return 0;
 }
 
 
 GL_FUNC(glfwSetCursor, args, ac) {
     GL_CHK_ARG(2, glfwSetCursor(window, cursor));
-    pushException("Unimplement function glfwSetCursor(...)");
+    pushException("Not implemented function glfwSetCursor(...)");
     return 0;
 }
 
 
 GL_FUNC(glfwSetKeyCallback, args, ac) {
     GL_CHK_ARG(2, glfwSetKeyCallback(window, cbfun));
-    pushException("Unimplement function glfwSetKeyCallback(...)");
+    pushException("Not implemented function glfwSetKeyCallback(...)");
     return 0;
 }
 
 
 GL_FUNC(glfwSetCharCallback, args, ac) {
     GL_CHK_ARG(2, glfwSetCharCallback(window, cbfun));
-    pushException("Unimplement function glfwSetCharCallback(...)");
+    pushException("Not implemented function glfwSetCharCallback(...)");
     return 0;
 }
 
 
 GL_FUNC(glfwSetCharModsCallback, args, ac) {
     GL_CHK_ARG(2, glfwSetCharModsCallback(window, cbfun));
-    pushException("Unimplement function glfwSetCharModsCallback(...)");
+    pushException("Not implemented function glfwSetCharModsCallback(...)");
     return 0;
 }
 
 
 GL_FUNC(glfwSetMouseButtonCallback, args, ac) {
     GL_CHK_ARG(2, glfwSetMouseButtonCallback(window, cbfun));
-    pushException("Unimplement function glfwSetMouseButtonCallback(...)");
+    pushException("Not implemented function glfwSetMouseButtonCallback(...)");
     return 0;
 }
 
 
 GL_FUNC(glfwSetCursorPosCallback, args, ac) {
     GL_CHK_ARG(2, glfwSetCursorPosCallback(window, cbfun));
-    pushException("Unimplement function glfwSetCursorPosCallback(...)");
+    pushException("Not implemented function glfwSetCursorPosCallback(...)");
     return 0;
 }
 
 
 GL_FUNC(glfwSetCursorEnterCallback, args, ac) {
     GL_CHK_ARG(2, glfwSetCursorEnterCallback(window, cbfun));
-    pushException("Unimplement function glfwSetCursorEnterCallback(...)");
+    pushException("Not implemented function glfwSetCursorEnterCallback(...)");
     return 0;
 }
 
 
 GL_FUNC(glfwSetScrollCallback, args, ac) {
     GL_CHK_ARG(2, glfwSetScrollCallback(window, cbfun));
-    pushException("Unimplement function glfwSetScrollCallback(...)");
+    pushException("Not implemented function glfwSetScrollCallback(...)");
     return 0;
 }
 
 
 GL_FUNC(glfwSetDropCallback, args, ac) {
     GL_CHK_ARG(2, glfwSetDropCallback(window, cbfun));
-    pushException("Unimplement function glfwSetDropCallback(...)");
+    pushException("Not implemented function glfwSetDropCallback(...)");
     return 0;
 }
 
 
 GL_FUNC(glfwJoystickPresent, args, ac) {
     GL_CHK_ARG(1, glfwJoystickPresent(jid));
-    pushException("Unimplement function glfwJoystickPresent(...)");
+    pushException("Not implemented function glfwJoystickPresent(...)");
     return 0;
 }
 
 
 GL_FUNC(glfwGetJoystickAxes, args, ac) {
     GL_CHK_ARG(2, glfwGetJoystickAxes(jid, count));
-    pushException("Unimplement function glfwGetJoystickAxes(...)");
+    pushException("Not implemented function glfwGetJoystickAxes(...)");
     return 0;
 }
 
 
 GL_FUNC(glfwGetJoystickButtons, args, ac) {
     GL_CHK_ARG(2, glfwGetJoystickButtons(jid, count));
-    pushException("Unimplement function glfwGetJoystickButtons(...)");
+    pushException("Not implemented function glfwGetJoystickButtons(...)");
     return 0;
 }
 
 
 GL_FUNC(glfwGetJoystickHats, args, ac) {
     GL_CHK_ARG(2, glfwGetJoystickHats(jid, count));
-    pushException("Unimplement function glfwGetJoystickHats(...)");
+    pushException("Not implemented function glfwGetJoystickHats(...)");
     return 0;
 }
 
 
 GL_FUNC(glfwGetJoystickName, args, ac) {
     GL_CHK_ARG(1, glfwGetJoystickName(jid));
-    pushException("Unimplement function glfwGetJoystickName(...)");
+    pushException("Not implemented function glfwGetJoystickName(...)");
     return 0;
 }
 
 
 GL_FUNC(glfwGetJoystickGUID, args, ac) {
     GL_CHK_ARG(1, glfwGetJoystickGUID(jid));
-    pushException("Unimplement function glfwGetJoystickGUID(...)");
+    pushException("Not implemented function glfwGetJoystickGUID(...)");
     return 0;
 }
 
 
 GL_FUNC(glfwSetJoystickUserPointer, args, ac) {
     GL_CHK_ARG(2, glfwSetJoystickUserPointer(jid, pointer));
-    pushException("Unimplement function glfwSetJoystickUserPointer(...)");
+    pushException("Not implemented function glfwSetJoystickUserPointer(...)");
     return 0;
 }
 
 
 GL_FUNC(glfwGetJoystickUserPointer, args, ac) {
     GL_CHK_ARG(1, glfwGetJoystickUserPointer(jid));
-    pushException("Unimplement function glfwGetJoystickUserPointer(...)");
+    pushException("Not implemented function glfwGetJoystickUserPointer(...)");
     return 0;
 }
 
 
 GL_FUNC(glfwJoystickIsGamepad, args, ac) {
     GL_CHK_ARG(1, glfwJoystickIsGamepad(jid));
-    pushException("Unimplement function glfwJoystickIsGamepad(...)");
+    pushException("Not implemented function glfwJoystickIsGamepad(...)");
     return 0;
 }
 
 
 GL_FUNC(glfwSetJoystickCallback, args, ac) {
     GL_CHK_ARG(1, glfwSetJoystickCallback(cbfun));
-    pushException("Unimplement function glfwSetJoystickCallback(...)");
+    pushException("Not implemented function glfwSetJoystickCallback(...)");
     return 0;
 }
 
 
 GL_FUNC(glfwUpdateGamepadMappings, args, ac) {
     GL_CHK_ARG(1, glfwUpdateGamepadMappings(string));
-    pushException("Unimplement function glfwUpdateGamepadMappings(...)");
+    pushException("Not implemented function glfwUpdateGamepadMappings(...)");
     return 0;
 }
 
 
 GL_FUNC(glfwGetGamepadName, args, ac) {
     GL_CHK_ARG(1, glfwGetGamepadName(jid));
-    pushException("Unimplement function glfwGetGamepadName(...)");
+    pushException("Not implemented function glfwGetGamepadName(...)");
     return 0;
 }
 
 
 GL_FUNC(glfwGetGamepadState, args, ac) {
     GL_CHK_ARG(2, glfwGetGamepadState(jid, state));
-    pushException("Unimplement function glfwGetGamepadState(...)");
+    pushException("Not implemented function glfwGetGamepadState(...)");
     return 0;
 }
 
 
 GL_FUNC(glfwSetClipboardString, args, ac) {
     GL_CHK_ARG(2, glfwSetClipboardString(window, string));
-    pushException("Unimplement function glfwSetClipboardString(...)");
+    pushException("Not implemented function glfwSetClipboardString(...)");
     return 0;
 }
 
 
 GL_FUNC(glfwGetClipboardString, args, ac) {
     GL_CHK_ARG(1, glfwGetClipboardString(window));
-    pushException("Unimplement function glfwGetClipboardString(...)");
+    pushException("Not implemented function glfwGetClipboardString(...)");
     return 0;
 }
 
 
 // GL_FUNC(glfwGetTime, args, ac) {
 //     GL_CHK_ARG(0, glfwGetTime());
-//     pushException("Unimplement function glfwGetTime(...)");
+//     pushException("Not implemented function glfwGetTime(...)");
 //     return 0;
 // }
 
 
 GL_FUNC(glfwSetTime, args, ac) {
     GL_CHK_ARG(1, glfwSetTime(time));
-    pushException("Unimplement function glfwSetTime(...)");
+    pushException("Not implemented function glfwSetTime(...)");
     return 0;
 }
 
 
 GL_FUNC(glfwGetTimerValue, args, ac) {
     GL_CHK_ARG(0, glfwGetTimerValue());
-    pushException("Unimplement function glfwGetTimerValue(...)");
+    pushException("Not implemented function glfwGetTimerValue(...)");
     return 0;
 }
 
 
 GL_FUNC(glfwGetTimerFrequency, args, ac) {
     GL_CHK_ARG(0, glfwGetTimerFrequency());
-    pushException("Unimplement function glfwGetTimerFrequency(...)");
+    pushException("Not implemented function glfwGetTimerFrequency(...)");
     return 0;
 }
 
 
 // GL_FUNC(glfwMakeContextCurrent, args, ac) {
 //     GL_CHK_ARG(1, glfwMakeContextCurrent(window));
-//     pushException("Unimplement function glfwMakeContextCurrent(...)");
+//     pushException("Not implemented function glfwMakeContextCurrent(...)");
 //     return 0;
 // }
 
 
 GL_FUNC(glfwGetCurrentContext, args, ac) {
     GL_CHK_ARG(0, glfwGetCurrentContext());
-    pushException("Unimplement function glfwGetCurrentContext(...)");
+    pushException("Not implemented function glfwGetCurrentContext(...)");
     return 0;
 }
 
 
 // GL_FUNC(glfwSwapBuffers, args, ac) {
 //     GL_CHK_ARG(1, glfwSwapBuffers(window));
-//     pushException("Unimplement function glfwSwapBuffers(...)");
+//     pushException("Not implemented function glfwSwapBuffers(...)");
 //     return 0;
 // }
 
 
 // GL_FUNC(glfwSwapInterval, args, ac) {
 //     GL_CHK_ARG(1, glfwSwapInterval(interval));
-//     pushException("Unimplement function glfwSwapInterval(...)");
+//     pushException("Not implemented function glfwSwapInterval(...)");
 //     return 0;
 // }
 
 
 GL_FUNC(glfwExtensionSupported, args, ac) {
     GL_CHK_ARG(1, glfwExtensionSupported(extension));
-    pushException("Unimplement function glfwExtensionSupported(...)");
+    pushException("Not implemented function glfwExtensionSupported(...)");
     return 0;
 }
 
 
 GL_FUNC(glfwGetProcAddress, args, ac) {
     GL_CHK_ARG(1, glfwGetProcAddress(procname));
-    pushException("Unimplement function glfwGetProcAddress(...)");
+    pushException("Not implemented function glfwGetProcAddress(...)");
     return 0;
 }
 
 
 GL_FUNC(glfwVulkanSupported, args, ac) {
     GL_CHK_ARG(0, glfwVulkanSupported());
-    pushException("Unimplement function glfwVulkanSupported(...)");
+    pushException("Not implemented function glfwVulkanSupported(...)");
     return 0;
 }
 
 
 GL_FUNC(glfwGetRequiredInstanceExtensions, args, ac) {
     GL_CHK_ARG(1, glfwGetRequiredInstanceExtensions(count));
-    pushException("Unimplement function glfwGetRequiredInstanceExtensions(...)");
+    pushException("Not implemented function glfwGetRequiredInstanceExtensions(...)");
     return 0;
 }
 
 
 GL_FUNC(glfwGetInstanceProcAddress, args, ac) {
     GL_CHK_ARG(2, glfwGetInstanceProcAddress(instance, procname));
-    pushException("Unimplement function glfwGetInstanceProcAddress(...)");
+    pushException("Not implemented function glfwGetInstanceProcAddress(...)");
     return 0;
 }
 
 
 GL_FUNC(glfwGetPhysicalDevicePresentationSupport, args, ac) {
     GL_CHK_ARG(3, glfwGetPhysicalDevicePresentationSupport(instance, device, queuefamily));
-    pushException("Unimplement function glfwGetPhysicalDevicePresentationSupport(...)");
+    pushException("Not implemented function glfwGetPhysicalDevicePresentationSupport(...)");
     return 0;
 }
 
 
 GL_FUNC(glfwCreateWindowSurface, args, ac) {
     GL_CHK_ARG(4, glfwCreateWindowSurface(instance, window, allocator, surface));
-    pushException("Unimplement function glfwCreateWindowSurface(...)");
+    pushException("Not implemented function glfwCreateWindowSurface(...)");
     return 0;
 }
 
