@@ -1,17 +1,5 @@
 #include "gl.h"
-
-
-template<> struct SharedResourceDeleter<GLFWwindow> {
-    virtual void operator()(GLFWwindow* w) {
-        println("GLFWwindow closed", 0, LDEBUG);
-        glfwDestroyWindow(w);
-    }
-};
-
-
-template<> struct SharedResourceDeleter<GLFWmonitor> {
-    virtual void operator()(GLFWmonitor* w) {/* Do nothing */ }
-};
+#include "gldeleter.h"
 
 
 GL_FUNC(glfwGetVersion, args, ac) {

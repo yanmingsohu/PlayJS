@@ -4,10 +4,10 @@
 //
 #pragma once
 
-#include "glfw/include/GLFW/glfw3.h"
 #include "vm.h"
 #include "util.h"
 #include "shared.h"
+#include "glfw/include/GLFW/glfw3.h"
 
 
 //
@@ -62,6 +62,10 @@
 
 LocalVal wrapJs(VM* vm, const GLFWvidmode* mode);
 LocalVal wrapJs(VM* vm, int width, int height);
+LocalVal wrapJs(GLFWgammaramp*);
+LocalVal wrapJs(GLFWimage*);
+LocalVal wrapJs(GLFWcursor*);
+LocalVal wrapJs(GLFWgamepadstate*);
 
 
 void installGLFWConst(VM* vm, LocalVal& _const);

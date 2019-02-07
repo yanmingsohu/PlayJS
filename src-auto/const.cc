@@ -1,11 +1,13 @@
-//
-// 2019-02-06 21:35:52
-// create from D:\game\sanguo7\src-auto\generate-gl-code.js 
-//
+// 
+// 2019-02-07 15:19:53
+// create from D:\game\sanguo7\src-auto\generate-code.js
+// 
 // Bind CONST to js
+//
 #include "../src/gl.h"
-
-
+#include "../src/gldeleter.h"
+
+
 void auto_gl_Const(VM* vm, LocalVal& _const) {
     // D:\game\sanguo7\deps\glfw\include\GLFW\glfw3.h
     // GL_INT_ENUM(_glfw3_h_);

@@ -176,6 +176,7 @@
     <ClInclude Include="..\src\export-js.h" />
     <ClInclude Include="..\src\fs.h" />
     <ClInclude Include="..\src\gl.h" />
+    <ClInclude Include="..\src\gldeleter.h" />
     <ClInclude Include="..\src\shared.h" />
     <ClInclude Include="..\src\threads.h" />
     <ClInclude Include="..\src\util.h" />

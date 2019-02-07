@@ -29,6 +29,26 @@ LocalVal wrapJs(VM* vm, int width, int height) {
 }
 
 
+LocalVal wrapJs(GLFWgammaramp* p) {
+    return make_shared_js_handle(p);
+}
+
+
+LocalVal wrapJs(GLFWimage* p) {
+    return make_shared_js_handle(p);
+}
+
+
+LocalVal wrapJs(GLFWcursor* p) {
+    return make_shared_js_handle(p);
+}
+
+
+LocalVal wrapJs(GLFWgamepadstate* p) {
+    return make_shared_js_handle(p);
+}
+
+
 static void gl_error_callback(int error, const char* desc) {
     println(desc, 0, LERROR);
 }
@@ -45,11 +65,12 @@ void installGL(VM* vm) {
 
     DEF_GLOBAL(vm, gl);
     auto _const = vm->createObject();
+    gl.put("const", _const);
 
+    INCLUDE_AUTO_GL_CODE(vm, gl, _const);
     installGLFWConst(vm, _const);
     installGLCore(vm, gl);
     installGLFW(vm, gl);
-    INCLUDE_AUTO_GL_CODE(vm, gl, _const);
 }
 
 

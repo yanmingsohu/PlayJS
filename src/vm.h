@@ -36,6 +36,9 @@ void pushException(std::string, int code = 0);
 // 把 js 数字对象转换为 整数, 如果 r 不是数字或出错, 返回默认值
 //
 int intValue(JsValueRef r, int defaultVal = 0);
+double floatValue(JsValueRef v, double defaultVal = 0);
+double doubleValue(JsValueRef v, double defaultVal = 0);
+
 
 //
 // 把 c++ 数据包装成 js 对象
@@ -45,6 +48,8 @@ JsValueRef wrapJs(double i);
 JsValueRef wrapJs(bool b);
 JsValueRef wrapJs(const char* str);
 JsValueRef wrapJs(size_t i);
+JsValueRef wrapJs(unsigned int i);
+
 
 //
 // 参数是数字类型返回 true

@@ -7,8 +7,13 @@
 //
 const fs   = require('fs');
 const path = require('path');
+const cppf = require('./cpp-function.js');
+const config = require('./config.js');
 const EE   = "\r\n\r\n";
 const TAB  = "    ";
+
+var __tab_count = 0;
+var __comment = 0;
 
 var outfile;
 //
@@ -17,21 +22,8 @@ var outfile;
 var cppFunctionPrototype = [];
 var cppFunctionCall = [];
 
-//
-// 需要解析的 GL 头文件
-//
-const heades = [
-  path.join(__dirname, '../deps/glfw/include/GLFW/glfw3.h'),
-  'C:/Program Files (x86)/Windows Kits/8.1/Include/um/gl/GL.h'
-];
-
-//
-// 已经实现的代码
-//
-const sourceCC = [
-  path.join(__dirname, '../src/glfw.cpp'),
-  path.join(__dirname, '../src/glcore.cpp'),
-];
+const heades = config.heades;
+const sourceCC = config.sourceCC;
 
 
 function pushFunc(retType, fname, argDef, argCall) {
@@ -43,7 +35,7 @@ function pushFunc(retType, fname, argDef, argCall) {
 
 
 //
-// 生成产量绑定到 js 对象的代码
+// 生成常量绑定到 js 对象的代码
 //
 (function() {
   outfile = __dirname +'/const.cc';
@@ -51,7 +43,7 @@ function pushFunc(retType, fname, argDef, argCall) {
   var pp = pushFunc('void', 'auto_gl_Const', 
                     "(VM* vm, LocalVal& _const)", '(vm, _const)');
   append(EE+ pp +' {');
-  heades.forEach(parseConst);
+  heades.forEach(generateConstCppFile);
   append('}');
 })();
 
@@ -60,15 +52,15 @@ function pushFunc(retType, fname, argDef, argCall) {
 // 生成 GL 函数到 js 函数的包装器默认实现, 跳过已经实现的函数.
 //
 (function() {
-  var skipFunc = {};
+  var skipFunc = config.skipFunc || {};
 
   sourceCC.forEach(function(f) {
     checkFunc(f, skipFunc);
   });
 
-  heades.forEach(function(f) {
-    outfile = __dirname +'/'+ path.basename(f) +".cc";
-    parseFunction(f, skipFunc);
+  heades.forEach(function(config) {
+    outfile = __dirname +'/'+ path.basename(config.file) +".cc";
+    generateFunctionDefCppFile(config, skipFunc);
   });
 })();
 
@@ -79,21 +71,23 @@ function pushFunc(retType, fname, argDef, argCall) {
 (function() {
   outfile = __dirname +'/glauto.h';
   newfile("Auto Generate Hander");
+  append();
   
   //
   // 生成一个宏定义, 在代码中引入
   //
-  var txt = [EE, '#define INCLUDE_AUTO_GL_CODE(vm, gl, _const) \\\r\n'];
-  cppFunctionCall.forEach(function(name) {
-    txt.push('    ', name, '; \\\r\n');
+  append('#define INCLUDE_AUTO_GL_CODE(vm, gl, _const) \\');
+  indentation(function() {
+    cppFunctionCall.forEach(function(name, i) {
+      var last = (i<cppFunctionCall.length-1) ? '; \\': '';
+      append(name + last);
+    });
   });
-  txt.push(EE);
 
+  append();
   cppFunctionPrototype.forEach(function(code) {
-    txt.push(code, ';\r\n');
+    append(code +';');
   });
-
-  append(txt.join(''));
 })();
 
 
@@ -116,7 +110,8 @@ function checkFunc(file, skipFunc) {
 }
 
 
-function parseFunction(file, skipFunc) {
+function generateFunctionDefCppFile(config, skipFunc) {
+  var file = config.file;
   newfile(file);
 
   var f = fs.readFileSync(file, 'utf8');
@@ -124,13 +119,14 @@ function parseFunction(file, skipFunc) {
   var funcBind = [];
 
   lines.forEach(function(line) {
-    var items = line.split(' ');
-    items = clearsp(items);
+    if (!config.parser(line)) return;
+    
+    var cppfunction = cppf.parse(line);
 
-    if (items[0] == 'WINGDIAPI') {
-      _gl(items);
-    } else if (items[0] == 'GLFWAPI') {
-      __glfw(items);
+    if (cppfunction) {
+      generate_cpp(cppfunction);
+    } else {
+      console.log("ERR", line);
     }
   });
 
@@ -138,87 +134,31 @@ function parseFunction(file, skipFunc) {
   var pp = pushFunc('void', 'auto_bind_'+ bname, 
                     '(VM*vm, LocalVal& gl)', '(vm, gl)');
   append(EE+ pp +' {');
-
-  funcBind.forEach(function(b) {
-    if (skipFunc[b]) {
-      append(TAB +'// GL_BIND('+ b +');');
-    } else {
-      append(TAB +'GL_BIND('+ b +');');
-    }
+  indentation(function() {
+    funcBind.forEach(function(b) {
+      __comment = skipFunc[b];
+      append('GL_BIND('+ b +');');
+    });
   });
+  __comment = 0;
   append('}');
 
 
-  function _gl(items) {
-    var st = 0;
-    for (var i=0; i<items.length; ++i) {
-      if (items[i] == 'APIENTRY') {
-        st = i+1;
-      }
-    }
-    var arg = items.slice(st+1);
+  function generate_cpp(func) {
+    // console.log(JSON.stringify(func, 0, 2));
+    append('');
+    append('');
 
-    arg = clearArg(arg);
-    var funcname = items[st];
-    var def = f_tpl(funcname, arg.join(', '), arg.length);
-    // console.log(funcname);
-    if (!funcname.startsWith('gl')) {
-      console.log("BAD", items);
-    }
-    append(def);
-    funcBind.push(funcname);
-  }
-
-
-  function __glfw(items) {
-    while (items[1] == 'const' || items[1] == 'unsigned') {
-      items.splice(1, 1);
-    }
-    var tmp = items[2].split('(');
-    var funcname = tmp[0];
-    var arg = tmp.slice(1).concat(items.slice(3));
-
-    arg = clearArg(arg);
-    var def = f_tpl(funcname, arg.join(', '), arg.length);
-    // console.log(funcname);
-    if (!funcname.startsWith('glfw')) {
-      console.log("BAD", items);
-    }
-    append(def);
-    funcBind.push(funcname);
-  }
-
-
-  function clearArg(arg) {
-    var r = [];
-    arg.join(' ').split(',').forEach(function(a) {
-      var i = a.split(' ');
-      if (i.length > 1) {
-        var v = i[i.length-1]; 
-        while (v[0] == '(') v = v.substr(1);
-        while (v[0] == '*') v = v.substr(1);
-        while (v[v.length-1] == ';') v = v.substr(0, v.length-1);
-        while (v[v.length-1] == ')') v = v.substr(0, v.length-1);
-        r.push(v);
-      }
-    });
-    return r;
-  }
-
-
-  function f_tpl(funcName, argsStr, argCount) {
-    var st = skipFunc[funcName] ? '// ': '';
-    return '\r\n\r\n'+
-`${st}GL_FUNC(${funcName}, args, ac) {
-${st}${TAB}GL_CHK_ARG(${argCount}, ${funcName}(${argsStr}));
-${st}${TAB}pushException("Not implemented function ${funcName}(...)");
-${st}${TAB}return 0;
-${st}}`;
+    __comment = skipFunc[func.name];
+    cppf.genCppCode(func, append, indentation, __comment);
+    __comment = 0;
+    funcBind.push(func.name);
   }
 }
 
 
-function parseConst(file) {
+function generateConstCppFile(config) {
+  var file = config.file;
   append(TAB +'// '+ file);
 
   var f = fs.readFileSync(file, 'utf8');
@@ -244,10 +184,31 @@ function parseConst(file) {
 }
 
 
+function clearArg(arg) {
+  var r = [];
+  arg.join(' ').split(',').forEach(function(a) {
+    var i = a.split(' ');
+    if (i.length > 1) {
+      var v = i[i.length-1]; 
+      while (v[0] == '(') v = v.substr(1);
+      while (v[0] == '*') v = v.substr(1);
+      while (v[v.length-1] == ';') v = v.substr(0, v.length-1);
+      while (v[v.length-1] == ')') v = v.substr(0, v.length-1);
+      r.push(v);
+    }
+  });
+  return r;
+}
+
+
 function writeConst(name, needComment) {
-  var code = (needComment ?TAB+'// ' :TAB) +'GL_INT_ENUM('+ name +');';
-  append(code);
-  // console.log(code);
+  indentation(function() {
+    var code = 'GL_INT_ENUM('+ name +');';
+    __comment = needComment;
+    append(code);
+    __comment = 0;
+    // console.log(code);
+  });
 }
 
 
@@ -268,14 +229,14 @@ function clearsp(arr) {
 
 function writeHeander() {
   var ntime = new Date();
-  var txt = [
-    '//\r\n',
-    '// ', ntime.toLocaleDateString(), 
-    ' ', ntime.toLocaleTimeString(), '\r\n',
-    '// create from ', __filename, ' \r\n', 
-    '//'
-  ];
-  append(txt.join(''));
+  comment(function() {
+    [
+      '',
+      ntime.toLocaleDateString() +' '+ ntime.toLocaleTimeString(),
+      'create from '+ __filename, 
+      ''
+    ].forEach(append);
+  });
 }
 
 
@@ -285,10 +246,32 @@ function newfile(txt) {
   }
   writeHeander();
   append('// '+ txt);
+  append('//');
   append('#include "../src/gl.h"');
+  append('#include "../src/gldeleter.h"');
 }
 
 
 function append(t) {
-  fs.appendFileSync(outfile, t +'\r\n');
+  (t||'').split('\n').forEach(function(t) {
+    for (var i=0; i<__tab_count; ++i) {
+      fs.appendFileSync(outfile, TAB);
+    }
+    if (__comment) fs.appendFileSync(outfile, '// ');
+    fs.appendFileSync(outfile, t +'\r\n');
+  });
+}
+
+
+function indentation(fn) {
+  ++__tab_count;
+  fn();
+  --__tab_count;
+}
+
+
+function comment(fn) {
+  __comment = 1;
+  fn();
+  __comment = 0;
 }

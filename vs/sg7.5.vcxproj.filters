@@ -75,6 +75,9 @@
     <ClInclude Include="..\src-auto\glauto.h">
       <Filter>auto-code</Filter>
     </ClInclude>
+    <ClInclude Include="..\src\gldeleter.h">
+      <Filter>core</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\boot\index.js">

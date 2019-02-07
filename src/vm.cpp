@@ -140,6 +140,24 @@ int intValue(JsValueRef v, int defaultVal) {
 }
 
 
+double floatValue(JsValueRef v, double defaultVal) {
+    double f = defaultVal;
+    if (v) {
+        JsNumberToDouble(v, &f);
+    }
+    return f;
+}
+
+
+double doubleValue(JsValueRef v, double defaultVal) {
+    double f = defaultVal;
+    if (v) {
+        JsNumberToDouble(v, &f);
+    }
+    return f;
+}
+
+
 bool isJsNumber(JsValueRef v) {
     return getJsType(v) == JsNumber;
 }
@@ -184,6 +202,11 @@ JsValueRef wrapJs(const char* str) {
     JsValueRef s = 0;
     JsCreateString(str, strlen(str), &s);
     return s;
+}
+
+
+JsValueRef wrapJs(unsigned int i) {
+    return wrapJs(static_cast<int>(i));
 }
 
 
