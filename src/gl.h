@@ -3,10 +3,12 @@
 // 宏定义是一整套的约定, 可以简化编码; 宏定义的约定互相依赖.
 //
 #pragma once
+#define GLEW_STATIC
 
 #include "vm.h"
 #include "util.h"
 #include "shared.h"
+#include "glew/include/GL/glew.h"
 #include "glfw/include/GLFW/glfw3.h"
 
 
@@ -38,9 +40,10 @@
 
 //
 // 更短的绑定, 绑定 js_name 的 js 函数为 name 属性到 gl 对象上.
+// DEF_JS_FUNC(vm, vm, gl, _name, js_##_name); 引起函数名二次替换
 //
 #define GL_BIND(_name) \
-    DEF_JS_FUNC(vm, vm, gl, _name, js_##_name);
+    gl.put(#_name, vm->createFunction(&js_##_name, #_name, vm))
 
 
 //

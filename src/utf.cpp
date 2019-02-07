@@ -36,7 +36,7 @@ static JsValueRef js_utf8string(JsValueRef callee, JsValueRef *args, unsigned sh
         pushException("bad arguments, toUtf8String(TypedArray, length)");
         return 0;
     }
-    LocalArray arr(args[1]);
+    LocalTypedArray arr(args[1]);
     size_t len = intValue(args[2], arr.length());
     JsValueRef str;
     JsCreateString(arr.buffer(), min(arr.length(), len), &str);
@@ -51,7 +51,7 @@ static JsValueRef js_gbkstring(JsValueRef callee, JsValueRef *args, unsigned sho
         pushException("bad arguments, toUtf8String(TypedArray, length)");
         return 0;
     }
-    LocalArray arr(args[1]);
+    LocalTypedArray arr(args[1]);
     size_t len = intValue(args[2], arr.length());
     JsValueRef str = 0;
     string utf8_str;

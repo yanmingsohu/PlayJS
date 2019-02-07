@@ -1,8 +1,8 @@
 // 
-// 2019-02-07 16:33:07
+// 2019-02-07 16:38:10
 // create from D:\game\sanguo7\src-auto\generate-code.js
 // 
-// C:/Program Files (x86)/Windows Kits/8.1/Include/um/gl/GL.h
+// D:\game\sanguo7\deps\glew\include\GL\glew.h
 //
 #include "../src/gl.h"
 #include "../src/gldeleter.h"
@@ -2794,7 +2794,7 @@ GL_FUNC(glVertexPointer, args, ac) {
 // }
 
 
-void auto_bind_GL_h(VM*vm, LocalVal& gl) {
+void auto_bind_glew_h(VM*vm, LocalVal& gl) {
     GL_BIND(glAccum);
     GL_BIND(glAlphaFunc);
     GL_BIND(glAreTexturesResident);

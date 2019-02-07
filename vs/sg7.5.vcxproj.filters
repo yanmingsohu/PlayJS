@@ -43,10 +43,10 @@
     <ClCompile Include="..\src-auto\const.cc">
       <Filter>auto-code</Filter>
     </ClCompile>
-    <ClCompile Include="..\src-auto\GL.h.cc">
+    <ClCompile Include="..\src-auto\glfw3.h.cc">
       <Filter>auto-code</Filter>
     </ClCompile>
-    <ClCompile Include="..\src-auto\glfw3.h.cc">
+    <ClCompile Include="..\src-auto\glew.h.cc">
       <Filter>auto-code</Filter>
     </ClCompile>
   </ItemGroup>

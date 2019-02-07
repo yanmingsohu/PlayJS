@@ -79,7 +79,7 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
     <IncludePath>$(MSBuildProjectDirectory)\..\deps;$(MSBuildProjectDirectory)\..\deps\ChakraCore\lib\Common;$(IncludePath)</IncludePath>
-    <LibraryPath>$(MSBuildProjectDirectory)\..\deps\glfw\src\Release;$(MSBuildProjectDirectory)\..\deps\ChakraCore\Build\VcBuild\bin\x64_release;$(LibraryPath)</LibraryPath>
+    <LibraryPath>$(MSBuildProjectDirectory)\..\deps\glfw\src\Release;$(MSBuildProjectDirectory)\..\deps\ChakraCore\Build\VcBuild\bin\x64_release;$(MSBuildProjectDirectory)\..\deps\glew\lib\Release\x64;$(LibraryPath)</LibraryPath>
     <OutDir>$(SolutionDir)..\</OutDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -90,7 +90,7 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
     <IncludePath>$(MSBuildProjectDirectory)\..\deps;$(MSBuildProjectDirectory)\..\deps\ChakraCore\lib\Common;$(IncludePath)</IncludePath>
-    <LibraryPath>$(MSBuildProjectDirectory)\..\deps\glfw\src\Release;$(MSBuildProjectDirectory)\..\deps\ChakraCore\Build\VcBuild\bin\x64_release;$(LibraryPath)</LibraryPath>
+    <LibraryPath>$(MSBuildProjectDirectory)\..\deps\glfw\src\Release;$(MSBuildProjectDirectory)\..\deps\ChakraCore\Build\VcBuild\bin\x64_release;$(MSBuildProjectDirectory)\..\deps\glew\lib\Release\x64;$(LibraryPath)</LibraryPath>
     <OutDir>$(SolutionDir)..\</OutDir>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
@@ -125,7 +125,7 @@
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>ChakraCore.lib;glfw3.lib;Opengl32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>ChakraCore.lib;glfw3.lib;Opengl32.lib;glew32s.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -168,7 +168,7 @@
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>ChakraCore.lib;glfw3.lib;Opengl32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>ChakraCore.lib;glfw3.lib;Opengl32.lib;glew32s.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
@@ -184,7 +184,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\src-auto\const.cc" />
-    <ClCompile Include="..\src-auto\GL.h.cc" />
+    <ClCompile Include="..\src-auto\glew.h.cc" />
     <ClCompile Include="..\src-auto\glfw3.h.cc" />
     <ClCompile Include="..\src\console.cpp" />
     <ClCompile Include="..\src\events.cpp" />

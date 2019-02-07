@@ -223,7 +223,7 @@ public:
 //
 // 方便对 TypedArray 的操作
 //
-class LocalArray : public LocalVal {
+class LocalTypedArray : public LocalVal {
 private:
     JsTypedArrayType _type;
     unsigned int _len;
@@ -240,11 +240,11 @@ private:
 
 public:
 
-    LocalArray(JsValueRef r) : LocalVal(r) {
+    LocalTypedArray(JsValueRef r) : LocalVal(r) {
         init();
     }
 
-    LocalArray(LocalArray& o) : LocalVal(o) {
+    LocalTypedArray(LocalTypedArray& o) : LocalVal(o) {
         init();
     }
 
@@ -271,6 +271,65 @@ public:
     //
     inline JsTypedArrayType type() {
         return _type;
+    }
+};
+
+
+//
+// 普通 js 数组
+//
+class LocalArray : public LocalVal {
+private:
+    LocalVal klen = 0;
+    LocalVal fpop = 0;
+    LocalVal fpush = 0;
+
+    void init() {
+        klen = wrapJs("length");
+        JsValueRef pop, push;
+        JsObjectGetProperty(jsv, wrapJs("pop"), &pop);
+        JsObjectGetProperty(jsv, wrapJs("push"), &push);
+        fpop = pop;
+        fpush = push;
+    }
+
+public:
+    LocalArray(JsValueRef r) : LocalVal(r) {
+        init();
+    }
+
+    LocalArray(LocalArray& o) : LocalVal(o) {
+        init();
+    }
+
+    int length() {
+        JsValueRef vlen = 0;
+        JsObjectGetProperty(jsv, klen, &vlen);
+        return intValue(vlen);
+    }
+
+    JsValueRef pop() {
+        JsValueRef arg[] = { jsv };
+        JsValueRef result = 0;
+        JsCallFunction(fpop, arg, 1, &result);
+        return result;
+    }
+
+    JsValueRef push(JsValueRef v) {
+        JsValueRef arg[] = { jsv, v };
+        JsValueRef result = 0;
+        JsCallFunction(fpop, arg, 2, &result);
+        return result;
+    }
+
+    void set(int index, JsValueRef v) {
+        JsSetIndexedProperty(jsv, wrapJs(index), v);
+    }
+
+    JsValueRef get(int index) {
+        JsValueRef res = 0;
+        JsGetIndexedProperty(jsv, wrapJs(index), &res);
+        return res;
     }
 };
 
@@ -339,6 +398,16 @@ public:
     LocalVal createObject() {
         JsValueRef o = 0;
         JsCreateObject(&o);
+        return o;
+    }
+
+
+    //
+    // 普通数组
+    //
+    LocalArray createArr(int length = 0) {
+        JsValueRef o = 0;
+        JsCreateArray(length, &o);
         return o;
     }
 

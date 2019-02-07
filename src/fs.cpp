@@ -95,7 +95,7 @@ JS_FUNC_TPL(js_read, c, args, ac, info, d) {
         return 0;
     }
     GET_FD_FROM_JS(fd, args[1]);
-    LocalArray arr(args[2]);
+    LocalTypedArray arr(args[2]);
     unsigned int b_offset = intValue(args[3], 0);
     unsigned int b_length = intValue(args[4], arr.length());
 
@@ -117,7 +117,7 @@ JS_FUNC_TPL(js_write, c, args, ac, info, d) {
         return 0;
     }
     GET_FD_FROM_JS(fd, args[1]);
-    LocalArray arr(args[2]);
+    LocalTypedArray arr(args[2]);
     unsigned int b_offset = intValue(args[3]);
     unsigned int b_length = intValue(args[4]);
 

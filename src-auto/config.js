@@ -12,7 +12,8 @@ heades : [
     parser : cppp.glfw,
   },
   {
-    file: 'C:/Program Files (x86)/Windows Kits/8.1/Include/um/gl/GL.h',
+    // file: 'C:/Program Files (x86)/Windows Kits/8.1/Include/um/gl/GL.h',
+    file: path.join(__dirname, '../deps/glew/include/GL/glew.h'),
     parser : cppp.gl,
   },
 ],

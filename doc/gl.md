@@ -40,6 +40,8 @@ CPP 参考中的各种指针, 在 js 中都是整数(句柄).
 
 ## void glfwWindowHint(hint, value)
 
+## Array|int glGenBuffers(size)
+
 
 # Class
 

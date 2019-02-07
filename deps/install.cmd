@@ -45,3 +45,19 @@ cmake -G "Visual Studio 14 2015 Win64" CMakeLists.txt
 msbuild /p:Configuration=Release GLFW.sln
 cd ..
 
+
+
+echo GLEW https://github.com/nigels-com/glew
+echo ===================================================================
+rem  单独下载源代码
+git clone https://github.com/nigels-com/glew
+cd glew/build/vc15
+msbuild /p:Platform=x64 /p:Configuration=Release glew.sln
+
+
+
+
+echo http://freeimage.sourceforge.net/download.html
+echo ===================================================================
+
+

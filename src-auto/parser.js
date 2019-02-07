@@ -5,7 +5,7 @@ module.exports = {
 
 
 function gl(line) {
-  return line.startsWith('WINGDIAPI');
+  return line.startsWith('GLAPI');
 }
 
 
