@@ -5,7 +5,6 @@
 #include <system_error>
 
 
-static const char* INIT_FAIL = "Cannot init GLFW";
 static std::atomic<int> gl_count = 0;
 
 
@@ -54,21 +53,27 @@ static void gl_error_callback(int error, const char* desc) {
 }
 
 
+static bool initOpenGlSystem(VM* vm) {
+    if (GLFW_FALSE == glfwInit()) {
+        println("Cannot init GLFW", vm->thread(), LERROR);
+        return false;
+    }
+
+    glfwSetErrorCallback(&gl_error_callback);
+    return true;
+}
+
+
 void installGL(VM* vm) {
     if (gl_count == 0) {
-        glfwSetErrorCallback(&gl_error_callback);
-        
-        if (GLFW_FALSE == glfwInit())
-            throw std::runtime_error(INIT_FAIL);
+        if (! initOpenGlSystem(vm)) return;
     }
     ++gl_count;
 
     DEF_GLOBAL(vm, gl);
-    auto _const = vm->createObject();
-    gl.put("const", _const);
 
-    INCLUDE_AUTO_GL_CODE(vm, gl, _const);
-    installGLFWConst(vm, _const);
+    INCLUDE_AUTO_GL_CODE(vm, gl, gl);
+    installGLFWConst(vm, gl);
     installGLCore(vm, gl);
     installGLFW(vm, gl);
 }

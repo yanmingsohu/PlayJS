@@ -1,5 +1,6 @@
 #include "vm.h"
 #include "fs.h"
+#include "util.h"
 
 #include <map>
 #include <filesystem>
@@ -259,6 +260,43 @@ void VM:: initModule() {
     JsSetModuleHostInfo(root,
         JsModuleHostInfo_NotifyModuleReadyCallback,
         &iNotifyModuleReadyCallback);
+}
+
+
+void LocalTypedArray::init() {
+    JsValueType type;
+    JsGetValueType(jsv, &type);
+    if (type != JsTypedArray) {
+        pushException("LocalTypedArray: Is not TypedArray");
+        return;
+    }
+
+    JsErrorCode code = JsGetTypedArrayStorage(jsv, &_buf, &_len, &_type, &_byteLen);
+    if (JsNoError != code) {
+        _len = 0;
+        _buf = 0;
+        _byteLen = -1;
+        pushException(parseJsErrCode(code));
+    }
+}
+
+
+const char* const getJsTypeName(const JsValueType type) {
+    switch (type) {
+        case JsUndefined:   return "undefined";
+        case JsNull:        return "null";
+        case JsNumber:      return "Number";
+        case JsString:      return "String";
+        case JsBoolean:     return "Boolean";
+        case JsObject:      return "Object";
+        case JsFunction:    return "Function";
+        case JsError:       return "Error";
+        case JsArray:       return "Array";
+        case JsSymbol:      return "Symbol";
+        case JsArrayBuffer: return "ArrayBuffer";
+        case JsTypedArray:  return "TypedArray";
+        case JsDataView:    return "JsDataView";
+    }
 }
 
 

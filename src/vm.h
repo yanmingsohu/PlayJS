@@ -83,6 +83,11 @@ bool hasThrowException();
 const char* const parseJsErrCode(JsErrorCode c);
 
 //
+// 解析 js 数据类型为描述字符串
+//
+const char* const getJsTypeName(const JsValueType type);
+
+//
 // 在 obj(LocalVal) 对象上绑定名字为 name 的方法 func_ptr(本地cpp函数指针)
 // 必要时附加扩展数据 ext_data, 或为 NULL
 //
@@ -230,13 +235,7 @@ private:
     int _byteLen;
     BYTE* _buf;
 
-    void init() {
-        if (JsGetTypedArrayStorage(jsv, &_buf, &_len, &_type, &_byteLen)) {
-            _len = 0;
-            _buf = 0;
-            _byteLen = -1;
-        }
-    }
+    void init();
 
 public:
 
@@ -299,6 +298,11 @@ public:
     }
 
     LocalArray(LocalArray& o) : LocalVal(o) {
+        init();
+    }
+
+    LocalArray(int size = 0) : LocalVal(0) {
+        JsCreateArray(size, &jsv);
         init();
     }
 
