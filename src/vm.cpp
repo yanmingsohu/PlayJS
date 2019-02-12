@@ -229,18 +229,21 @@ bool hasThrowException() {
 
 
 std::string toString(JsValueRef str) {
+    return stringValue(str);
+}
+
+
+std::string stringValue(JsValueRef str, std::string def) {
     size_t len = 0;
     JsCopyString(str, 0, 0, &len);
 
     if (len > 0) {
-        char *buf = new char[len + 1];
+        std::unique_ptr<char[]> buf(new char[len + 1]);
         buf[len] = 0;
-        JsCopyString(str, buf, len, 0);
-        std::string s = std::string(buf);
-        delete[] buf;
-        return s;
+        JsCopyString(str, buf.get(), len, 0);
+        return std::string(buf.get());
     }
-    return std::string();
+    return def;
 }
 
 

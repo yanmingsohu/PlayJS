@@ -31,7 +31,9 @@ var { GLFW_KEY_ESCAPE, GLFW_PRESS, GL_TRUE, GL_COLOR_BUFFER_BIT,
       GL_ARRAY_BUFFER, GL_STATIC_DRAW } = gl;
 var a = [1.0, 1, 1];
 
-
+//
+// 顶点着色器
+//
 var shaderSource = `
     #version 330 core
     layout (location = 0) in vec3 aPos;
@@ -49,6 +51,9 @@ if (!gl.glGetShaderiv(vertexShader, gl.GL_COMPILE_STATUS)) {
 }
 checkGLerr("vertex shader");
 
+//
+// 片段着色器
+//
 var fragmentShaderSource = `
     #version 330 core
     out vec4 FragColor;
@@ -65,6 +70,10 @@ if (!gl.glGetShaderiv(fragmentShader, gl.GL_COMPILE_STATUS)) {
     console.log(gl.glGetShaderInfoLog(fragmentShader));
 }
 checkGLerr("fragmentShader");
+
+//
+// 编译/链接着色器
+//
 var shaderProgram = gl.glCreateProgram();
 gl.glAttachShader(shaderProgram, vertexShader);
 gl.glAttachShader(shaderProgram, fragmentShader);
@@ -80,7 +89,14 @@ var vertices = new Float32Array([
      0.0,  0.5, 0.0,
   ]);
 
+//
+// 顶点数组对象
+//
 var VAO = gl.glGenVertexArrays(1);
+//
+// 顶点缓冲对象 
+// 可以在GPU的内存中存储大量顶点。
+//
 var VBO = gl.glGenBuffers(1);
 
 gl.glBindVertexArray(VAO);
@@ -88,6 +104,9 @@ gl.glBindBuffer(GL_ARRAY_BUFFER, VBO);
 gl.glBufferData(GL_ARRAY_BUFFER, vertices, gl.GL_STATIC_DRAW);
 
 var attrid = 0;
+//
+// 顶点属性
+//
 gl.glVertexAttribPointer(attrid, 3, gl.GL_FLOAT, 
         gl.GL_FALSE, 3 * gl.sizeof$float, 0);
 gl.glEnableVertexAttribArray(attrid);

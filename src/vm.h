@@ -65,6 +65,7 @@ JsValueType getJsType(JsValueRef v);
 // 尝试把 js 对象输出为字符串(即使不是字符串对象)
 //
 std::string toString(JsValueRef str);
+std::string stringValue(JsValueRef str, std::string def = std::string());
 
 //
 // 检查 js 虚拟机异常状态, 如果有异常返回异常句柄, 否则返回 0;

@@ -1,11 +1,57 @@
 # gl
 
-OpenGL 应用库, 可以在任意模块直接调用.  
-该模块语法与 [GLFW](https://www.glfw.org/docs/latest/modules.html) 语法非常接近可以直接参考.
-CPP 参考中的 NULL 值在 js 中用 0 替代.
-CPP 参考中的各种指针, 在 js 中都是整数(句柄).
+3D 视频加速库继承了 GLFW 与 GLEW, 将所有公共的 c/c++ 函数导出到 javascript
+中, 命名空间为 `gl` 函数名原样保留, 常量名和宏定义名原样保留; 如果本机方法没有
+返回值, js 方法返回 `undefined`; 如果本机方法返回一个变量, js 原样返回这个包装
+后的变量, 数字/字符串/数组类型原样返回, 如果本机返回指针, js 返回一个代表句柄
+的普通数字; 如果本机方法通过多个指针返回多个值, 在 js 函数上, 直接用对象返回
+多个值, 并且这些参数不在形参列表中出现;
 
-* [OpenGL API 参考](https://www.khronos.org/registry/OpenGL-Refpages/gl4/html/)
+
+# GLFW
+
+可以在 js 环境的 'gl' 前缀中直接方法这些方法和常量;
+glfwGetPrimaryMonitor() 返回的句柄可以直接传给 glfwGetVideoMode()
+句柄的有效期由 PlayJS 管理.
+
+
+## 特殊说明
+
+Monitor/Window 等句柄可以跨线程访问.
+Window 句柄用 glfwDestroyWindow() 方法释放.
+
+
+#### Monitor glfwGetPrimaryMonitor()
+
+返回主显示器的句柄, 实际的本机指针由 PlayJS 管理.
+
+
+#### Mode glfwGetVideoMode(Monitor)
+
+Mode 是个对象, 对象中有 `width`, `height` 等属性来描述给定监视器当前状态.
+
+
+# GLEW
+
+可以在 js 环境的 'gl' 前缀中直接方法这些方法和常量;
+glBufferData() 的本机方法中有一个参数指向数组, 该参数 用 js 环境中的 
+TypedArray 代替, 长度参数被省略,  常量参数直接从 `gl` 中取值.
+倘若需要 c 语言环境中 `sizeof(float)` 的值, 
+则在 js 中访问 `gl.sizeof$float` 这个常量.
+
+
+## 特殊说明
+
+
+#### Array|int glGenBuffers(size)
+
+如果 size == 1, 则返回一个数字; 如果 size > 1, 则返回一个数组包含指定数量的数字;
+该数字是 OpenGL 状态机生成的缓冲区句柄.
+
+
+# 参考
+
+* [OpenGL API 参考](https://www.khronos.org/registry/OpenGL-Refpages)
 * [GLFW API 参考](https://www.glfw.org/docs/latest/modules.html)
 * [OpenGL 学习1](http://openglbook.com/the-book.html)
 * [OpenGL 学习2](https://open.gl/)
@@ -18,68 +64,3 @@ CPP 参考中的各种指针, 在 js 中都是整数(句柄).
 * [ ] 完成更多 GLFW 函数
 * [ ] 完成更多 OpenGL 函数
 * [ ] 完成文档
-
-
-# API
-
-## Version glfwGetVersion()
-
-## string glfwGetVersionString()
-
-## Window glfwCreateWindow(width, height, title[, monitor, share])
-
-## void glfwDestroyWindow(Window)
-
-## Monitor glfwGetPrimaryMonitor()
-
-## Mode glfwGetVideoMode(Monitor)
-
-## void glfwSetWindowMonitor(Window, Monitor, xpos, ypos, width, height, refreshRate)
-
-## void glfwSetWindowSize(Window, width, height)
-
-## void glfwWindowHint(hint, value)
-
-## Array|int glGenBuffers(size)
-
-
-# Class
-
-## Version
-
-当前 GLFW 版本, 该对象有以下属性
-
-* major
-* minor
-* rev
-
-
-## Mode
-
-显示器模式, 有以下属性
-
-* width
-* height
-* redBits
-* greenBits
-* blueBits
-* refreshRate
-
-
-## Window
-
-窗口句柄, 通过消息总线传递, 支持多线程访问.
-用完后需要释放句柄.
-
-
-## Monitor
-
-监视器句柄, 通过消息总线传递, 支持多线程访问.
-句柄无需释放.
-
-
-# const
-
-gl.const.[const-name] 来引用这些常量
-
-## GLFW_RESIZABLE

@@ -213,6 +213,99 @@ GL_FUNC(glUseProgram, args, ac) {
 }
 
 
+GL_FUNC(glGetUniformLocation, args, ac) {
+    GL_CHK_ARG(2, glGetUniformLocation(program, name));
+    GLuint prog = intValue(args[1]);
+    std::string name = stringValue(args[2]);
+    GLint r = glGetUniformLocation(prog, name.c_str());
+    return wrapJs(r);
+}
+
+
+GL_FUNC(glUniform4f, args, ac) {
+    GL_CHK_ARG(5, glUniform4f(location, v0, v1, v2, v3));
+    GLint location = intValue(args[1]);
+    GLfloat v0 = floatValue(args[2]);
+    GLfloat v1 = floatValue(args[3]);
+    GLfloat v2 = floatValue(args[4]);
+    GLfloat v3 = floatValue(args[5]);
+    glUniform4f(location, v0, v1, v2, v3);
+    return 0;
+}
+
+
+GL_FUNC(glUniform3f, args, ac) {
+    GL_CHK_ARG(4, glUniform3f(location, v0, v1, v2));
+    GLint location = intValue(args[1]);
+    GLfloat v0 = floatValue(args[2]);
+    GLfloat v1 = floatValue(args[3]);
+    GLfloat v2 = floatValue(args[4]);
+    glUniform3f(location, v0, v1, v2);
+    return 0;
+}
+
+
+GL_FUNC(glUniform2f, args, ac) {
+    GL_CHK_ARG(3, glUniform2f(location, v0, v1));
+    GLint location = intValue(args[1]);
+    GLfloat v0 = floatValue(args[2]);
+    GLfloat v1 = floatValue(args[3]);
+    glUniform2f(location, v0, v1);
+    return 0;
+}
+
+
+GL_FUNC(glUniform1f, args, ac) {
+    GL_CHK_ARG(2, glUniform1f(location, v0));
+    GLint location = intValue(args[1]);
+    GLfloat v0 = floatValue(args[2]);
+    glUniform1f(location, v0);
+    return 0;
+}
+
+
+GL_FUNC(glUniform4i, args, ac) {
+    GL_CHK_ARG(5, glUniform4i(location, v0, v1, v2, v3));
+    GLint location = intValue(args[1]);
+    GLint v0 = intValue(args[2]);
+    GLint v1 = intValue(args[3]);
+    GLint v2 = intValue(args[4]);
+    GLint v3 = intValue(args[5]);
+    glUniform4i(location, v0, v1, v2, v3);
+    return 0;
+}
+
+
+GL_FUNC(glUniform3i, args, ac) {
+    GL_CHK_ARG(4, glUniform3i(location, v0, v1, v2));
+    GLint location = intValue(args[1]);
+    GLint v0 = intValue(args[2]);
+    GLint v1 = intValue(args[3]);
+    GLint v2 = intValue(args[4]);
+    glUniform3i(location, v0, v1, v2);
+    return 0;
+}
+
+
+GL_FUNC(glUniform2i, args, ac) {
+    GL_CHK_ARG(3, glUniform2i(location, v0, v1));
+    GLint location = intValue(args[1]);
+    GLint v0 = intValue(args[2]);
+    GLint v1 = intValue(args[3]);
+    glUniform2i(location, v0, v1);
+    return 0;
+}
+
+
+GL_FUNC(glUniform1i, args, ac) {
+    GL_CHK_ARG(2, glUniform1i(location, v0));
+    GLint location = intValue(args[1]);
+    GLint v0 = intValue(args[2]);
+    glUniform1i(location, v0);
+    return 0;
+}
+
+
 GL_FUNC(glDeleteShader, args, ac) {
     GL_CHK_ARG(1, glDeleteShader(shader));
     GLuint shader = intValue(args[1]);
@@ -283,6 +376,26 @@ GL_FUNC(glDeleteVertexArrays, args, ac) {
 }
 
 
+GL_FUNC(glDrawElements, args, ac) {
+    GL_CHK_ARG(4, glDrawElements(mode, count, type, indices));
+    GLenum mode = intValue(args[1]); 
+    GLsizei count = intValue(args[2]);
+    GLenum type = intValue(args[3]);
+    int indices = intValue(args[4]);
+    glDrawElements(mode, count, type, (void*) indices);
+    return 0;
+}
+
+
+GL_FUNC(glGetIntegerv, args, ac) {
+    GL_CHK_ARG(1, glGetIntegerv(pname));
+    GLenum pname = intValue(args[1]);
+    GLint ret = 0;
+    glGetIntegerv(pname, &ret);
+    return wrapJs(ret);
+}
+
+
 void installGLCore(VM* vm, LocalVal& gl) {
     GL_BIND(glewInit);
     GL_BIND(glViewport);
@@ -290,6 +403,18 @@ void installGLCore(VM* vm, LocalVal& gl) {
     GL_BIND(glDeleteBuffers);
     GL_BIND(glBindBuffer);
     GL_BIND(glBufferData);
+
+    GL_BIND(glDrawElements);
+    GL_BIND(glGetIntegerv);
+    GL_BIND(glGetUniformLocation);
+    GL_BIND(glUniform4f);
+    GL_BIND(glUniform3f);
+    GL_BIND(glUniform2f);
+    GL_BIND(glUniform1f);
+    GL_BIND(glUniform4i);
+    GL_BIND(glUniform3i);
+    GL_BIND(glUniform2i);
+    GL_BIND(glUniform1i);
 
     GL_BIND(glCreateShader);
     GL_BIND(glDeleteShader);
