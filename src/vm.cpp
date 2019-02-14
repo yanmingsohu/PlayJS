@@ -159,6 +159,15 @@ double doubleValue(JsValueRef v, double defaultVal) {
 }
 
 
+bool boolValue(JsValueRef v, bool defaultVal) {
+    bool r = defaultVal;
+    if (v) {
+        JsBooleanToBool(v, &r);
+    }
+    return r;
+}
+
+
 bool isJsNumber(JsValueRef v) {
     return getJsType(v) == JsNumber;
 }

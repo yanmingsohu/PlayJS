@@ -58,6 +58,18 @@ JsValueRef genTpl(GLsizei size, void(*genFunc)(GLsizei, IdType*)) {
 }
 
 
+typedef void(*UniformMatrixFunc)(GLint location,
+        GLsizei count, GLboolean transpose, const GLfloat *value);
+
+void UniformMatrixTpl(JsValueRef *args, UniformMatrixFunc umat) {
+    GLint location = intValue(args[1]);
+    GLsizei count = intValue(args[2]);
+    GLboolean transpose = boolValue(args[3]);
+    LocalTypedArray value(args[4]);
+    umat(location, count, transpose, (GLfloat*)value.buffer());
+}
+
+
 GL_FUNC(glViewport, args, ac) {
     GL_CHK_ARG(4, glViewport(x, y, width, height));
     int x = intValue(args[1]);
@@ -313,6 +325,69 @@ GL_FUNC(glUniform1i, args, ac) {
 }
 
 
+GL_FUNC(glUniformMatrix4fv, args, ac) {
+    GL_CHK_ARG(4, glUniformMatrix4fv(location, count, transpose, value));
+    UniformMatrixTpl(args, glUniformMatrix4fv);
+    return 0;
+}
+
+
+GL_FUNC(glUniformMatrix3fv, args, ac) {
+    GL_CHK_ARG(4, glUniformMatrix3fv(location, count, transpose, value));
+    UniformMatrixTpl(args, glUniformMatrix3fv);
+    return 0;
+}
+
+
+GL_FUNC(glUniformMatrix2fv, args, ac) {
+    GL_CHK_ARG(4, glUniformMatrix2fv(location, count, transpose, value));
+    UniformMatrixTpl(args, glUniformMatrix2fv);
+    return 0;
+}
+
+
+GL_FUNC(glUniformMatrix2x3fv, args, ac) {
+    GL_CHK_ARG(4, glUniformMatrix2x3fv(location, count, transpose, value));
+    UniformMatrixTpl(args, glUniformMatrix2x3fv);
+    return 0;
+}
+
+
+GL_FUNC(glUniformMatrix3x2fv, args, ac) {
+    GL_CHK_ARG(4, glUniformMatrix3x2fv(location, count, transpose, value));
+    UniformMatrixTpl(args, glUniformMatrix3x2fv);
+    return 0;
+}
+
+
+GL_FUNC(glUniformMatrix2x4fv, args, ac) {
+    GL_CHK_ARG(4, glUniformMatrix2x4fv(location, count, transpose, value));
+    UniformMatrixTpl(args, glUniformMatrix2x4fv);
+    return 0;
+}
+
+
+GL_FUNC(glUniformMatrix4x2fv, args, ac) {
+    GL_CHK_ARG(4, glUniformMatrix4x2fv(location, count, transpose, value));
+    UniformMatrixTpl(args, glUniformMatrix4x2fv);
+    return 0;
+}
+
+
+GL_FUNC(glUniformMatrix3x4fv, args, ac) {
+    GL_CHK_ARG(4, glUniformMatrix3x4fv(location, count, transpose, value));
+    UniformMatrixTpl(args, glUniformMatrix3x4fv);
+    return 0;
+}
+
+
+GL_FUNC(glUniformMatrix4x3fv, args, ac) {
+    GL_CHK_ARG(4, glUniformMatrix4x3fv(location, count, transpose, value));
+    UniformMatrixTpl(args, glUniformMatrix4x3fv);
+    return 0;
+}
+
+
 GL_FUNC(glDeleteShader, args, ac) {
     GL_CHK_ARG(1, glDeleteShader(shader));
     GLuint shader = intValue(args[1]);
@@ -458,6 +533,15 @@ void installGLCore(VM* vm, LocalVal& gl) {
     GL_BIND(glUniform3i);
     GL_BIND(glUniform2i);
     GL_BIND(glUniform1i);
+    GL_BIND(glUniformMatrix2fv);
+    GL_BIND(glUniformMatrix3fv);
+    GL_BIND(glUniformMatrix4fv);
+    GL_BIND(glUniformMatrix2x3fv);
+    GL_BIND(glUniformMatrix3x2fv);
+    GL_BIND(glUniformMatrix2x4fv);
+    GL_BIND(glUniformMatrix4x2fv);
+    GL_BIND(glUniformMatrix3x4fv);
+    GL_BIND(glUniformMatrix4x3fv);
 
     GL_BIND(glCreateShader);
     GL_BIND(glDeleteShader);

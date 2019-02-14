@@ -158,6 +158,14 @@ JS_FUNC_TPL(js_fpos, c, args, ac, info, d) {
 }
 
 
+JS_FUNC_TPL(js_exists, c, args, ac, info, d) {
+    JSS_CHK_ARG(1, exists(path));
+    auto filename = stringValue(args[1]);
+    bool ex = fs::exists(filename);
+    return wrapJs(ex);
+}
+
+
 void installFileSystem(VM *vm) {
     DEF_GLOBAL(vm, fs);
 
@@ -182,4 +190,5 @@ void installFileSystem(VM *vm) {
     fs.put("fposSync", fpos);
 
     DEF_JS_FUNC(vm, vm, fs, fileSize, js_file_size);
+    DEF_JS_FUNC(vm, vm, fs, exists, js_exists);
 }

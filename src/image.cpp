@@ -9,6 +9,14 @@ void freeImage(void *data) {
 }
 
 
+JSS_FUNC(flip_vertically_on_load, args, ac) {
+    JSS_CHK_ARG(1, stbi_set_flip_vertically_on_load());
+    bool flag = boolValue(args[1]);
+    stbi_set_flip_vertically_on_load(flag);
+    return 0;
+}
+
+
 JSS_FUNC(load, args, ac) {
     JSS_CHK_ARG(1, load(filename));
     std::string fn = stringValue(args[1]);
@@ -33,4 +41,5 @@ JSS_FUNC(load, args, ac) {
 JSS_INIT_MODULE(installImage) {
     JSS_MOD(image);
     JSS_BIND(load);
+    JSS_BIND(flip_vertically_on_load);
 }

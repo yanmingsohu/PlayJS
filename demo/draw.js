@@ -1,5 +1,6 @@
 export default {}
 import draw from '../boot/draw.js'
+import matrix from '../boot/matrix.js'
 
 var window = draw.createWindow();
 window.setClearColor([0.2, 0.3, 0.3, 1]);
@@ -15,10 +16,12 @@ layout (location = 2) in vec2 aTexCoord;
 
 out vec3 ourColor;
 out vec2 TexCoord;
+uniform mat4 transform;
+
 
 void main()
 {
-    gl_Position = vec4(aPos, 1.0);
+    gl_Position = transform * vec4(aPos, 1.0);
     ourColor = aColor;
     TexCoord = aTexCoord;
 }`;
@@ -83,11 +86,15 @@ window.onKey(gl.GLFW_KEY_ESCAPE, gl.GLFW_PRESS, 0, function() {
 });
 
 var frameCount = 0;
-
+var transform = shaderProgram.getUniform('transform');
+var tmat = matrix.mat4.create(1);
 
 while (window.nextFrame()) {
   var timeValue = gl.glfwGetTime();
   ++frameCount;
+  transform.active();
+  matrix.mat4.rotateY(tmat, tmat, 0.01);
+  transform.setMatrix4fv(1, gl.GL_FALSE, tmat);
   console.line('total:', frameCount, 'rate:', parseInt(frameCount/timeValue));
 }
 

@@ -45,3 +45,12 @@ mode可以是 'w' 写文件, 'r' 读文件等.
 将缓冲区 buffer 中从 b_offset 开始 b_length 个字节的数据;
 写入文件句柄 fd 引用的文件中, 文件从 f_pos 开始写, f_pos 参数可以省略.
 
+
+## int fileSize(path)
+
+返回文件大小(字节)
+
+
+## bool exists(path)
+
+文件存在返回 true

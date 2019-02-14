@@ -135,9 +135,7 @@ function createProgram() {
     attach        : attach,
     link          : link,
     _program      : program,
-    setUniform4f  : setUniform4f,
-    setUniform1f  : setUniform1f,
-    setUniform1i  : setUniform1i,
+    getUniform    : getUniform,
   };
 
   //
@@ -160,30 +158,51 @@ function createProgram() {
     }
   }
 
+  function getUniform(name) {
+    var uni = uniformMap[name];
+    if (!uni) { 
+      var loc = gl.glGetUniformLocation(program, name);
+      uni = uniformMap[name] = Uniform(loc, program);
+    }
+    return uni;
+  }
+}
+
+
+//
+// 设置全局变量
+//
+function Uniform(loc, program) {
+  return {
+    _loc : loc,
+    active : active,
+    setUniform4f : setUniform4f,
+    setUniform1f : setUniform1f,
+    setUniform1i : setUniform1i,
+    setMatrix4fv : setMatrix4fv,
+  };
+
   //
-  // 设置全局变量
+  // 在 set (多个)变量前, 执行一次该方法.
   //
-  function setUniform4f(name, v1, v2, v3, v4) {
-    var loc = _get_uniform(name);
+  function active() {
+    gl.glUseProgram(program); 
+  }
+
+  function setUniform4f(v1, v2, v3, v4) {
     gl.glUniform4f(loc, v1, v2, v3, v4);
   }
 
-  function setUniform1f(name, v1) {
-    var loc = _get_uniform(name);
+  function setUniform1f(v1) {
     gl.glUniform1f(loc, v1);
   }
 
-  function setUniform1i(name, v1) {
-    var loc = _get_uniform(name);
+  function setUniform1i(v1) {
     gl.glUniform1i(loc, v1);
   }
 
-  function _get_uniform(name) {
-    var u = uniformMap[name];
-    if (u) { return u; }
-    var loc = gl.glGetUniformLocation(program, name);
-    uniformMap[name] = loc;
-    return loc;
+  function setMatrix4fv(count, transpose, value) {
+    gl.glUniformMatrix4fv(loc, count, transpose, value);
   }
 }
 
@@ -204,6 +223,7 @@ function createBasicDrawObject(programObj) {
   return _ret;
 
   function loadTexImage(file) {
+    image.flip_vertically_on_load(true);
     var img = image.load(file);
     var texture = gl.glGenTextures(1);
     gl.glBindTexture(gl.GL_TEXTURE_2D, texture);  
@@ -339,5 +359,5 @@ function checkGLerr(name) {
     case gl.GL_NO_ERROR:
         return;
   }
-  console.log("GL err:", name, code.toString(16), msg);
+  console.log("GL err:", name, '0x'+code.toString(16), msg);
 }

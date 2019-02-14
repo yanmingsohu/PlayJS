@@ -40,6 +40,7 @@ void pushException(std::string, int code = 0);
 int intValue(JsValueRef r, int defaultVal = 0);
 double floatValue(JsValueRef v, double defaultVal = 0);
 double doubleValue(JsValueRef v, double defaultVal = 0);
+bool boolValue(JsValueRef v, bool defaultVal = false);
 
 
 //
