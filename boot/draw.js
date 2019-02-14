@@ -22,8 +22,10 @@ function createWindow(w, h, title) {
   var window = gl.glfwCreateWindow(w, h, title || "PlayJS");
   gl.glfwMakeContextCurrent(window);
   gl.glewInit();
+  gl.glEnable(gl.GL_DEPTH_TEST);  
   gl.glViewport(0, 0, w, h);
 
+  var clearFlag = gl.GL_DEPTH_BUFFER_BIT | gl.GL_COLOR_BUFFER_BIT;
   var key_listener = [];
   var draw_list = [];
 
@@ -59,7 +61,7 @@ function createWindow(w, h, title) {
       }
     }
 
-    gl.glClear(gl.GL_COLOR_BUFFER_BIT);
+    gl.glClear(clearFlag);
 
     for (var i=draw_list.length-1; i>=0; --i) {
       draw_list[i].draw();

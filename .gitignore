@@ -39,3 +39,4 @@ deps/**
 !*.vcxproj
 !*.filters
 !*.user
+!art/**

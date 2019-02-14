@@ -77,7 +77,7 @@ d1.setAttr({ index: 1, vsize: 3, stride: 8*gl.sizeof$float,
              offset: 4*gl.sizeof$float });
 d1.setAttr({ index: 2, vsize: 2, stride: 8*gl.sizeof$float, 
              offset: 6*gl.sizeof$float });
-d1.loadTexImage("./demo/container.jpg");
+d1.loadTexImage("./art/container.jpg");
 window.add(d1);
 
 
