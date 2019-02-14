@@ -22,6 +22,7 @@ const char* prefix[] = {
 };
 
 static unsigned int codePage;
+static char endch = '\n';
 
 #ifdef WIN32
 static void checkCodePage() {
@@ -39,9 +40,9 @@ static void sys_out(const char *src_str) {
         int rlen = MultiByteToWideChar(CP_UTF8, 0, src_str, -1, buf1, sizeof(buf1));
         WideCharToMultiByte(codePage, 0, buf1, rlen, buf2, sizeof(buf2), NULL, NULL);
 
-        printf("%s %s\n", head_buf, buf2);
+        printf("%s %s%c", head_buf, buf2, endch);
     } else {
-        printf("%s %s\n", head_buf, src_str);
+        printf("%s %s%c", head_buf, src_str, endch);
     }
 }
 #else
@@ -49,7 +50,7 @@ static void checkCodePage() {
 }
 
 static void sys_out(const char *out) {
-    printf("%s %s\n", head_buf, out);
+    printf("%s %s%c", head_buf, out, endch);
 }
 #endif
 
@@ -103,6 +104,7 @@ static JsValueRef logfunc(JsValueRef *args, unsigned short ac, int level, thread
         content_buf[buf_off] = 0;
         sys_out(content_buf);
     }
+    endch = '\n';
     return 0;
 }
 
@@ -132,6 +134,12 @@ JS_FUNC_TPL(js_fatal, c, args, ac, info, _vm) {
 }
 
 
+JS_FUNC_TPL(js_line, c, args, ac, info, _vm) {
+    endch = '\r';
+    return logfunc(args, ac, LINFO, ((VM*)_vm)->thread());
+}
+
+
 void installConsole(VM* vm) {
     checkCodePage();
     DEF_GLOBAL(vm, console);
@@ -142,4 +150,5 @@ void installConsole(VM* vm) {
     DEF_JS_FUNC(vm, vm, console, error, js_error);
     DEF_JS_FUNC(vm, vm, console, debug, js_debug);
     DEF_JS_FUNC(vm, vm, console, fatal, js_fatal);
+    DEF_JS_FUNC(vm, vm, console, line,  js_line);
 }

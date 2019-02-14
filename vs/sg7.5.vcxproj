@@ -179,6 +179,7 @@
     <ClInclude Include="..\src\fs.h" />
     <ClInclude Include="..\src\gl.h" />
     <ClInclude Include="..\src\gldeleter.h" />
+    <ClInclude Include="..\src\js.h" />
     <ClInclude Include="..\src\shared.h" />
     <ClInclude Include="..\src\threads.h" />
     <ClInclude Include="..\src\util.h" />
@@ -195,6 +196,7 @@
     <ClCompile Include="..\src\glconst.cpp" />
     <ClCompile Include="..\src\glcore.cpp" />
     <ClCompile Include="..\src\glfw.cpp" />
+    <ClCompile Include="..\src\image.cpp" />
     <ClCompile Include="..\src\main.cpp" />
     <ClCompile Include="..\src\shared.cpp" />
     <ClCompile Include="..\src\threads.cpp" />

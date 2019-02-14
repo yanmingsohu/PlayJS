@@ -6,6 +6,8 @@
 #include <string>
 #include <iostream>
 #include "threads.h"
+#include "js.h"
+
 
 JsErrorCode iFetchImportedModuleCallBack(
     _In_ JsModuleRecord referencingModule,
@@ -87,29 +89,6 @@ const char* const parseJsErrCode(JsErrorCode c);
 // 解析 js 数据类型为描述字符串
 //
 const char* const getJsTypeName(const JsValueType type);
-
-//
-// 在 obj(LocalVal) 对象上绑定名字为 name 的方法 func_ptr(本地cpp函数指针)
-// 必要时附加扩展数据 ext_data, 或为 NULL
-//
-#define DEF_JS_FUNC(vm, ext_data, obj, jsname, func_ptr) \
-    obj.put(#jsname, vm->createFunction(&func_ptr, #jsname, ext_data))
-
-//
-// 用 val_name 绑定 js 全局变量, 创建 cpp 的变量句柄 val_name
-//
-#define DEF_GLOBAL(vm, val_name) \
-    LocalVal val_name = vm->createObject(); \
-    vm->getGlobal().put(#val_name, val_name)
-
-//
-// 生成 js 本机方法函数头.
-// args[0] 是 this, args[1] 是第一个参数.
-//
-#define JS_FUNC_TPL(name, callee, args, argc, info, vm) \
-    static JsValueRef name( \
-        JsValueRef callee, JsValueRef *args, unsigned short argc, \
-        JsNativeFunctionInfo *info, void *vm)
 
 //
 // 在局部变量上引用 js 对象, 自动对 js 对象增加外部引用计数

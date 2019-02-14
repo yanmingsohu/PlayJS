@@ -49,6 +49,9 @@
     <ClCompile Include="..\src-auto\glew.h.cc">
       <Filter>auto-code</Filter>
     </ClCompile>
+    <ClCompile Include="..\src\image.cpp">
+      <Filter>core</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\src\export-js.h">
@@ -76,6 +79,9 @@
       <Filter>auto-code</Filter>
     </ClInclude>
     <ClInclude Include="..\src\gldeleter.h">
+      <Filter>core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\js.h">
       <Filter>core</Filter>
     </ClInclude>
   </ItemGroup>

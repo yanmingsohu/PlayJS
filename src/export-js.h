@@ -9,6 +9,7 @@ void installThread(VM*);
 void installEvents(VM* vm);
 void installShared(VM* vm);
 void installGL(VM* vm);
+void installImage(VM* vm);
 
 void unstallGL(VM* vm);
 void destoryEvents(VM* vm);

@@ -1,19 +1,24 @@
 # PlayJS 
 
 基于 javascript 的游戏引擎.
+The Javascript Game engine.
 
 特征:
+feature
 
-1. 支持多线程.
-2. 支持线程间消息传递.
-3. 文本使用 UTF-8 编码.
+1. 支持多线程. Support for multi-threading.
+2. 支持线程间消息传递. Support inter-thread messaging.
+3. 文本使用 UTF-8 编码. The text uses UTF-8 encoding.
+4. 无复制的线程间数据共享. Data sharing between threads without replication.
+5. 底层函数和高级函数共存. The underlying function and the advanced function coexist.
+6. 不安全的高性能. Unsafe high performance.
 
 
-## 待实现
+## 待实现 Pending
 
 * [x] 控制台输出乱码
 * [x] 启动新线程
-* [ ] 线程数据共享
+* [ ] 线程数据共享(无复制)
   * [x] 在线程间传递消息
   * [ ] 在线程间共享缓冲区
   * [ ] 在线程间共享对象

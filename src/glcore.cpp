@@ -41,6 +41,23 @@ static int callJsWithNumOrArr(JsValueRef arg,
 }
 
 
+template<class IdType>
+JsValueRef genTpl(GLsizei size, void(*genFunc)(GLsizei, IdType*)) {
+    if (size == 1) {
+        GLuint id = 0;
+        genFunc(1, &id);
+        return wrapJs(id);
+    }
+    else if (size > 1) {
+        std::unique_ptr<IdType[]> arr(new IdType[size]);
+        genFunc(size, arr.get());
+        return wrapArr(arr.get(), size);
+    }
+    pushException("size must > 0");
+    return 0;
+}
+
+
 GL_FUNC(glViewport, args, ac) {
     GL_CHK_ARG(4, glViewport(x, y, width, height));
     int x = intValue(args[1]);
@@ -55,17 +72,7 @@ GL_FUNC(glViewport, args, ac) {
 GL_FUNC(glGenBuffers, args, ac) {
     GL_CHK_ARG(1, glGenBuffers(size));
     GLsizei size = intValue(args[1]);
-    if (size == 1) {
-        GLuint id = 0;
-        glGenBuffers(1, &id);
-        return wrapJs(id);
-    }
-    else if (size > 1) {
-        std::unique_ptr<GLuint[]> arr(new GLuint[size]);
-        glGenBuffers(size, arr.get()); 
-        return wrapArr(arr.get(), size);
-    }
-    return 0;
+    return genTpl(size, glGenBuffers);
 }
 
 
@@ -354,17 +361,7 @@ GL_FUNC(glBindVertexArray, args, ac) {
 GL_FUNC(glGenVertexArrays, args, ac) {
     GL_CHK_ARG(1, glGenVertexArrays(size));
     GLsizei size = intValue(args[1]);
-    if (size == 1) {
-        GLuint id = 0;
-        glGenVertexArrays(1, &id);
-        return wrapJs(id);
-    }
-    else if (size > 1) {
-        std::unique_ptr<GLuint[]> arr(new GLuint[size]);
-        glGenVertexArrays(size, arr.get());
-        return wrapArr(arr.get(), size);
-    }   
-    return 0;
+    return genTpl(size, glGenVertexArrays);
 }
 
 
@@ -396,6 +393,47 @@ GL_FUNC(glGetIntegerv, args, ac) {
 }
 
 
+GL_FUNC(glTexParameterfv, args, ac) {
+    GL_CHK_ARG(3, glTexParameterfv(target, pname, params));
+    GLenum target = intValue(args[1]);
+    GLenum pname = intValue(args[2]);
+    LocalTypedArray arr(args[3]);
+    glTexParameterfv(target, pname, (GLfloat*) arr.buffer());
+    return 0;
+}
+
+
+GL_FUNC(glGenTextures, args, ac) {
+    GL_CHK_ARG(1, glGenTextures(size));
+    GLsizei size = intValue(args[1]);
+    return genTpl(size, glGenTextures);
+}
+
+
+GL_FUNC(glTexImage2D, args, ac) {
+    GL_CHK_ARG(9, glTexImage2D(target, mipmap_level, internalformat, width, height, border, format, type, data));
+    GLenum target = intValue(args[1]);
+    GLint level = intValue(args[2]);
+    GLint internalformat = intValue(args[3]);
+    GLsizei width = intValue(args[4]);
+    GLsizei height = intValue(args[5]);
+    GLint border = intValue(args[6]);
+    GLenum format = intValue(args[7]);
+    GLenum type = intValue(args[8]);
+    LocalTypedArray data(args[9]);
+    glTexImage2D(target, level, internalformat, width, height, border, format, type, data.buffer());
+    return 0;
+}
+
+
+JSS_FUNC(glGenerateMipmap, args, ac) {
+    GL_CHK_ARG(1, glGenerateMipmap(target));
+    GLenum target = intValue(args[1]);
+    glGenerateMipmap(target);
+    return 0;
+}
+
+
 void installGLCore(VM* vm, LocalVal& gl) {
     GL_BIND(glewInit);
     GL_BIND(glViewport);
@@ -403,6 +441,11 @@ void installGLCore(VM* vm, LocalVal& gl) {
     GL_BIND(glDeleteBuffers);
     GL_BIND(glBindBuffer);
     GL_BIND(glBufferData);
+
+    GL_BIND(glTexParameterfv);
+    GL_BIND(glGenTextures);
+    GL_BIND(glTexImage2D);
+    GL_BIND(glGenerateMipmap);
 
     GL_BIND(glDrawElements);
     GL_BIND(glGetIntegerv);

@@ -199,8 +199,26 @@ function createBasicDrawObject(programObj) {
     setAttr     : setAttr,
     addVertices : addVertices,
     addVerticesElements : addVerticesElements,
+    loadTexImage : loadTexImage,
   };
   return _ret;
+
+  function loadTexImage(file) {
+    var img = image.load(file);
+    var texture = gl.glGenTextures(1);
+    gl.glBindTexture(gl.GL_TEXTURE_2D, texture);  
+
+    gl.glTexParameteri(gl.GL_TEXTURE_2D, 
+      gl.GL_TEXTURE_WRAP_S, gl.GL_MIRRORED_REPEAT);
+    gl.glTexParameteri(gl.GL_TEXTURE_2D, 
+      gl.GL_TEXTURE_MIN_FILTER, gl.GL_LINEAR_MIPMAP_LINEAR);
+    gl.glTexParameteri(gl.GL_TEXTURE_2D, 
+      gl.GL_TEXTURE_MAG_FILTER, gl.GL_LINEAR);
+    
+    gl.glTexImage2D(gl.GL_TEXTURE_2D, 0, gl.GL_RGB, 
+            img.x, img.y, 0, gl.GL_RGB, gl.GL_UNSIGNED_BYTE, img.data);
+    gl.glGenerateMipmap(gl.GL_TEXTURE_2D);
+  }
 
   //
   // vertices : Float32Array 对象, 存储顶点

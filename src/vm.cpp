@@ -269,12 +269,20 @@ void VM:: initModule() {
 void LocalTypedArray::init() {
     JsValueType type;
     JsGetValueType(jsv, &type);
-    if (type != JsTypedArray) {
-        pushException("LocalTypedArray: Is not TypedArray");
-        return;
+    JsErrorCode code;
+
+    if (type == JsTypedArray) {
+        code = JsGetTypedArrayStorage(jsv, &_buf, &_len, &_type, &_byteLen);
+    }
+    else if (type == JsArrayBuffer) {
+        code = JsGetArrayBufferStorage(jsv, &_buf, &_len);
+        _byteLen = _len;
+        _type = JsArrayTypeInt8;
+    }
+    else {
+        pushException("<LocalTypedArray> Value Is not TypedArray or ArrayBuffer");
     }
 
-    JsErrorCode code = JsGetTypedArrayStorage(jsv, &_buf, &_len, &_type, &_byteLen);
     if (JsNoError != code) {
         _len = 0;
         _buf = 0;

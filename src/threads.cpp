@@ -40,6 +40,7 @@ static void installJsLibrary(VM* vm) {
     installEvents(vm);
     installShared(vm);
     installGL(vm);
+    installImage(vm);
 }
 
 
