@@ -52,6 +52,9 @@
     <ClCompile Include="..\src\image.cpp">
       <Filter>core</Filter>
     </ClCompile>
+    <ClCompile Include="..\src\model-parser.cpp">
+      <Filter>core</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\src\export-js.h">
@@ -82,6 +85,9 @@
       <Filter>core</Filter>
     </ClInclude>
     <ClInclude Include="..\src\js.h">
+      <Filter>core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\model-ply.h">
       <Filter>core</Filter>
     </ClInclude>
   </ItemGroup>

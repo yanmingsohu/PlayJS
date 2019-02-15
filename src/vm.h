@@ -91,6 +91,13 @@ const char* const parseJsErrCode(JsErrorCode c);
 //
 const char* const getJsTypeName(const JsValueType type);
 
+
+//
+// 错误对象的堆栈字符串, 如果不是错误对象返回空字符串
+//
+std::string errorStack(JsValueRef _err);
+
+
 //
 // 在局部变量上引用 js 对象, 自动对 js 对象增加外部引用计数
 //
@@ -178,6 +185,10 @@ public:
 
     bool isFunction() {
         return getJsType(jsv) == JsFunction;
+    }
+
+    bool is(JsValueType t) {
+        return getJsType(jsv) == t;
     }
 
     //

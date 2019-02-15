@@ -81,6 +81,6 @@
 
 
 //
-// 模块初始化
+// 定义一个函数, 用于js模块初始化
 //
 #define JSS_INIT_MODULE(name)  void name(VM* vm)

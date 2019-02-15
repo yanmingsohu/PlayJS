@@ -25,7 +25,7 @@ namespace fs = std::experimental::filesystem::v1;
 size_t readFile(std::string& file, char **buf) {
     FILE* fd = 0;
     if (fopen_s(&fd, file.c_str(), "rb")) {
-        return FAILED;
+        return 0;
     }
     
     LocalResource<FILE, int> close(fd, fclose);

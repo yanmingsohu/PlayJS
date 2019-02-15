@@ -2,7 +2,7 @@ export default {}
 
 import draw   from '../boot/draw.js'
 import matrix from '../boot/matrix.js'
-import ply    from '../boot/model-ply.js'
+import model  from '../boot/model.js'
 
 var window = draw.createWindow();
 window.setClearColor([0.2, 0.3, 0.3, 1]);
@@ -18,8 +18,9 @@ uniform mat4 projection;
 
 void main()
 {
-    gl_Position = projection * transform * vec4(aPos, 1.0);
-    ourColor = aColor;
+    gl_Position = projection * transform 
+            * vec4(aPos[0]/100, aPos[1]/100, aPos[2]/100, 1.0);
+    ourColor = vec3(aColor[0]/255, aColor[1]/255, aColor[2]/255);
 }`;
 
 var vertexShader = draw.createShader(
@@ -51,9 +52,16 @@ shaderProgram.link();
 var d1 = draw.createBasicDrawObject(shaderProgram);
 
 console.log("start ply model..");
-var opt = { pos_normalized: 100, color_normalized: 256 };
-var model = ply.read('art/monu1.ply', opt);
-d1.addVerticesElements(model.vertex.data, model.face.data);
+// ** parse PLY file use javascript.
+// import ply from '../boot/model-ply.js'
+// var opt = { pos_normalized: 1, color_normalized: 1 };
+// var model0 = ply.read('art/monu1.ply', opt);
+// d1.addVerticesElements(model0.vertex.data, model0.face.data);
+
+var plyfile = 'art/chr_rain.ply'; //'art/monu1.ply';
+var m3d = model.load(plyfile);
+d1.addVerticesElements(m3d.vertex, m3d.index);
+
 d1.setAttr({ index: 0, vsize: 3, stride: 6*gl.sizeof$float });
 d1.setAttr({ index: 1, vsize: 3, stride: 6*gl.sizeof$float,
              offset: 3*gl.sizeof$float });

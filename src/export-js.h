@@ -2,14 +2,31 @@
 
 #include "vm.h"
 
-void installConsole(VM*);
-void installFileSystem(VM*);
-void installUtf(VM*);
-void installThread(VM*);
-void installEvents(VM* vm);
-void installShared(VM* vm);
-void installGL(VM* vm);
-void installImage(VM* vm);
+//
+// 声明已经定义的函数, 并调用
+//
+#define JSS_DECLARE_MODULE(name) \
+    JSS_INIT_MODULE(name); \
+    name(data)
 
-void unstallGL(VM* vm);
-void destoryEvents(VM* vm);
+
+template<class T>
+void installJsLibrary(T *data) {
+    JSS_DECLARE_MODULE(installConsole);
+    JSS_DECLARE_MODULE(installFileSystem);
+    JSS_DECLARE_MODULE(installUtf);
+    JSS_DECLARE_MODULE(installThread);
+    JSS_DECLARE_MODULE(installEvents);
+    JSS_DECLARE_MODULE(installShared);
+    JSS_DECLARE_MODULE(installGL);
+    JSS_DECLARE_MODULE(installImage);
+    JSS_DECLARE_MODULE(installModelParser);
+}
+
+
+template<class T>
+void unstallJsLIbrary(T *data) {
+    JSS_DECLARE_MODULE(unstallGL);
+    JSS_DECLARE_MODULE(destoryEvents);
+}
+

@@ -108,6 +108,7 @@ JsErrorCode newModule(JsModuleRecord parent,
             JsParseModuleSourceFlags_DataIsUTF8, &exception);
     
     if (exception) {
+        println(errorStack(exception), 0, LERROR);
         return JsErrorModuleParsed;
     }
     if (err) return err;
@@ -298,6 +299,19 @@ void LocalTypedArray::init() {
         _byteLen = -1;
         pushException(parseJsErrCode(code));
     }
+}
+
+
+std::string errorStack(JsValueRef _err) {
+    if (_err) {
+        LocalVal err(_err);
+        LocalVal st = err.get("stack");
+        if (st.is(JsString)) {
+            return st.toString();
+        }
+        return err.toString();
+    }
+    return "";
 }
 
 

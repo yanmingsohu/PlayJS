@@ -1,3 +1,7 @@
+//
+// 该模块仅作为演示, 使用 `model` 模块来加速解析各种文件.
+// 用 js 来解析 3d 模型消耗内存太大.
+//
 export default {
   parse : parse,
   read  : read,

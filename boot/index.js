@@ -1,4 +1,3 @@
-import hex from './hex.js';
 import test from '../demo/basic.js';
 //import pck from './pck.js';
 //export default {};

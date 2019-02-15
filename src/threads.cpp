@@ -32,24 +32,6 @@ static string& operator+(string& s, int i) {
 }
 
 
-static void installJsLibrary(VM* vm) {
-    installConsole(vm);
-    installFileSystem(vm);
-    installUtf(vm);
-    installThread(vm);
-    installEvents(vm);
-    installShared(vm);
-    installGL(vm);
-    installImage(vm);
-}
-
-
-static void unstallJsLIbrary(VM* vm) {
-    destoryEvents(vm);
-    unstallGL(vm);
-}
-
-
 void loadScript(string& filename, threadId id) {
     LocalResource<threadId> freeThreadHandle(reinterpret_cast<threadId*>(id), freeThread);
     println("Start Script '"+ filename +"'", id);
@@ -65,18 +47,13 @@ void loadScript(string& filename, threadId id) {
 
     JsErrorCode r = vm.loadModule(0, filename, code);
     if (r) {
-        println("Load Module '"+ filename +"' failed code: "+ r, id);
+        println("Load Module '"+ filename +"' failed code: "+ r, id, LERROR);
+        println(parseJsErrCode(r), id, LERROR);
     }
 
     LocalVal err = vm.checkError();
     if (err.notNull()) {
-        LocalVal st = err.get("stack");
-        if (st.notNull()) {
-            println("Exit on failed: "+ st.toString(), id);
-        }
-        else {
-            println("Exit on failed: "+ err.toString(), id);
-        }
+        println("Exit on failed: "+ errorStack(err), id, LERROR);
     }
     unstallJsLIbrary(&vm);
     println("Script '"+ filename+ "' Exit", id);
