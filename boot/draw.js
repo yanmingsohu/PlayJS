@@ -2,6 +2,8 @@
 // 在 OpenGL 上做一层 api, 使绘制函数更易于使用.
 //
 console.log('GLFW version:', gl.glfwGetVersionString());
+import matrix from './matrix.js'
+
 export default {
   createWindow          : createWindow,
   checkGLerr            : checkGLerr,
@@ -19,10 +21,13 @@ function createWindow(w, h, title) {
   var mode = gl.glfwGetVideoMode(moni);
   console.log("Primary Monitor:", JSON.stringify(mode));
 
+  // 4 倍抗锯齿
+  gl.glfwWindowHint(gl.GLFW_SAMPLES, 4);
   var window = gl.glfwCreateWindow(w, h, title || "PlayJS");
   gl.glfwMakeContextCurrent(window);
   gl.glewInit();
-  gl.glEnable(gl.GL_DEPTH_TEST);  
+  gl.glEnable(gl.GL_DEPTH_TEST);
+  gl.glEnable(gl.GL_MULTISAMPLE);  
   gl.glViewport(0, 0, w, h);
 
   var clearFlag = gl.GL_DEPTH_BUFFER_BIT | gl.GL_COLOR_BUFFER_BIT;
@@ -85,6 +90,7 @@ function createWindow(w, h, title) {
   function fullscreen() {
     gl.glfwSetWindowMonitor(window, moni, 0, 0, 
         mode.width, mode.height, mode.refreshRate);
+    gl.glViewport(0, 0, mode.width, mode.height);
   }
 
   //
@@ -134,11 +140,33 @@ function createProgram() {
   var uniformMap = {};
 
   return {
-    attach        : attach,
-    link          : link,
-    _program      : program,
-    getUniform    : getUniform,
+    attach           : attach,
+    link             : link,
+    _program         : program,
+    getUniform       : getUniform,
+    setProjection    : setProjection,
+    readShader       : readShader,
+    readFragShader   : readFragShader,
+    readVertexShader : readVertexShader,
   };
+
+  //
+  // 从文件中读取着色器, 并绑定到当前程序, 返回 shader 句柄.
+  //
+  function readShader(filename, type) {
+    var code = fs.read_txt(filename);
+    var shader = createShader(code, type);
+    attach(shader);
+    return shader;
+  }
+
+  function readVertexShader(filename) {
+    return readShader(filename, gl.GL_VERTEX_SHADER);
+  }
+
+  function readFragShader(filename) {
+    return readShader(filename, gl.GL_FRAGMENT_SHADER);
+  }
 
   //
   // 连接着色器
@@ -164,9 +192,20 @@ function createProgram() {
     var uni = uniformMap[name];
     if (!uni) { 
       var loc = gl.glGetUniformLocation(program, name);
+      if (loc < 0) {
+        throw new Error("Uniform '"+ name +"' not exists in shader");
+      }
       uni = uniformMap[name] = Uniform(loc, program);
     }
     return uni;
+  }
+
+  function setProjection(fovy, aspect, near, far) {
+    var proj = matrix.mat4.create(1);
+    matrix.mat4.perspective(proj, fovy, aspect, near, far);
+    var projectionVar = getUniform('projection');
+    projectionVar.active();
+    projectionVar.setMatrix4fv(1, gl.GL_FALSE, proj);
   }
 }
 
@@ -209,6 +248,9 @@ function Uniform(loc, program) {
 }
 
 
+//
+// 一个对象可以绘制多次
+//
 function createBasicDrawObject(programObj) {
   var program = programObj._program;
   var VAO = gl.glGenVertexArrays(1);

@@ -10,6 +10,7 @@
 
 static char head_buf[25];
 static std::mutex log_lock;
+static const char NO_ENTER = '\r';
 
 
 const char* prefix[] = {
@@ -55,6 +56,17 @@ static void sys_out(const char *out) {
 #endif
 
 
+//
+// 如果处于无换行状态则切入新行, 进入换行状态.
+//
+static void check_enter() {
+    if (endch == NO_ENTER) {
+        printf("\n");
+    }
+    endch = '\n';
+}
+
+
 static void update_time(const int level, threadId id=0) {
     time_t now = time(0);
     tm t;
@@ -67,6 +79,7 @@ static void update_time(const int level, threadId id=0) {
 void println(const char *out, threadId id, int level) {
     std::lock_guard<std::mutex> lock(log_lock);
     update_time(level, id);
+    check_enter();
     sys_out(out);
 }
 
@@ -104,38 +117,42 @@ static JsValueRef logfunc(JsValueRef *args, unsigned short ac, int level, thread
         content_buf[buf_off] = 0;
         sys_out(content_buf);
     }
-    endch = '\n';
     return 0;
 }
 
 
 JS_FUNC_TPL(js_info, c, args, ac, info, _vm) {
+    check_enter();
     return logfunc(args, ac, LINFO, ((VM*)_vm)->thread());
 }
 
 
 JS_FUNC_TPL(js_warn, c, args, ac, info, _vm) {
+    check_enter();
     return logfunc(args, ac, LWARN, ((VM*)_vm)->thread());
 }
 
 
 JS_FUNC_TPL(js_error, c, args, ac, info, _vm) {
+    check_enter();
     return logfunc(args, ac, LERROR, ((VM*)_vm)->thread());
 }
 
 
 JS_FUNC_TPL(js_debug, c, args, ac, info, _vm) {
+    check_enter();
     return logfunc(args, ac, LDEBUG, ((VM*)_vm)->thread());
 }
 
 
 JS_FUNC_TPL(js_fatal, c, args, ac, info, _vm) {
+    check_enter();
     return logfunc(args, ac, LFATAL, ((VM*)_vm)->thread());
 }
 
 
 JS_FUNC_TPL(js_line, c, args, ac, info, _vm) {
-    endch = '\r';
+    endch = NO_ENTER;
     return logfunc(args, ac, LINFO, ((VM*)_vm)->thread());
 }
 

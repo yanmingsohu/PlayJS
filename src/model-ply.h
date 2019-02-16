@@ -8,10 +8,12 @@ protected:
     virtual void push(char *str, int countOfLine) {}
     virtual void newLine() {}
 
+
 public:
     PlyElement() : count(0) {}
     PlyElement(int c) : count(c) {}
     virtual ~PlyElement() {}
+
 
     virtual void addProp(char *type, char *name) {}
     virtual void end() {}
@@ -19,6 +21,7 @@ public:
     virtual void buffer(char* buf) {}
     // 获取内部缓冲区长度, 用于复制数据
     virtual int bufferSize() { return -1; }
+
 
     void pushLine(char* buf, int begin, int end) {
         int countOfLine = 0;
@@ -53,7 +56,9 @@ private:
     float *buf;
 
 public:
+
     VertexEle(int c) : PlyElement(c), mapper{ X,Y,Z,R,G,B }, buf(0) {}
+
 
     ~VertexEle() {
         if (buf) {
@@ -61,6 +66,7 @@ public:
             buf = 0;
         }
     }
+
 
     virtual void addProp(char *type, char *name) {
         if (property_count >= MAX_MAPPER_SIZE) 
@@ -86,13 +92,16 @@ public:
         }
     }
 
+
     virtual void end() {
         buf = new float[MAX_MAPPER_SIZE*count];
     }
 
+
     virtual void buffer(char* tbuf) {
         memcpy(tbuf, buf, bufferSize());
     }
+
 
     virtual int bufferSize() {
         return MAX_MAPPER_SIZE * count * sizeof(float);
@@ -101,10 +110,12 @@ public:
 protected:
     int pushIndex = 0;
 
+
     void push(char *str, int countOfLine) {
         if (countOfLine >= MAX_MAPPER_SIZE) return;
         buf[pushIndex + mapper[countOfLine]] = std::stof(str);
     }
+
 
     void newLine() {
         pushIndex += MAX_MAPPER_SIZE;
@@ -133,10 +144,12 @@ protected:
     int vertex[MAX_V_SIZE];
     int index = 0;
 
+
     virtual void push(char *str, int countOfLine) {
         if (countOfLine >= MAX_V_SIZE) return;
         vertex[countOfLine] = std::stoi(str);
     }
+
 
     void newLine() {
         switch (vertex[0]) {
@@ -151,9 +164,11 @@ protected:
         }
     }
 
+
     virtual int bufferSize() {
         return triangles.size() * sizeof(float) * 3;
     }
+
 
     virtual void buffer(char* bbuf) {
         int *buf = (int*) bbuf;
@@ -190,11 +205,13 @@ public:
         }
     }
 
+
     ~PlyParser() {
         for (int i = 0; i < curr_element; ++i) {
             delete elements[i];
         }
     }
+
 
     // 返回的指针需要自行释放
     char* vertexBuf(int& len) {
@@ -208,6 +225,7 @@ public:
         return buf;
     }
 
+
     // 返回的指针需要自行释放
     char* indexBuf(int& len) {
         if (faceEleIdx < 0) {
@@ -219,6 +237,7 @@ public:
         elements[faceEleIdx]->buffer(buf);
         return buf;
     }
+
 
     void parseHeader(int begin, int end, char* buf) {
         char *arg[MAX_ELE_SIZE] = {0};
@@ -268,10 +287,10 @@ public:
         }
     }
 
+
     void _state(int begin, int end, char* buf) {
         while (buf[end-1] == ' ') --end;
         while (buf[begin] == ' ') ++begin;
-        //printf("[%x]", begin);
 
         if (state == 0) {
             if (buf[begin] == 'p' && buf[begin+1] == 'l' 

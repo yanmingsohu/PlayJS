@@ -8,6 +8,8 @@ export default {
 
 
 function load(file) {
+  console.debug("Load model", file);
+  
   if (file.endsWith('.ply')) {
     return ply(file);
   }

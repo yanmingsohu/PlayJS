@@ -49,7 +49,7 @@ bool boolValue(JsValueRef v, bool defaultVal = false);
 JsValueRef wrapJs(int i);
 JsValueRef wrapJs(double i);
 JsValueRef wrapJs(bool b);
-JsValueRef wrapJs(const char* str);
+JsValueRef wrapJs(const char* str, size_t strlen = 0);
 JsValueRef wrapJs(size_t i);
 JsValueRef wrapJs(unsigned int i);
 

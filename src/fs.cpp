@@ -166,6 +166,20 @@ JS_FUNC_TPL(js_exists, c, args, ac, info, d) {
 }
 
 
+JSS_FUNC(read_txt, args, ac) {
+    JSS_CHK_ARG(1, read_txt(path));
+    auto filename = stringValue(args[1]);
+    char *buf;
+    int rlen = readFile(filename, &buf);
+    if (rlen <= 0) {
+        pushException("Read string from file failed: "+ filename);
+        return 0;
+    }
+    std::unique_ptr<char[]> ptr(buf);
+    return wrapJs(buf, rlen);
+}
+
+
 void installFileSystem(VM *vm) {
     DEF_GLOBAL(vm, fs);
 
@@ -191,4 +205,5 @@ void installFileSystem(VM *vm) {
 
     DEF_JS_FUNC(vm, vm, fs, fileSize, js_file_size);
     DEF_JS_FUNC(vm, vm, fs, exists, js_exists);
+    DEF_JS_FUNC(vm, vm, fs, read_txt, js_read_txt);
 }

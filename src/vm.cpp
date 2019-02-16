@@ -208,10 +208,13 @@ JsValueRef wrapJs(bool b) {
 }
 
 
-JsValueRef wrapJs(const char* str) {
+JsValueRef wrapJs(const char* str, size_t len) {
     if (!str) return 0;
     JsValueRef s = 0;
-    JsCreateString(str, strlen(str), &s);
+    if (len == 0) {
+        len = strlen(str);
+    }
+    JsCreateString(str, len, &s);
     return s;
 }
 
