@@ -2,7 +2,8 @@
 // 在 OpenGL 上做一层 api, 使绘制函数更易于使用.
 //
 console.log('GLFW version:', gl.glfwGetVersionString());
-import matrix from './matrix.js'
+import node from '../boot/node.js'
+const matrix = node.load('boot/gl-matrix.js');
 
 export default {
   createWindow          : createWindow,
@@ -33,6 +34,7 @@ function createWindow(w, h, title) {
   var clearFlag = gl.GL_DEPTH_BUFFER_BIT | gl.GL_COLOR_BUFFER_BIT;
   var key_listener = [];
   var draw_list = [];
+  var timeValue, used, lastTime = gl.glfwGetTime();
 
   return {
     fullscreen    : fullscreen,
@@ -42,6 +44,7 @@ function createWindow(w, h, title) {
     nextFrame     : nextFrame,
     add           : add,
     shouldClose   : shouldClose,
+    prepareDraw   : prepareDraw,
   };
 
   //
@@ -53,11 +56,28 @@ function createWindow(w, h, title) {
   }
 
   //
+  // 在进入循环前执行一次
+  //
+  function prepareDraw() {
+    lastTime = gl.glfwGetTime();
+
+    for (var len = draw_list.length, i=0; i<len; ++i) {
+      if (draw_list[i].prepareDraw) {
+        draw_list[i].prepareDraw();
+      }
+    }
+  }
+
+  //
   // 绘制下一帧, 如果窗口需要关闭返回 false.
   //
   function nextFrame() {
     if (gl.glfwWindowShouldClose(window))
       return false;
+
+    timeValue = gl.glfwGetTime();
+    used = timeValue - lastTime;
+    lastTime = timeValue;
     
     for (var i=key_listener.length-1; i>=0; --i) {
       var li = key_listener[i];
@@ -68,8 +88,8 @@ function createWindow(w, h, title) {
 
     gl.glClear(clearFlag);
 
-    for (var i=draw_list.length-1; i>=0; --i) {
-      draw_list[i].draw();
+    for (var len = draw_list.length, i=0; i<len; ++i) {
+      draw_list[i].draw(used);
     }
 
     gl.glfwSwapBuffers(window);
@@ -217,10 +237,12 @@ function Uniform(loc, program) {
   return {
     _loc : loc,
     active : active,
+    setMatrix4fv : setMatrix4fv,
     setUniform4f : setUniform4f,
     setUniform1f : setUniform1f,
     setUniform1i : setUniform1i,
-    setMatrix4fv : setMatrix4fv,
+    setUniform2uiv : setUniform2uiv,
+    setUniform3fv  : setUniform3fv,
   };
 
   //
@@ -245,6 +267,14 @@ function Uniform(loc, program) {
   function setMatrix4fv(count, transpose, value) {
     gl.glUniformMatrix4fv(loc, count, transpose, value);
   }
+
+  function setUniform2uiv(UINTarr) {
+    gl.glUniform2uiv(loc, UINTarr);
+  }
+
+  function setUniform3fv(Float32arr) {
+    gl.glUniform3fv(loc, Float32arr);
+  }
 }
 
 
@@ -258,13 +288,18 @@ function createBasicDrawObject(programObj) {
   var element_count = 0;
 
   const _ret = {
-    draw        : draw,
-    setAttr     : setAttr,
-    addVertices : addVertices,
+    draw                : draw,
+    prepareDraw         : prepareDraw,
+    setAttr             : setAttr,
+    addVertices         : addVertices,
     addVerticesElements : addVerticesElements,
-    loadTexImage : loadTexImage,
+    loadTexImage        : loadTexImage,
+    program             : programObj,
+    bindVAO             : bindVAO,
   };
   return _ret;
+
+  function prepareDraw() {}
 
   function loadTexImage(file) {
     image.flip_vertically_on_load(true);
@@ -341,6 +376,10 @@ function createBasicDrawObject(programObj) {
     var EBO = gl.glGenBuffers(1);
     gl.glBindBuffer(gl.GL_ELEMENT_ARRAY_BUFFER, EBO);
     gl.glBufferData(gl.GL_ELEMENT_ARRAY_BUFFER, indices, usage);
+  }
+
+  function bindVAO() {
+    gl.glBindVertexArray(VAO);
   }
 
   function draw() {

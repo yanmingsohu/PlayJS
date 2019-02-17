@@ -1,8 +1,11 @@
 export default {}
 
 import draw   from '../boot/draw.js'
-import matrix from '../boot/matrix.js'
+import node   from '../boot/node.js'
 import model  from '../boot/model.js'
+import game   from '../boot/game.js'
+// import matrix from '../boot/matrix.js'
+const matrix = node.load('boot/gl-matrix.js');
 
 var window = draw.createWindow();
 window.setClearColor([0.2, 0.3, 0.3, 1]);
@@ -29,7 +32,6 @@ console.log("start ply model..");
 // var model0 = ply.read('art/monu1.ply', opt);
 // d1.addVerticesElements(model0.vertex.data, model0.face.data);
 
-var frameCount = 0;
 var transform = shaderProgram.getUniform('transform');
 var tmat = matrix.mat4.create(1);
 matrix.mat4.rotateX(tmat, tmat, 4.5);
@@ -55,43 +57,32 @@ d1.setAttr({ index: 1, vsize: 3, stride: 6*gl.sizeof$float,
 // window.add(d1);
 
 
-var cubePositions = [
-    matrix.vec3.fromValues( 0.0,  0.0,  0.0), 
-    matrix.vec3.fromValues( 2.0,  5.0, -15.0), 
-    matrix.vec3.fromValues(-1.5, -2.2, -2.5),  
-    matrix.vec3.fromValues(-3.8, -2.0, -12.3),  
-    matrix.vec3.fromValues( 2.4, -0.4, -3.5),  
-    matrix.vec3.fromValues(-1.7,  3.0, -7.5),  
-    matrix.vec3.fromValues( 1.3, -2.0, -2.5),  
-    matrix.vec3.fromValues( 1.5,  2.0, -2.5), 
-    matrix.vec3.fromValues( 1.5,  0.2, -1.5), 
-    matrix.vec3.fromValues(-1.3,  1.0, -1.5),
-];
-
 for (var i=0; i<1000; ++i) {
 (function() {
-    var ref = {};
-    var x = i%10;
-    var y = i/10 %10;
-    var z = i/100 %10;
-    var pos = matrix.vec3.fromValues(x, y, z);
+  var ref = {};
+  var x = i%10;
+  var y = i/10 %10;
+  var z = i/100 %10;
+  var pos = matrix.vec3.fromValues(x, y, z);
 
-    var m = matrix.mat4.create(1);
-    matrix.mat4.translate(m, m, pos);//平移
-    var scale = Math.random()* 9;
-    matrix.mat4.scale(m, m, [scale, scale, scale]); // 缩放
+  var m = matrix.mat4.create(1);
+  matrix.mat4.translate(m, m, pos);//平移
+  var scale = Math.random()* 9;
+  matrix.mat4.scale(m, m, [scale, scale, scale]); // 缩放
 
-    ref.draw = function() {
-        var mm = matrix.mat4.create(1);
-        matrix.mat4.translate(mm, m, [
-            Math.random()*0.01, Math.random()*0.01, Math.random()*0.01]);//平移
-        modelTrans.setMatrix4fv(1, gl.GL_FALSE, mm);
-        d1.draw();
-    };
+  ref.draw = function() {
+    var mm = matrix.mat4.create(1);
+    matrix.mat4.translate(mm, m, [
+        Math.random()*0.01, Math.random()*0.01, Math.random()*0.01]);//平移
+    modelTrans.setMatrix4fv(1, gl.GL_FALSE, mm);
+    d1.draw();
+  };
 
-    window.add(ref);
+  window.add(ref);
 })();
 }
+
+window.add(game.createShowRate());
 
 
 window.onKey(gl.GLFW_KEY_ESCAPE, gl.GLFW_PRESS, 0, function() {
@@ -110,34 +101,24 @@ window.onKey(gl.GLFW_KEY_D, gl.GLFW_PRESS, 0, function() {
 window.onKey(gl.GLFW_KEY_A, gl.GLFW_PRESS, 0, function() {
     matrix.mat4.rotateZ(tmat, tmat, 0.01);
 });
-window.onKey(gl.GLFW_KEY_J, gl.GLFW_PRESS, 0, function() {
+window.onKey(gl.GLFW_KEY_L, gl.GLFW_PRESS, 0, function() {
     tmat[12] -= 0.01;
 });
-window.onKey(gl.GLFW_KEY_L, gl.GLFW_PRESS, 0, function() {
+window.onKey(gl.GLFW_KEY_J, gl.GLFW_PRESS, 0, function() {
     tmat[12] += 0.01;
 });
-window.onKey(gl.GLFW_KEY_K, gl.GLFW_PRESS, 0, function() {
+window.onKey(gl.GLFW_KEY_I, gl.GLFW_PRESS, 0, function() {
     tmat[13] -= 0.01;
 });
-window.onKey(gl.GLFW_KEY_I, gl.GLFW_PRESS, 0, function() {
+window.onKey(gl.GLFW_KEY_K, gl.GLFW_PRESS, 0, function() {
     tmat[13] += 0.01;
 });
 
-var lastTime = gl.glfwGetTime();
+window.prepareDraw();
 while (window.nextFrame()) {
-  var timeValue = gl.glfwGetTime();
-  var used = timeValue - lastTime;
-  lastTime = timeValue;
-
-  ++frameCount;
   transform.active();
   transform.setMatrix4fv(1, gl.GL_FALSE, tmat);
-
-  console.line('total:', frameCount, 
-        ', average rate:', parseInt(frameCount/timeValue), 
-        ', frame rate:', parseInt(1/used));
 }
 
-console.log("Exit Frame Loop .......");
 window.destroy();
 

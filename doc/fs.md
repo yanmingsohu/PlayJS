@@ -54,3 +54,8 @@ mode可以是 'w' 写文件, 'r' 读文件等.
 ## bool exists(path)
 
 文件存在返回 true
+
+
+## string read_txt(path)
+
+读取文本文件

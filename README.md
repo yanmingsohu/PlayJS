@@ -41,3 +41,9 @@ feature
   * [ ] YAML 解析
   * [ ] 当前文件路径 __dirname/__filename
   * [ ] 压缩/解压缩
+  
+
+## 外部资源
+
+* 动画: https://www.khronos.org/opengl/wiki/Skeletal_Animation
+* 资产导入: https://github.com/assimp/assimp

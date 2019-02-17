@@ -1,6 +1,7 @@
 export default {}
 import draw from '../boot/draw.js'
-import matrix from '../boot/matrix.js'
+// import matrix from '../boot/matrix.js'
+const matrix = node.load('boot/gl-matrix.js');
 
 var window = draw.createWindow();
 window.setClearColor([0.2, 0.3, 0.3, 1]);

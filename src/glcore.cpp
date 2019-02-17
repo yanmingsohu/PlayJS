@@ -325,6 +325,30 @@ GL_FUNC(glUniform1i, args, ac) {
 }
 
 
+GL_FUNC(glUniform2uiv, args, ac) {
+    GL_CHK_ARG(2, glUniform2uiv(location, Uint32Array));
+    GLint location = intValue(args[1]);
+    LocalTypedArray arr(args[2]);
+    glUniform2uiv(location, arr.length()/arr.unitLen(), (GLuint*) arr.buffer());
+}
+
+
+GL_FUNC(glUniform3fv, args, ac) {
+    GL_CHK_ARG(2, glUniform3fv(location, Float32Array));
+    GLint location = intValue(args[1]);
+    LocalTypedArray arr(args[2]);
+    glUniform3fv(location, arr.length()/arr.unitLen(), (GLfloat*)arr.buffer());
+}
+
+
+GL_FUNC(glUniform4fv, args, ac) {
+    GL_CHK_ARG(2, glUniform4fv(location, Float32Array));
+    GLint location = intValue(args[1]);
+    LocalTypedArray arr(args[2]);
+    glUniform4fv(location, arr.length() / arr.unitLen(), (GLfloat*)arr.buffer());
+}
+
+
 GL_FUNC(glUniformMatrix4fv, args, ac) {
     GL_CHK_ARG(4, glUniformMatrix4fv(location, count, transpose, value));
     UniformMatrixTpl(args, glUniformMatrix4fv);
@@ -509,6 +533,24 @@ JSS_FUNC(glGenerateMipmap, args, ac) {
 }
 
 
+JSS_FUNC(glGetUniformBlockIndex, args, ac) {
+    GL_CHK_ARG(1, glGetUniformBlockIndex(program, name));
+    GLuint prog = intValue(args[1]);
+    auto name = stringValue(args[2]);
+    GLuint idx = glGetUniformBlockIndex(prog, name.c_str());
+    return wrapJs(idx);
+}
+
+
+JSS_FUNC(glUniformBlockBinding, args, ac) {
+    GL_CHK_ARG(1, glUniformBlockBinding(program, name));
+    GLuint prog = intValue(args[1]);
+    GLuint idx = intValue(args[2]);
+    GLuint bind = intValue(args[3]);
+    glUniformBlockBinding(prog, idx, bind);
+}
+
+
 void installGLCore(VM* vm, LocalVal& gl) {
     GL_BIND(glewInit);
     GL_BIND(glViewport);
@@ -542,6 +584,9 @@ void installGLCore(VM* vm, LocalVal& gl) {
     GL_BIND(glUniformMatrix4x2fv);
     GL_BIND(glUniformMatrix3x4fv);
     GL_BIND(glUniformMatrix4x3fv);
+    GL_BIND(glUniform2uiv);
+    GL_BIND(glUniform3fv);
+    GL_BIND(glUniform4fv);
 
     GL_BIND(glCreateShader);
     GL_BIND(glDeleteShader);
@@ -563,4 +608,6 @@ void installGLCore(VM* vm, LocalVal& gl) {
     GL_BIND(glUseProgram);
     GL_BIND(glGetProgramInfoLog);
     GL_BIND(glGetProgramiv);
+    GL_BIND(glGetUniformBlockIndex);
+    GL_BIND(glUniformBlockBinding);
 }

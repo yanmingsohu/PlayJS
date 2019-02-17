@@ -6,7 +6,8 @@ export default {}
 // import t3 from './event.js';
 // import t4 from './gl.js';
 // import t5 from './draw.js';
-import t6 from './ply-model.js';
+// import t6 from './ply-model.js';
+import t7 from './camera.js';
 
 // console.log(new Error('test').stack);
 // console.log('hello world 中文正常!!');
