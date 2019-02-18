@@ -246,11 +246,13 @@ function createShowRate() {
     if (c > max) max = c;
     if (c < min) min = c;
 
-    console.line('total:', frameCount, 
-      ', average:', parseInt(frameCount / gl.glfwGetTime()), 
-      ', frame:', c,
-      ', max:', max,
-      ', min:', min);
+    if (frameCount % 10 == 0) {
+      console.line('Frame:', frameCount, 
+        'Avg:', parseInt(frameCount / gl.glfwGetTime()), 
+        'Real:', c,
+        'Min:', min,
+        'Max:', max);
+    }
   }
 }
 
@@ -342,8 +344,10 @@ function createAnimation(drawObj, skeObj) {
 
 //
 // 固定行走动画
+// TODO: 参数都与模型和骨骼绑定, 不通用.
 //
 function FixedWalk(drawObj, skeObj) {
+  var rand = Math.random();
   var loc = drawObj.program.getLocationIndex('skBind');
   drawObj.bindBuffer(skeObj.bind);
   drawObj.setAttr({ index: loc, vsize: 2, 
@@ -376,6 +380,7 @@ function FixedWalk(drawObj, skeObj) {
   //
   function draw(used, time) {
     // matrix.vec4.rotateX(rightFoot, rightFoot, used);
+    time += rand;
     var speed = 8;
     var pos = time*speed;
     var ssin = Math.sin(pos);

@@ -11,6 +11,7 @@ export default {
   createShader          : createShader,
   createProgram         : createProgram,
   createBasicDrawObject : createBasicDrawObject,
+  delayDraw             : delayDraw,
 };
 
 
@@ -470,6 +471,26 @@ function createBasicDrawObject(programObj) {
     gl.glUseProgram(program);
     gl.glBindVertexArray(VAO);
     gl.glDrawElements(gl.GL_TRIANGLES, element_count, gl.GL_UNSIGNED_INT, 0)
+  }
+}
+
+
+//
+// 对于不需要每帧都绘制的对象, 延迟绘制.
+//
+function delayDraw(wrapDrawble, wait) {
+  if (!wrapDrawble.draw) throw new Error("not drawable");
+  var total = 0;
+  return {
+    draw : draw,
+  }
+
+  function draw(used, time) {
+    total += used;
+    if (total > wait) {
+      total = 0;
+      wrapDrawble.draw(used, time);
+    }
   }
 }
 

@@ -91,6 +91,7 @@ JsErrorCode newModule(JsModuleRecord parent,
                       std::string &fileName, 
                       std::string &script,
                       JsModuleRecord* moduleRet) {
+
     JsErrorCode err = JsNoError;
     JsValueRef spec;
     err = JsCreateString(fileName.c_str(), fileName.length(), &spec);
@@ -103,16 +104,21 @@ JsErrorCode newModule(JsModuleRecord parent,
 
     JsSetModuleHostInfo(newMod, JsModuleHostInfo_Url, spec);
     JsValueRef exception = 0;
-    err = JsParseModuleSource(newMod, sourceContext,
-            (BYTE*)script.c_str(), script.length(),
-            JsParseModuleSourceFlags_DataIsUTF8, &exception);
+
+    err = JsParseModuleSource(
+            newMod, 
+            sourceContext,
+            (BYTE*) script.c_str(), 
+            script.length(),
+            JsParseModuleSourceFlags_DataIsUTF8, 
+            &exception);
     
     if (exception) {
         println(errorStack(exception), 0, LERROR);
         return JsErrorModuleParsed;
     }
-    if (err) return err;
 
+    if (err) return err;
     if (moduleRet) {
         *moduleRet = newMod;
     }

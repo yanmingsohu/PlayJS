@@ -45,5 +45,6 @@ feature
 
 ## 外部资源
 
-* 动画: https://www.khronos.org/opengl/wiki/Skeletal_Animation
-* 资产导入: https://github.com/assimp/assimp
+* (骨骼动画)[https://www.khronos.org/opengl/wiki/Skeletal_Animation]
+* (资产导入)[https://github.com/assimp/assimp]
+* (着色器指南)[https://github.com/wshxbqq/GLSL-Card]
