@@ -89,7 +89,7 @@ function createWindow(w, h, title) {
     gl.glClear(clearFlag);
 
     for (var len = draw_list.length, i=0; i<len; ++i) {
-      draw_list[i].draw(used);
+      draw_list[i].draw(used, timeValue);
     }
 
     gl.glfwSwapBuffers(window);
@@ -168,6 +168,7 @@ function createProgram() {
     readShader       : readShader,
     readFragShader   : readFragShader,
     readVertexShader : readVertexShader,
+    getLocationIndex : getLocationIndex,
   };
 
   //
@@ -227,6 +228,15 @@ function createProgram() {
     projectionVar.active();
     projectionVar.setMatrix4fv(1, gl.GL_FALSE, proj);
   }
+
+  //
+  // 返回着色器中变量 name 的 location 索引值
+  //
+  function getLocationIndex(name) {
+    var i = gl.glGetAttribLocation(program, name);
+    if (i < 0) throw new Error("location not found "+ name);
+    return i;
+  }
 }
 
 
@@ -268,12 +278,18 @@ function Uniform(loc, program) {
     gl.glUniformMatrix4fv(loc, count, transpose, value);
   }
 
-  function setUniform2uiv(UINTarr) {
-    gl.glUniform2uiv(loc, UINTarr);
+  function setUniform2uiv(uint_arr) {
+    if (uint_arr.constructor != Uint32Array) {
+      throw new Error("must Uint32Array");
+    }
+    gl.glUniform2uiv(loc, uint_arr);
   }
 
-  function setUniform3fv(Float32arr) {
-    gl.glUniform3fv(loc, Float32arr);
+  function setUniform3fv(float32arr) {
+    if (float32arr.constructor != Float32Array) {
+      throw new Error("must Float32Array");
+    }
+    gl.glUniform3fv(loc, float32arr);
   }
 }
 
@@ -287,19 +303,24 @@ function createBasicDrawObject(programObj) {
   var vertices_count = 0;
   var element_count = 0;
 
-  const _ret = {
+  const thiz = {
     draw                : draw,
     prepareDraw         : prepareDraw,
     setAttr             : setAttr,
+    setAttrI            : setAttrI,
+    setAttrF            : setAttr,
     addVertices         : addVertices,
     addVerticesElements : addVerticesElements,
     loadTexImage        : loadTexImage,
     program             : programObj,
-    bindVAO             : bindVAO,
+    setModelData        : setModelData,
+    bindBuffer          : bindBuffer,
   };
-  return _ret;
+  return thiz;
+
 
   function prepareDraw() {}
+
 
   function loadTexImage(file) {
     image.flip_vertically_on_load(true);
@@ -320,13 +341,24 @@ function createBasicDrawObject(programObj) {
   }
 
   //
+  // 把模型数据作为当前绘制对象的数据
+  //
+  function setModelData(modelObj) {
+    if (!modelObj.setupDraw) {
+      throw new Error("model obj cannot 'setupDraw()'");
+    }
+    modelObj.setupDraw(thiz, programObj);
+  }
+
+  //
   // vertices : Float32Array 对象, 存储顶点
   // attr : 属性配置, 
   //
   function addVertices(vertices, _vertices_count, usage) {
+    gl.glBindVertexArray(VAO);
     _vertices(vertices, usage || gl.GL_STATIC_DRAW);
     vertices_count = _vertices_count;
-    _ret.draw = draw1;
+    thiz.draw = draw1;
   }
 
   //
@@ -334,14 +366,16 @@ function createBasicDrawObject(programObj) {
   // indices : Uint32Array  对象, 存储索引
   //
   function addVerticesElements(vertices, indices, usage) {
+    gl.glBindVertexArray(VAO);
     var usage = usage || gl.GL_STATIC_DRAW;
     _vertices(vertices, usage);
     _indices(indices, usage);
     element_count = indices.length;
-    _ret.draw = draw2;
+    thiz.draw = draw2;
   }
 
   //
+  // 绑定着色器的浮点类型缓冲区指针
   // 必须在绑定了顶点缓冲区之后再设置属性
   // 属性在 GLSL 中用 `layout (location = 0)` 来定义,
   // location 与 attr.index 对应.
@@ -355,22 +389,49 @@ function createBasicDrawObject(programObj) {
   //    attr.offset -- 数据指针偏移
   //
   function setAttr(attr) {
+    _check_attr(attr);
     gl.glVertexAttribPointer(
-        attr.index, 
-        attr.vsize, 
-        attr.type || gl.GL_FLOAT, 
-        attr.normalized || gl.GL_FALSE, 
-        attr.stride, 
-        attr.offset || 0);
+      attr.index, 
+      attr.vsize, 
+      attr.type || gl.GL_FLOAT, 
+      attr.normalized || gl.GL_FALSE, 
+      attr.stride, 
+      attr.offset || 0);
+    checkGLerr("glVertexAttribPointer", 1);
     gl.glEnableVertexAttribArray(attr.index);
   }
 
+
+  //
+  // 绑定着色器的整数类型缓冲区指针
+  // 必须在绑定了顶点缓冲区之后再设置属性
+  //
+  function setAttrI(attr) {
+    _check_attr(attr);
+    gl.glVertexAttribIPointer(
+      attr.index,
+      attr.visize,
+      attr.type || gl.GL_INT,
+      attr.stride,
+      attr.offset || 0);
+    checkGLerr("glVertexAttribIPointer", 1);
+    gl.glEnableVertexAttribArray(attr.index);
+  }
+
+
+  function _check_attr(attr) {
+    if (!attr.vsize) throw new Error("'vsize' must number");
+    if (!attr.stride) throw new Error("'stride' must number");
+    if (isNaN(attr.index)) throw new Error("'index' must number");
+  }
+
+
   function _vertices(vertices, usage) {
     var VBO = gl.glGenBuffers(1);
-    gl.glBindVertexArray(VAO);
     gl.glBindBuffer(gl.GL_ARRAY_BUFFER, VBO);  
     gl.glBufferData(gl.GL_ARRAY_BUFFER, vertices, usage);
   }
+
 
   function _indices(indices, usage) {
     var EBO = gl.glGenBuffers(1);
@@ -378,19 +439,32 @@ function createBasicDrawObject(programObj) {
     gl.glBufferData(gl.GL_ELEMENT_ARRAY_BUFFER, indices, usage);
   }
 
-  function bindVAO() {
+  //
+  // 绑定一个非顶点缓冲区, 用于自定义数据.
+  //
+  function bindBuffer(typedarr, type, usage) {
     gl.glBindVertexArray(VAO);
+    if (!usage) usage = gl.GL_STATIC_DRAW;
+    if (!type)  type = gl.GL_ARRAY_BUFFER;
+
+    var bo = gl.glGenBuffers(1);
+    gl.glBindBuffer(type, bo);
+    gl.glBufferData(type, typedarr, usage);
+    return bo;
   }
+
 
   function draw() {
     throw new Error("No data to be drawn");
   }
+
 
   function draw1() {
     gl.glUseProgram(program);
     gl.glBindVertexArray(VAO);
     gl.glDrawArrays(gl.GL_TRIANGLES, 0, vertices_count);
   }
+
 
   function draw2() {
     gl.glUseProgram(program);
@@ -400,7 +474,7 @@ function createBasicDrawObject(programObj) {
 }
 
 
-function checkGLerr(name) {
+function checkGLerr(name, _throw) {
   var code = gl.glGetError();
   var msg;
   switch(code) {
@@ -442,5 +516,9 @@ function checkGLerr(name) {
     case gl.GL_NO_ERROR:
         return;
   }
-  console.log("GL err:", name, '0x'+code.toString(16), msg);
+  var str = [ "GL err:", name||'', '0x'+code.toString(16), msg ].join(' ');
+  if (_throw) {
+    throw new Error(str);
+  }
+  console.log(str);
 }

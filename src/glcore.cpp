@@ -329,7 +329,8 @@ GL_FUNC(glUniform2uiv, args, ac) {
     GL_CHK_ARG(2, glUniform2uiv(location, Uint32Array));
     GLint location = intValue(args[1]);
     LocalTypedArray arr(args[2]);
-    glUniform2uiv(location, arr.length()/arr.unitLen(), (GLuint*) arr.buffer());
+    glUniform2uiv(location, arr.length()/arr.unitLen()/2, (GLuint*) arr.buffer());
+    return 0;
 }
 
 
@@ -337,7 +338,8 @@ GL_FUNC(glUniform3fv, args, ac) {
     GL_CHK_ARG(2, glUniform3fv(location, Float32Array));
     GLint location = intValue(args[1]);
     LocalTypedArray arr(args[2]);
-    glUniform3fv(location, arr.length()/arr.unitLen(), (GLfloat*)arr.buffer());
+    glUniform3fv(location, arr.length()/arr.unitLen()/3, (GLfloat*)arr.buffer());
+    return 0;
 }
 
 
@@ -345,7 +347,8 @@ GL_FUNC(glUniform4fv, args, ac) {
     GL_CHK_ARG(2, glUniform4fv(location, Float32Array));
     GLint location = intValue(args[1]);
     LocalTypedArray arr(args[2]);
-    glUniform4fv(location, arr.length() / arr.unitLen(), (GLfloat*)arr.buffer());
+    glUniform4fv(location, arr.length()/arr.unitLen()/4, (GLfloat*)arr.buffer());
+    return 0;
 }
 
 
@@ -429,6 +432,18 @@ GL_FUNC(glVertexAttribPointer, args, ac) {
     GLsizei stride = intValue(args[5]);
     GLvoid * pointer = (GLvoid *) intValue(args[6]);
     glVertexAttribPointer(index, size, type, normalized, stride, pointer);
+    return 0;
+}
+
+
+GL_FUNC(glVertexAttribIPointer, args, ac) {
+    GL_CHK_ARG(5, glVertexAttribIPointer(index, size, type, stride, pointer));
+    GLuint index = intValue(args[1]);
+    GLint size = intValue(args[2]);
+    GLenum type = intValue(args[3]);
+    GLsizei stride = intValue(args[4]);
+    GLvoid * pointer = (GLvoid *)intValue(args[5]);
+    glVertexAttribIPointer(index, size, type, stride, pointer);
     return 0;
 }
 
@@ -534,7 +549,7 @@ JSS_FUNC(glGenerateMipmap, args, ac) {
 
 
 JSS_FUNC(glGetUniformBlockIndex, args, ac) {
-    GL_CHK_ARG(1, glGetUniformBlockIndex(program, name));
+    GL_CHK_ARG(2, glGetUniformBlockIndex(program, name));
     GLuint prog = intValue(args[1]);
     auto name = stringValue(args[2]);
     GLuint idx = glGetUniformBlockIndex(prog, name.c_str());
@@ -543,11 +558,21 @@ JSS_FUNC(glGetUniformBlockIndex, args, ac) {
 
 
 JSS_FUNC(glUniformBlockBinding, args, ac) {
-    GL_CHK_ARG(1, glUniformBlockBinding(program, name));
+    GL_CHK_ARG(2, glUniformBlockBinding(program, name));
     GLuint prog = intValue(args[1]);
     GLuint idx = intValue(args[2]);
     GLuint bind = intValue(args[3]);
     glUniformBlockBinding(prog, idx, bind);
+    return 0;
+}
+
+
+JSS_FUNC(glGetAttribLocation, args, ac) {
+    GL_CHK_ARG(2, glGetAttribLocation(program, name));
+    GLuint prog = intValue(args[1]);
+    auto name = stringValue(args[2]);
+    GLint idx = glGetAttribLocation(prog, name.c_str());
+    return wrapJs(idx);
 }
 
 
@@ -595,6 +620,7 @@ void installGLCore(VM* vm, LocalVal& gl) {
     GL_BIND(glGetShaderiv);
     GL_BIND(glGetShaderInfoLog);
     GL_BIND(glVertexAttribPointer);
+    GL_BIND(glVertexAttribIPointer);
 
     GL_BIND(glGenVertexArrays);
     GL_BIND(glDeleteVertexArrays);
@@ -610,4 +636,5 @@ void installGLCore(VM* vm, LocalVal& gl) {
     GL_BIND(glGetProgramiv);
     GL_BIND(glGetUniformBlockIndex);
     GL_BIND(glUniformBlockBinding);
+    GL_BIND(glGetAttribLocation);
 }
