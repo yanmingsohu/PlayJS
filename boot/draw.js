@@ -12,6 +12,7 @@ export default {
   createProgram         : createProgram,
   createBasicDrawObject : createBasicDrawObject,
   delayDraw             : delayDraw,
+  showRate              : showRate
 };
 
 
@@ -19,13 +20,13 @@ function createWindow(w, h, title) {
   if (!w) w = 1024;
   if (!h) h = 768;
 
-  var moni = gl.glfwGetPrimaryMonitor();
-  var mode = gl.glfwGetVideoMode(moni);
+  const moni = gl.glfwGetPrimaryMonitor();
+  const mode = gl.glfwGetVideoMode(moni);
   console.log("Primary Monitor:", JSON.stringify(mode));
 
   // 4 倍抗锯齿
   gl.glfwWindowHint(gl.GLFW_SAMPLES, 4);
-  var window = gl.glfwCreateWindow(w, h, title || "PlayJS");
+  const window = gl.glfwCreateWindow(w, h, title || "PlayJS");
   gl.glfwMakeContextCurrent(window);
   gl.glewInit();
   gl.glEnable(gl.GL_DEPTH_TEST);
@@ -41,6 +42,7 @@ function createWindow(w, h, title) {
     fullscreen    : fullscreen,
     destroy       : destroy,
     onKey         : onKey,
+    center        : center,
     setClearColor : setClearColor,
     nextFrame     : nextFrame,
     add           : add,
@@ -54,6 +56,16 @@ function createWindow(w, h, title) {
   function add(drawable) {
     if (!drawable.draw) throw new Error("not drawable");
     draw_list.push(drawable);
+  }
+
+  //
+  // 窗口移动到屏幕中央
+  //
+  function center() {
+    var wsize = gl.glfwGetWindowSize(window);
+    var x = (mode.width - wsize.width)/2;
+    var y = (mode.height - wsize.height)/2;
+    gl.glfwSetWindowPos(window, x, y);
   }
 
   //
@@ -170,7 +182,12 @@ function createProgram() {
     readFragShader   : readFragShader,
     readVertexShader : readVertexShader,
     getLocationIndex : getLocationIndex,
+    active           : active,
   };
+
+  function active() {
+    gl.glUseProgram(program); 
+  }
 
   //
   // 从文件中读取着色器, 并绑定到当前程序, 返回 shader 句柄.
@@ -299,10 +316,12 @@ function Uniform(loc, program) {
 // 一个对象可以绘制多次
 //
 function createBasicDrawObject(programObj) {
-  var program = programObj._program;
-  var VAO = gl.glGenVertexArrays(1);
-  var vertices_count = 0;
-  var element_count = 0;
+  let program = programObj._program;
+  let VAO = gl.glGenVertexArrays(1);
+  let buffers = [];
+  let vertices_count = 0;
+  let element_count = 0;
+  let skeleton;
 
   const thiz = {
     draw                : draw,
@@ -314,8 +333,11 @@ function createBasicDrawObject(programObj) {
     addVerticesElements : addVerticesElements,
     loadTexImage        : loadTexImage,
     program             : programObj,
-    setModelData        : setModelData,
     bindBuffer          : bindBuffer,
+    setModelData        : setModelData,
+    setSkeleton         : setSkeleton,
+    getSkeleton         : getSkeleton,
+    free                : free,
   };
   return thiz;
 
@@ -325,8 +347,8 @@ function createBasicDrawObject(programObj) {
 
   function loadTexImage(file) {
     image.flip_vertically_on_load(true);
-    var img = image.load(file);
-    var texture = gl.glGenTextures(1);
+    let img = image.load(file);
+    let texture = gl.glGenTextures(1);
     gl.glBindTexture(gl.GL_TEXTURE_2D, texture);  
 
     gl.glTexParameteri(gl.GL_TEXTURE_2D, 
@@ -368,7 +390,7 @@ function createBasicDrawObject(programObj) {
   //
   function addVerticesElements(vertices, indices, usage) {
     gl.glBindVertexArray(VAO);
-    var usage = usage || gl.GL_STATIC_DRAW;
+    usage = usage || gl.GL_STATIC_DRAW;
     _vertices(vertices, usage);
     _indices(indices, usage);
     element_count = indices.length;
@@ -429,6 +451,7 @@ function createBasicDrawObject(programObj) {
 
   function _vertices(vertices, usage) {
     var VBO = gl.glGenBuffers(1);
+    buffers.push(VBO);
     gl.glBindBuffer(gl.GL_ARRAY_BUFFER, VBO);  
     gl.glBufferData(gl.GL_ARRAY_BUFFER, vertices, usage);
   }
@@ -436,6 +459,7 @@ function createBasicDrawObject(programObj) {
 
   function _indices(indices, usage) {
     var EBO = gl.glGenBuffers(1);
+    buffers.push(EBO);
     gl.glBindBuffer(gl.GL_ELEMENT_ARRAY_BUFFER, EBO);
     gl.glBufferData(gl.GL_ELEMENT_ARRAY_BUFFER, indices, usage);
   }
@@ -449,6 +473,7 @@ function createBasicDrawObject(programObj) {
     if (!type)  type = gl.GL_ARRAY_BUFFER;
 
     var bo = gl.glGenBuffers(1);
+    buffers.push(bo);
     gl.glBindBuffer(type, bo);
     gl.glBufferData(type, typedarr, usage);
     return bo;
@@ -472,6 +497,26 @@ function createBasicDrawObject(programObj) {
     gl.glBindVertexArray(VAO);
     gl.glDrawElements(gl.GL_TRIANGLES, element_count, gl.GL_UNSIGNED_INT, 0)
   }
+
+
+  function setSkeleton(sk) {
+    if (!sk) throw new Error("null argument");
+    skeleton = sk;
+  }
+
+
+  function getSkeleton() {
+    return skeleton;
+  }
+
+
+  function free() {
+    for (var i=0; i<buffers.length; ++i) {
+      gl.glDeleteBuffers(buffers[i]);
+    }
+    gl.glDeleteVertexArrays(VAO);
+    console.debug("VAO and VBO delete");
+  }
 }
 
 
@@ -480,7 +525,7 @@ function createBasicDrawObject(programObj) {
 //
 function delayDraw(wrapDrawble, wait) {
   if (!wrapDrawble.draw) throw new Error("not drawable");
-  var total = 0;
+  let total = 0;
   return {
     draw : draw,
   }
@@ -495,9 +540,41 @@ function delayDraw(wrapDrawble, wait) {
 }
 
 
+//
+// 用于显示帧率
+//
+function showRate() {
+  var frameCount = 0;
+  var min = 1000;
+  var max = 0;
+  var c = 0;
+
+  return {
+    draw : draw,
+  };
+
+  function draw(used) {
+    ++frameCount;  
+    c = parseInt(1 / used);
+
+    if (frameCount % 1000 == 0) {
+      max = 0; min = 1000;
+    }
+    if (c > max) max = c;
+    if (c < min) min = c;
+
+    if (frameCount % 10 == 0) {
+      console.line('Frame:', frameCount, 
+        'Avg:', parseInt(frameCount / gl.glfwGetTime()), 
+        'Real:', c, '[', min, '-', max, ']   ');
+    }
+  }
+}
+
+
 function checkGLerr(name, _throw) {
-  var code = gl.glGetError();
-  var msg;
+  let code = gl.glGetError();
+  let msg;
   switch(code) {
     case gl.GL_INVALID_ENUM:
         msg = `An unacceptable value is specified for an enumerated argument. 
@@ -537,7 +614,7 @@ function checkGLerr(name, _throw) {
     case gl.GL_NO_ERROR:
         return;
   }
-  var str = [ "GL err:", name||'', '0x'+code.toString(16), msg ].join(' ');
+  let str = [ "GL err:", name||'', '0x'+code.toString(16), msg ].join(' ');
   if (_throw) {
     throw new Error(str);
   }

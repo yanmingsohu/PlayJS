@@ -4,6 +4,7 @@
 
 #include <map>
 #include <filesystem>
+#include <atomic>
 
 using namespace std;
 using namespace experimental::filesystem::v1; 
@@ -18,10 +19,17 @@ static map<JsModuleRecord, string> modMap;
 //
 static map<string, JsModuleRecord> loaded;
 
+static std::atomic<JsSourceContext> dbg_ctx(0);
+
 
 ostream& operator<<(ostream& a, LocalVal& b) {
     a << b.toString();
     return a;
+}
+
+
+JsSourceContext nextSourceContext() {
+    return dbg_ctx++;
 }
 
 
@@ -45,6 +53,7 @@ JsErrorCode iFetchImportedModuleCallBack(
     if (rmod != modMap.end()) {
         full.append(rmod->second);
     }
+
     LocalVal spec(specifier);
     full.append(spec.toString());
     if (!exists(full)) {
@@ -62,7 +71,7 @@ JsErrorCode iFetchImportedModuleCallBack(
         return JsErrorInvalidArgument;
     }
 
-    return newModule(referencingModule, JS_SOURCE_CONTEXT_NONE, 
+    return newModule(referencingModule,
               full.string(), content, dependentModuleRecord);
 }
 
@@ -86,15 +95,19 @@ JsErrorCode iNotifyModuleReadyCallback(
 }
 
 
+//
+// sourceContext 不能 < 0 否则错误堆栈不显示脚本路径
+//
 JsErrorCode newModule(JsModuleRecord parent,
-                      JsSourceContext sourceContext,
                       std::string &fileName, 
                       std::string &script,
                       JsModuleRecord* moduleRet) {
 
+    JsSourceContext sourceContext = nextSourceContext();
     JsErrorCode err = JsNoError;
     JsValueRef spec;
-    err = JsCreateString(fileName.c_str(), fileName.length(), &spec);
+    std::string norfile = canonical(fileName).string();
+    err = JsCreateString(norfile.c_str(), norfile.length(), &spec);
     if (err) return err;
 
     JsModuleRecord newMod;
@@ -114,7 +127,7 @@ JsErrorCode newModule(JsModuleRecord parent,
             &exception);
     
     if (exception) {
-        println(errorStack(exception), 0, LERROR);
+        println(norfile +" "+ errorStack(exception), 0, LERROR);
         return JsErrorModuleParsed;
     }
 

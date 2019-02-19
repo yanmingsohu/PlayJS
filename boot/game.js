@@ -6,17 +6,15 @@ const yaml = node.load('boot/js-yaml.js');
 // 单位矩阵
 const ONE = matrix.mat4.create(1);
 // 默认操作者
-const DEF_OP = { op: function() {} };
+const DEF_OP = { draw: function() {} };
 
 
 export default {
   createSprite    : createSprite,
-  createShowRate  : createShowRate,
   createCamera    : createCamera,
   Vec3Transition  : Vec3Transition,
   readSkeleton    : readSkeleton,
   createAnimation : createAnimation,
-  FixedWalk       : FixedWalk,
 };
 
 
@@ -143,7 +141,7 @@ function Transformation() {
 
 //
 // 创建摄像机, 可绘制; 要求着色器变量 `mat4 camera`
-// operator{op:Function(used, camera)}
+// operator{draw:Function(used, time, camera)}
 //
 function createCamera(program, operator) {
   if (!operator) operator = DEF_OP;
@@ -189,9 +187,9 @@ function createCamera(program, operator) {
   }
 
   function draw(used, time) {
-    operator.op(used, time, cm);
-    matrix.mat4.lookAt(cm.objTr, cameraPos, cameraFront, cameraUp);
     cameraUi.active();
+    operator.draw(used, time, cm);
+    matrix.mat4.lookAt(cm.objTr, cameraPos, cameraFront, cameraUp);
     cameraUi.setMatrix4fv(1, gl.GL_FALSE, cm.objTr);
   }
 }
@@ -201,7 +199,7 @@ function createCamera(program, operator) {
 // 创建精灵对象, 多个精灵可以引用同一个可绘制对象(模型)
 // 精灵对象本身可绘制, 
 // 要求着色器变量: `mat4 model`,
-// operator{op:Function(used, sprite)} 操作者对象, op 在每一帧上被调用
+// operator{draw:Function(used, time, sprite)} 操作者对象, draw 在每一帧上被调用
 //
 function createSprite(drawObj, operator) {
   const modelUi = drawObj.program.getUniform('model');
@@ -214,45 +212,11 @@ function createSprite(drawObj, operator) {
   //
   // 由框架调用, 用户不要直接调用
   //
-  function draw(used) {
-    operator.op(used, sp);
+  function draw(used, time) {
     modelUi.active();
+    operator.draw(used, time, sp);
     modelUi.setMatrix4fv(1, gl.GL_FALSE, sp.objTr);
     drawObj.draw(used);
-  }
-}
-
-
-//
-// 用于显示帧率
-//
-function createShowRate() {
-  var frameCount = 0;
-  var min = 1000;
-  var max = 0;
-  var c = 0;
-
-  return {
-    draw : draw,
-  };
-
-  function draw(used) {
-    ++frameCount;  
-    c = parseInt(1 / used);
-
-    if (frameCount % 1000 == 0) {
-      max = 0; min = 1000;
-    }
-    if (c > max) max = c;
-    if (c < min) min = c;
-
-    if (frameCount % 10 == 0) {
-      console.line('Frame:', frameCount, 
-        'Avg:', parseInt(frameCount / gl.glfwGetTime()), 
-        'Real:', c,
-        'Min:', min,
-        'Max:', max);
-    }
   }
 }
 
@@ -265,28 +229,26 @@ function createShowRate() {
 //
 function readSkeleton(filename, vertexCount) {
   if (!vertexCount) throw new Error('vertexCount > 0');
-  const SKE_SIZE = 10;
-  const SKE_ELE_LEN = 3;
+  const SKE_MAX_SIZE = 10;
   const BIND_LEN = 2;
 
-  var txt = fs.read_txt(filename);
-  var config = yaml.load(txt);
+  var config = yaml.load(fs.read_txt(filename));
+  if (config.type != 'skeleton') {
+    throw new Error("bad file type `"+ config.type +"` in "+ filename);
+  }
+  if (config.bone.size > SKE_MAX_SIZE) {
+    throw new Error("bone size max:"+ SKE_MAX_SIZE);
+  }
+
   var bind = new Float32Array(vertexCount * BIND_LEN);
-  var ske = new Float32Array(SKE_SIZE*SKE_ELE_LEN);
 
   bind.fill(-1);
-  _bind(config.bindex, config.vbind, bind, 1);
-  _bind(config.bindex, config.vbind4, bind, 4);
-
-  // console.log(JSON.stringify(config, 0, 2));
-  for (var i=0; i<config.bone.length; ++i) {
-    var j = i*SKE_ELE_LEN;
-    matrix.vec4.copy(ske.subarray(j, j+SKE_ELE_LEN), config.bone[i]);
-  }
+  config.vbind  && _bind(config.bindex, config.vbind,  bind, 1);
+  config.vbind4 && _bind(config.bindex, config.vbind4, bind, 4);
 
   return {
     bind : bind,
-    ske  : ske,
+    bone : config.bone,
   };
 
   function _bind(bindex, vbind, to, count) {
@@ -320,86 +282,83 @@ function readSkeleton(filename, vertexCount) {
 //
 // 将骨骼动画与模型绑定
 // https://www.khronos.org/opengl/wiki/Skeletal_Animation
+// 骨骼会产生两个缓冲区, 一个偏移, 一个旋转,
+// 这些行为与着色器脚本绑定.
 //
-function createAnimation(drawObj, skeObj) {
+function createAnimation(drawObj) {
+  const skeObj = drawObj.getSkeleton();
+  if (!skeObj) {
+    throw new Error("drawable object must has Skeleton");
+  }
+
+  const OFFSET_BUF_SIZE = 3;
+  const ROTATE_BUF_SIZE = 9;
+  const _pose = {};
+  var currentpose;
+
+  const loc = drawObj.program.getLocationIndex('skBind');
+  drawObj.bindBuffer(skeObj.bind);
+  drawObj.setAttr({ index: loc, vsize: 2, stride: 2 *gl.sizeof$float });
+
+  const bone = skeObj.bone;
+  const skeletonUi = drawObj.program.getUniform('skeleton');
+  const off = new Float32Array(bone.size * OFFSET_BUF_SIZE);
+  const rot = new Float32Array(bone.size * ROTATE_BUF_SIZE);
+
+  const animData = {
+    offsetBuf : off,
+    getOffset : getOffset,
+    getRotate : getRotate,
+  };
+
   const thiz = {
     pose : pose,
     draw : draw,
+    addPose : addPose,
   };
   return thiz;
 
   //
   // 切换动作
+  // TODO: 动作混合
   //
   function pose(name) {
+    currentpose = _pose[name];
+  }
+
+  //
+  // 添加一个动作动画
+  //
+  function addPose(name, animFunc) {
+    if (!name) throw new Error("name is null");
+    if (!animFunc) throw new Error("animFunc is null");
+    _pose[name] = animFunc(animData);
   }
 
   //
   // 下一帧动画
   //
   function draw(used, time) {
+    if (currentpose) {
+      currentpose.draw(used, time);
+      skeletonUi.setUniform3fv(off);
+    }
+  }
+
+  //
+  // 返回第 i 个偏移参数的缓冲区片段
+  //
+  function getOffset(i) {
+    let begin = i* OFFSET_BUF_SIZE;
+    return off.subarray(begin, begin + OFFSET_BUF_SIZE);
+  }
+
+  //
+  // 返回第 i 个旋转参数的缓冲区片段
+  //
+  function getRotate(i) {
+    let begin = i* ROTATE_BUF_SIZE;
+    return rot.subarray(begin, begin + ROTATE_BUF_SIZE);
   }
 }
 
-
-//
-// 固定行走动画
-// TODO: 参数都与模型和骨骼绑定, 不通用.
-//
-function FixedWalk(drawObj, skeObj) {
-  var rand = Math.random();
-  var loc = drawObj.program.getLocationIndex('skBind');
-  drawObj.bindBuffer(skeObj.bind);
-  drawObj.setAttr({ index: loc, vsize: 2, 
-      stride: 2 * gl.sizeof$float });
-
-  var skeleton = drawObj.program.getUniform('skeleton');
-  skeleton.setUniform3fv(skeObj.ske);
-
-  var rightFoot = skeObj.ske.subarray(0, 3);
-  var leftFoot  = skeObj.ske.subarray(3, 6);
-  var rightHead = skeObj.ske.subarray(9, 12);
-  var leftHead  = skeObj.ske.subarray(12, 15);
-  var mawe1     = skeObj.ske.subarray(15, 18);
-  var eye       = skeObj.ske.subarray(18, 21);
-
-  const r = {
-    pose : pose,
-    draw : draw,
-  };
-  return r;
-
-  //
-  // 切换动作
-  //
-  function pose(name) {
-  }
-
-  //
-  // 下一帧动画
-  //
-  function draw(used, time) {
-    // matrix.vec4.rotateX(rightFoot, rightFoot, used);
-    time += rand;
-    var speed = 8;
-    var pos = time*speed;
-    var ssin = Math.sin(pos);
-    var scos = Math.cos(pos);
-
-    rightFoot[1] = ssin/8;
-    rightFoot[2] = -scos/50;
-
-    leftFoot[1] = -ssin/8;
-    leftFoot[2] = scos/50;
-
-    rightHead[1] = -ssin/20;
-    leftHead[1]  = ssin/20;
-
-    pos = time*(speed-2)
-    // mawe1[1] = Math.sin(pos)/50;
-    mawe1[2] = scos/70;
-    eye[2] = (parseInt(time*10)%40 < 2)? -0.09: 0;
-
-    skeleton.setUniform3fv(skeObj.ske);
-  }
-}

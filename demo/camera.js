@@ -1,34 +1,28 @@
 export default {}
 
-import draw   from '../boot/draw.js'
-import node   from '../boot/node.js'
-import model  from '../boot/model.js'
-import game   from '../boot/game.js'
+import Draw   from '../boot/draw.js'
+import Node   from '../boot/node.js'
+import Game   from '../boot/game.js'
+import Res    from '../boot/resource.js'
 
-const matrix = node.load('boot/gl-matrix.js');
+const matrix = Node.load('boot/gl-matrix.js');
 const PI = Math.PI;
 
-var window = draw.createWindow();
+var window = Draw.createWindow();
 window.setClearColor([0.2, 0.3, 0.3, 1]);
+window.center();
+window.add(Draw.showRate());
 
 //
 // 编译/链接着色器
 //
-var shaderProgram = draw.createProgram();
-shaderProgram.readVertexShader("boot/game.vert");
-shaderProgram.readFragShader("boot/game.frag");
+var shaderProgram = Draw.createProgram();
+shaderProgram.readVertexShader("demo/camera.vert");
+shaderProgram.readFragShader("demo/camera.frag");
 shaderProgram.link();
-shaderProgram.setProjection(45, 1024/768, 0.01, 100);
+shaderProgram.setProjection(45, 4/3, 0.01, 100);
 
-
-var m3d = model.load('art/chr_rain.ply');
-var d1 = draw.createBasicDrawObject(shaderProgram);
-d1.setModelData(m3d);
-
-shaderProgram.getUniform('colorCoefficient').setUniform1f(1/255);
-shaderProgram.getUniform('sizeCoefficient').setUniform1f(0.1);
-
-var sk = game.readSkeleton("demo/skeleton.yaml", m3d.vertex.length/3);
+var res_ctx = Res.context(shaderProgram);
 
 
 var lastModel = [];
@@ -37,22 +31,20 @@ for (var i=0; i<10; ++i) {
     var m = matrix.mat4.create(1);
     matrix.mat4.rotateX(m, m, -90*PI/180);
     matrix.mat4.translate(m, m, [j*5, i*5, 0]);
-    var sp = game.createSprite(d1);
+    
+    var sp = res_ctx.load('art/chr_rain.sprite.yaml');
     sp.reset(m);
     
-    var anim = game.FixedWalk(d1, sk);
-    window.add(anim);
     window.add(sp);
     lastModel.push(sp);
   }
 }
 
-window.add(game.createShowRate());
-
-var camera = game.createCamera(shaderProgram, { op: surroundOP });
-var cameraLookAt = game.Vec3Transition(camera.lookWhere());
-var camMoveTo = game.Vec3Transition(camera.pos(), 4);
+var camera = Game.createCamera(shaderProgram, { draw: surroundOP });
+var cameraLookAt = Game.Vec3Transition(camera.lookWhere());
+var camMoveTo = Game.Vec3Transition(camera.pos(), 4);
 window.add(camera);
+
 
 // 镜头切换时间
 var switchTime = 3;
@@ -78,4 +70,5 @@ window.onKey(gl.GLFW_KEY_ESCAPE, gl.GLFW_PRESS, 0, function() {
 window.prepareDraw();
 while (window.nextFrame()) {
 }
+res_ctx.free();
 window.destroy();

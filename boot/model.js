@@ -18,6 +18,9 @@ function load(file) {
 }
 
 
+//
+// 着色器要有 `aPos` `aColor` 命名的 layout 变量.
+//
 function ply(file) {
   var ret    = model_parser.ply(file);
   var vertex = new Float32Array(ret.vertex);
@@ -27,6 +30,8 @@ function ply(file) {
     vertex    : vertex,
     index     : index,
     setupDraw : setupDraw,
+    // 必须返回顶点数量
+    vertexCount : vertex.length/3,
   };
 
   //

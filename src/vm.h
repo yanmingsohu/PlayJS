@@ -24,7 +24,6 @@ JsErrorCode iNotifyModuleReadyCallback(
     _In_opt_ JsValueRef exceptionVar);
 
 JsErrorCode newModule(JsModuleRecord parent,
-    JsSourceContext sourceContext,
     std::string &fileName,
     std::string &script, 
     JsModuleRecord* moduleRet);
@@ -42,6 +41,10 @@ double floatValue(JsValueRef v, double defaultVal = 0);
 double doubleValue(JsValueRef v, double defaultVal = 0);
 bool boolValue(JsValueRef v, bool defaultVal = false);
 
+//
+// 生成不重复的上下文
+//
+JsSourceContext nextSourceContext();
 
 //
 // 把 c++ 数据包装成 js 对象
@@ -334,14 +337,13 @@ class VM {
 private:
 	JsRuntimeHandle runtime;
 	JsContextRef context;
-	unsigned currentSourceContext;
     threadId _tid;
 
     void initModule();
 
 public:
 
-	VM(threadId& tid) : currentSourceContext(0), _tid(tid) {
+	VM(threadId& tid) : _tid(tid) {
 		JsCreateRuntime(JsRuntimeAttributeNone, nullptr, &runtime);
 		JsCreateContext(runtime, &context);
 		JsSetCurrentContext(context);
@@ -357,8 +359,7 @@ public:
 
     JsErrorCode loadModule(JsModuleRecord parent, 
                            std::string &fileName, std::string &script) {
-        JsErrorCode code = newModule(
-            parent, currentSourceContext, fileName, script, 0);
+        JsErrorCode code = newModule(parent, fileName, script, 0);
         if (code) return code;
         return JsNoError;
     }
@@ -370,7 +371,7 @@ public:
 		JsValueRef url;
 		JsCreateString(code.c_str(), code.length(), &script);
 		JsCreateString(surl.c_str(), surl.length(), &url);
-		JsRun(script, currentSourceContext++, url, 
+		JsRun(script, nextSourceContext(), url,
 			JsParseScriptAttributeNone, &result);
 
 		JsValueRef err = checkError();

@@ -1,0 +1,20 @@
+type: sprite
+
+# 模型文件, 文件总是与当前配置文件在同一目录
+model: chr_rain.ply
+
+# [可选] 颜色归一化系数 (1/255 == 0.00392)
+colorCoefficient: 0.00392156862745098
+
+# [可选] 顶点坐标归一化系数
+sizeCoefficient: 0.1
+
+# 骨骼绑定文件
+skeleton: chr_rain.skeleton.yaml
+
+# TODO: 动画绑定, 第一个动作为默认动作
+pose:
+    # 动作名称
+  - name: walk
+    # file: 动画文件, func: 来自 boot/anim.js 模块的动画函数
+    func: FixedWalk
