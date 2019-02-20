@@ -14,8 +14,8 @@ const Yaml = Node.load('boot/js-yaml.js');
 
 
 export default {
-  context     : context,
-  createCache : createCache,
+  context,
+  createCache,
 };
 
 
@@ -32,15 +32,15 @@ function context(program, _animlib) {
   };
 
   const TYPE_FUNC = {
-    'camera': camera,
-    'sprite': sprite,
+    camera,
+    sprite,
   };
 
   const animlib = _animlib || Anim;
 
   return {
-    load : load,
-    free : free,
+    load,
+    free,
   };
 
 
@@ -153,8 +153,8 @@ function context(program, _animlib) {
 function createCache(creator) {
   const pool = {};
   return {
-    get : get,
-    free : free,
+    get,
+    free,
   };
 
   function get(key, data) {

@@ -81,6 +81,7 @@
     <IncludePath>$(MSBuildProjectDirectory)\..\deps;$(MSBuildProjectDirectory)\..\deps\ChakraCore\lib\Common;$(IncludePath)</IncludePath>
     <LibraryPath>$(MSBuildProjectDirectory)\..\deps\glfw\src\Release;$(MSBuildProjectDirectory)\..\deps\ChakraCore\Build\VcBuild\bin\x64_release;$(MSBuildProjectDirectory)\..\deps\glew\lib\Release\x64;$(LibraryPath)</LibraryPath>
     <OutDir>$(SolutionDir)..\</OutDir>
+    <TargetName>playjs</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
@@ -92,6 +93,7 @@
     <IncludePath>$(MSBuildProjectDirectory)\..\deps;$(MSBuildProjectDirectory)\..\deps\ChakraCore\lib\Common;$(IncludePath)</IncludePath>
     <LibraryPath>$(MSBuildProjectDirectory)\..\deps\glfw\src\Release;$(MSBuildProjectDirectory)\..\deps\ChakraCore\Build\VcBuild\bin\x64_release;$(MSBuildProjectDirectory)\..\deps\glew\lib\Release\x64;$(LibraryPath)</LibraryPath>
     <OutDir>$(SolutionDir)..\</OutDir>
+    <TargetName>playjs</TargetName>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>

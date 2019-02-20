@@ -6,13 +6,13 @@ import node from '../boot/node.js'
 const matrix = node.load('boot/gl-matrix.js');
 
 export default {
-  createWindow          : createWindow,
-  checkGLerr            : checkGLerr,
-  createShader          : createShader,
-  createProgram         : createProgram,
-  createBasicDrawObject : createBasicDrawObject,
-  delayDraw             : delayDraw,
-  showRate              : showRate
+  createWindow,
+  checkGLerr,
+  createShader,
+  createProgram,
+  createBasicDrawObject,
+  delayDraw,
+  showRate,
 };
 
 
@@ -39,15 +39,15 @@ function createWindow(w, h, title) {
   var timeValue, used, lastTime = gl.glfwGetTime();
 
   return {
-    fullscreen    : fullscreen,
-    destroy       : destroy,
-    onKey         : onKey,
-    center        : center,
-    setClearColor : setClearColor,
-    nextFrame     : nextFrame,
-    add           : add,
-    shouldClose   : shouldClose,
-    prepareDraw   : prepareDraw,
+    fullscreen,
+    destroy,
+    onKey,
+    center,
+    setClearColor,
+    nextFrame,
+    add,
+    shouldClose,
+    prepareDraw,
   };
 
   //
@@ -173,16 +173,16 @@ function createProgram() {
   var uniformMap = {};
 
   return {
-    attach           : attach,
-    link             : link,
-    _program         : program,
-    getUniform       : getUniform,
-    setProjection    : setProjection,
-    readShader       : readShader,
-    readFragShader   : readFragShader,
-    readVertexShader : readVertexShader,
-    getLocationIndex : getLocationIndex,
-    active           : active,
+    attach,
+    getUniform,
+    setProjection,
+    readShader,
+    readFragShader,
+    readVertexShader,
+    getLocationIndex,
+    active,
+    link,
+    _program : program,
   };
 
   function active() {
@@ -264,13 +264,13 @@ function createProgram() {
 function Uniform(loc, program) {
   return {
     _loc : loc,
-    active : active,
-    setMatrix4fv : setMatrix4fv,
-    setUniform4f : setUniform4f,
-    setUniform1f : setUniform1f,
-    setUniform1i : setUniform1i,
-    setUniform2uiv : setUniform2uiv,
-    setUniform3fv  : setUniform3fv,
+    active,
+    setMatrix4fv,
+    setUniform4f,
+    setUniform1f,
+    setUniform1i,
+    setUniform2uiv,
+    setUniform3fv,
   };
 
   //
@@ -324,20 +324,20 @@ function createBasicDrawObject(programObj) {
   let skeleton;
 
   const thiz = {
-    draw                : draw,
-    prepareDraw         : prepareDraw,
-    setAttr             : setAttr,
-    setAttrI            : setAttrI,
-    setAttrF            : setAttr,
-    addVertices         : addVertices,
-    addVerticesElements : addVerticesElements,
-    loadTexImage        : loadTexImage,
-    program             : programObj,
-    bindBuffer          : bindBuffer,
-    setModelData        : setModelData,
-    setSkeleton         : setSkeleton,
-    getSkeleton         : getSkeleton,
-    free                : free,
+    draw,               
+    prepareDraw,
+    setAttr,
+    setAttrI,
+    addVertices,
+    addVerticesElements,
+    loadTexImage,
+    bindBuffer,
+    setModelData,
+    setSkeleton,
+    getSkeleton,
+    free,
+    setAttrF : setAttr,
+    program  : programObj,
   };
   return thiz;
 

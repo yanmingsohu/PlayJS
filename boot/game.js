@@ -10,11 +10,11 @@ const DEF_OP = { draw: function() {} };
 
 
 export default {
-  createSprite    : createSprite,
-  createCamera    : createCamera,
-  Vec3Transition  : Vec3Transition,
-  readSkeleton    : readSkeleton,
-  createAnimation : createAnimation,
+  createSprite,
+  createCamera,
+  Vec3Transition,
+  readSkeleton,
+  createAnimation,
 };
 
 
@@ -26,8 +26,13 @@ export default {
 function Vec3Transition(ctrl_vec3, speed) {
   if (!speed) speed = 1;
   return {
-    line : line,
+    line,
+    speed : setSpeed,
   };
+
+  function setSpeed(s) {
+    if (s) speed = s;
+  }
 
   function line(used, end_vec3) {
     var f = speed / used;
@@ -40,8 +45,9 @@ function Vec3Transition(ctrl_vec3, speed) {
 
 //
 // 3D 转换
+// ext - 对象与 ext 组合
 //
-function Transformation() {
+function Transformation(ext) {
   // 对象的变换矩阵
   const objTr = matrix.mat4.create(1);
   // 对象的中心在模型上的偏移
@@ -52,18 +58,18 @@ function Transformation() {
   var initTr  = ONE;
 
   const sp = {
-    translate : translate,
-    scale     : scale,
-    reset     : reset,
-    rotate    : rotate,
-    rotateX   : rotateX,
-    rotateY   : rotateY,
-    rotateZ   : rotateZ,
-    objTr     : objTr,
-    setCenter : setCenter,
-    where     : where,
+    translate,
+    scale,
+    reset,
+    rotate,
+    rotateX,
+    rotateY,
+    rotateZ,
+    objTr,
+    setCenter,
+    where,
   };
-  return sp;
+  return Object.assign(sp, ext);
   
   //
   // 平移
@@ -151,14 +157,15 @@ function createCamera(program, operator) {
   const cameraFront = matrix.vec3.fromValues(0.0, 0.0, -1.0);
   const cameraUp    = matrix.vec3.fromValues(0.0, 1.0,  0.0);
 
-  const cm = Transformation(); 
-  cm.draw         = draw;
-  cm.setPos       = setPos;
-  cm.lookAt       = lookAt;
-  cm.lookAtSprite = lookAtSprite;
-  cm.lookWhere    = lookWhere;
-  cm.pos          = pos;
-  return cm;
+  const thiz = Transformation({
+    draw,
+    setPos,
+    lookAt,
+    lookAtSprite,
+    lookWhere,
+    pos,
+  });
+  return thiz;
 
   function setPos(x, y, z) {
     matrix.vec3.set(cameraPos, x, y, z);
@@ -188,9 +195,9 @@ function createCamera(program, operator) {
 
   function draw(used, time) {
     cameraUi.active();
-    operator.draw(used, time, cm);
-    matrix.mat4.lookAt(cm.objTr, cameraPos, cameraFront, cameraUp);
-    cameraUi.setMatrix4fv(1, gl.GL_FALSE, cm.objTr);
+    operator.draw(used, time, thiz);
+    matrix.mat4.lookAt(thiz.objTr, cameraPos, cameraFront, cameraUp);
+    cameraUi.setMatrix4fv(1, gl.GL_FALSE, thiz.objTr);
   }
 }
 
@@ -205,8 +212,9 @@ function createSprite(drawObj, operator) {
   const modelUi = drawObj.program.getUniform('model');
   if (!operator) operator = DEF_OP;
 
-  const sp = Transformation(); 
-  sp.draw  = draw;
+  const sp = Transformation({
+    draw : draw,
+  }); 
   return sp;
 
   //
@@ -247,7 +255,7 @@ function readSkeleton(filename, vertexCount) {
   config.vbind4 && _bind(config.bindex, config.vbind4, bind, 4);
 
   return {
-    bind : bind,
+    bind,
     bone : config.bone,
   };
 
@@ -303,18 +311,19 @@ function createAnimation(drawObj) {
   const bone = skeObj.bone;
   const skeletonUi = drawObj.program.getUniform('skeleton');
   const off = new Float32Array(bone.size * OFFSET_BUF_SIZE);
-  const rot = new Float32Array(bone.size * ROTATE_BUF_SIZE);
+  //TODO: 需要在着色器中设置变量
+  // const rot = new Float32Array(bone.size * ROTATE_BUF_SIZE);
 
   const animData = {
     offsetBuf : off,
-    getOffset : getOffset,
-    getRotate : getRotate,
+    getOffset,
+    getRotate,
   };
 
   const thiz = {
-    pose : pose,
-    draw : draw,
-    addPose : addPose,
+    pose,
+    draw,
+    addPose,
   };
   return thiz;
 

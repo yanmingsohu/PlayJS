@@ -1,5 +1,5 @@
 export default {
-  FixedWalk       : FixedWalk,
+  FixedWalk,
 };
 
 //
@@ -16,10 +16,10 @@ function FixedWalk(animData) {
   let mawe1     = animData.getOffset(5);
   let eye       = animData.getOffset(6);
 
-  const r = {
-    draw : draw,
+  const thiz = {
+    draw,
   };
-  return r;
+  return thiz;
 
   //
   // 下一帧动画

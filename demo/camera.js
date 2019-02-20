@@ -58,6 +58,7 @@ function surroundOP(used, time, cm) {
   // cm.lookAtSprite(mod);
   var modwhere = mod.where();
   // 线性移动摄像头
+  modwhere[1] += 0.6;
   cameraLookAt.line(used, modwhere);
   camMoveTo.line(used, [modwhere[0]+0.5, 1, modwhere[2]+3]);
 }
