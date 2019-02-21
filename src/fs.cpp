@@ -65,12 +65,12 @@ JS_FUNC_TPL(js_open, c, args, ac, info, d) {
         pushException("bad arguments length, open(path, mode)");
         return 0;
     }
-    LocalVal path(args[1]);
-    LocalVal flag(args[2]);
+    auto path = stringValue(args[1]);
+    auto flag = stringValue(args[2]);
 
     FILE* fd = 0;
-    if (fopen_s(&fd, path.toString().c_str(), flag.toString().c_str())) {
-        pushException("open file fail "+ path.toString());
+    if (fopen_s(&fd, path.c_str(), flag.c_str())) {
+        pushException("open file fail "+ path);
         return 0;
     }
     int handle = make_shared_handle(fd);

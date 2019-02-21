@@ -9,7 +9,3 @@ export default {}
 // import t6 from './ply-model.js';
 // import t8 from './class-speed.js';
 import t7 from './camera.js';
-
-// console.log(new Error('test').stack);
-// console.log('hello world 中文正常!!');
-

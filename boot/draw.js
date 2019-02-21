@@ -17,8 +17,8 @@ export default {
 
 
 function createWindow(w, h, title) {
-  if (!w) w = 1024;
-  if (!h) h = 768;
+  if (!w) w = global.screen.width  || 1024;
+  if (!h) h = global.screen.height || 768;
 
   const moni = gl.glfwGetPrimaryMonitor();
   const mode = gl.glfwGetVideoMode(moni);

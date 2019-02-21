@@ -18,6 +18,11 @@ static map<JsModuleRecord, string> modMap;
 // 模块可以在多个 js runtime 里面运行, 支持多线程
 //
 static map<string, JsModuleRecord> loaded;
+//
+// {线程 : 全局对象}
+//
+static map<threadId, JsValueRef> globals;
+static const char GLOBAL[] = "global";
 
 static std::atomic<JsSourceContext> dbg_ctx(0);
 
@@ -515,5 +520,53 @@ const char* const parseJsErrCode(JsErrorCode c) {
 
     case JsErrorDiagUnableToPerformAction: return
     "VM was unable to perform the request action";
+    }
+}
+
+
+JSS_FUNC(loadModule, args, ac) {
+    JSS_CHK_ARG(1, loadModule(filename));
+    std::string file = stringValue(args[1]);
+    loadScript(file, JVM->thread());
+    return 0;
+}
+
+
+JSS_INIT_MODULE(installVM) {
+    JSS_MOD(vm);
+    JSS_BIND(loadModule);
+}
+
+
+//
+// LocalVal 在 map 释放元素的时候会执行 JsRelease 
+// 而此时 jsvm 已经退出会引发异常.
+//
+void installGlobal(VM* vm) {
+    auto it = globals.find(vm->thread());
+    JsValueRef global(0);
+    if (it != globals.end()) {
+        global = it->second;
+    } else {
+        global = vm->createObject();
+        globals.insert(std::pair<threadId, JsValueRef>(vm->thread(), global));
+    }
+    JsAddRef(global, 0);
+    vm->getGlobal().put(GLOBAL, global);
+}
+
+
+void unstallGlobal(VM *vm) {
+    auto it = globals.find(vm->thread());
+    JsValueRef global = it->second;
+
+    unsigned int ref_count = 0;
+    if (JsNoError != JsRelease(global, &ref_count)) {
+        println("release global fail", vm->thread(), LERROR);
+        return;
+    }
+    if (ref_count <= 0) {
+        globals.erase(vm->thread());
+        //println("release global.", vm->thread(), LDEBUG);
     }
 }

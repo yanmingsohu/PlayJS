@@ -1,5 +1,10 @@
-import test from '../demo/basic.js';
-//import pck from './pck.js';
-//export default {};
-//hex.printHex("abcdefjdklasf");
-// 中文测试
+import Node from './node.js'
+
+const Yaml = Node.load('boot/js-yaml.js');
+const config = Yaml.load(fs.read_txt('playjs.yaml'));
+const main = config['main-script'];
+
+global.screen = config.screen;
+global.game = config.game || {};
+
+vm.loadModule(main);

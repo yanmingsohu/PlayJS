@@ -12,6 +12,7 @@
 
 template<class T>
 void installJsLibrary(T *data) {
+    JSS_DECLARE_MODULE(installVM);
     JSS_DECLARE_MODULE(installConsole);
     JSS_DECLARE_MODULE(installFileSystem);
     JSS_DECLARE_MODULE(installUtf);
@@ -21,6 +22,7 @@ void installJsLibrary(T *data) {
     JSS_DECLARE_MODULE(installGL);
     JSS_DECLARE_MODULE(installImage);
     JSS_DECLARE_MODULE(installModelParser);
+    JSS_DECLARE_MODULE(installGlobal);
 }
 
 
@@ -28,5 +30,6 @@ template<class T>
 void unstallJsLIbrary(T *data) {
     JSS_DECLARE_MODULE(unstallGL);
     JSS_DECLARE_MODULE(destoryEvents);
+    JSS_DECLARE_MODULE(unstallGlobal);
 }
 
