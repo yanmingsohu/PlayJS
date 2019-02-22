@@ -55,6 +55,9 @@
     <ClCompile Include="..\src\model-parser.cpp">
       <Filter>core</Filter>
     </ClCompile>
+    <ClCompile Include="..\src\special.cpp">
+      <Filter>core</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\src\export-js.h">

@@ -23,6 +23,7 @@ void installJsLibrary(T *data) {
     JSS_DECLARE_MODULE(installImage);
     JSS_DECLARE_MODULE(installModelParser);
     JSS_DECLARE_MODULE(installGlobal);
+    JSS_DECLARE_MODULE(installSpecial);
 }
 
 

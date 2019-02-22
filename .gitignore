@@ -27,6 +27,8 @@ Shape/**
 **/.vs/**
 vs/x64/**
 vs/x86/**
+**/Debug/**
+**/Release/**
 
 deps/**
 

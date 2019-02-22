@@ -79,7 +79,7 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
     <IncludePath>$(MSBuildProjectDirectory)\..\deps;$(MSBuildProjectDirectory)\..\deps\ChakraCore\lib\Common;$(IncludePath)</IncludePath>
-    <LibraryPath>$(MSBuildProjectDirectory)\..\deps\glfw\src\Release;$(MSBuildProjectDirectory)\..\deps\ChakraCore\Build\VcBuild\bin\x64_release;$(MSBuildProjectDirectory)\..\deps\glew\lib\Release\x64;$(LibraryPath)</LibraryPath>
+    <LibraryPath>$(MSBuildProjectDirectory)\..\deps\glfw\src\Release;$(MSBuildProjectDirectory)\..\deps\ChakraCore\Build\VcBuild\bin\x64_release;$(MSBuildProjectDirectory)\..\deps\glew\lib\Release\x64;$(MSBuildProjectDirectory)\$(IntDir);$(LibraryPath)</LibraryPath>
     <OutDir>$(SolutionDir)..\</OutDir>
     <TargetName>playjs</TargetName>
   </PropertyGroup>
@@ -91,7 +91,7 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
     <IncludePath>$(MSBuildProjectDirectory)\..\deps;$(MSBuildProjectDirectory)\..\deps\ChakraCore\lib\Common;$(IncludePath)</IncludePath>
-    <LibraryPath>$(MSBuildProjectDirectory)\..\deps\glfw\src\Release;$(MSBuildProjectDirectory)\..\deps\ChakraCore\Build\VcBuild\bin\x64_release;$(MSBuildProjectDirectory)\..\deps\glew\lib\Release\x64;$(LibraryPath)</LibraryPath>
+    <LibraryPath>$(MSBuildProjectDirectory)\..\deps\glfw\src\Release;$(MSBuildProjectDirectory)\..\deps\ChakraCore\Build\VcBuild\bin\x64_release;$(MSBuildProjectDirectory)\..\deps\glew\lib\Release\x64;$(MSBuildProjectDirectory)\$(IntDir);$(LibraryPath)</LibraryPath>
     <OutDir>$(SolutionDir)..\</OutDir>
     <TargetName>playjs</TargetName>
   </PropertyGroup>
@@ -203,6 +203,7 @@
     <ClCompile Include="..\src\main.cpp" />
     <ClCompile Include="..\src\model-parser.cpp" />
     <ClCompile Include="..\src\shared.cpp" />
+    <ClCompile Include="..\src\special.cpp" />
     <ClCompile Include="..\src\threads.cpp" />
     <ClCompile Include="..\src\utf.cpp" />
     <ClCompile Include="..\src\util.cpp" />

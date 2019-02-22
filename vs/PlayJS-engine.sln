@@ -3,18 +3,37 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
 VisualStudioVersion = 15.0.28307.329
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "PlayJS", "core.vcxproj", "{10FC829A-4989-4501-BF2F-C4F25D6B0B7F}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "core", "core.vcxproj", "{10FC829A-4989-4501-BF2F-C4F25D6B0B7F}"
+	ProjectSection(ProjectDependencies) = postProject
+		{BF1B986D-EE6B-4B8A-BE7F-0F64E0EDB686} = {BF1B986D-EE6B-4B8A-BE7F-0F64E0EDB686}
+	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "adt", "adt\adt.vcxproj", "{BF1B986D-EE6B-4B8A-BE7F-0F64E0EDB686}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
+		Debug|x86 = Debug|x86
 		Release|x64 = Release|x64
+		Release|x86 = Release|x86
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
 		{10FC829A-4989-4501-BF2F-C4F25D6B0B7F}.Debug|x64.ActiveCfg = Debug|x64
 		{10FC829A-4989-4501-BF2F-C4F25D6B0B7F}.Debug|x64.Build.0 = Debug|x64
+		{10FC829A-4989-4501-BF2F-C4F25D6B0B7F}.Debug|x86.ActiveCfg = Debug|Win32
+		{10FC829A-4989-4501-BF2F-C4F25D6B0B7F}.Debug|x86.Build.0 = Debug|Win32
 		{10FC829A-4989-4501-BF2F-C4F25D6B0B7F}.Release|x64.ActiveCfg = Release|x64
 		{10FC829A-4989-4501-BF2F-C4F25D6B0B7F}.Release|x64.Build.0 = Release|x64
+		{10FC829A-4989-4501-BF2F-C4F25D6B0B7F}.Release|x86.ActiveCfg = Release|Win32
+		{10FC829A-4989-4501-BF2F-C4F25D6B0B7F}.Release|x86.Build.0 = Release|Win32
+		{BF1B986D-EE6B-4B8A-BE7F-0F64E0EDB686}.Debug|x64.ActiveCfg = Debug|x64
+		{BF1B986D-EE6B-4B8A-BE7F-0F64E0EDB686}.Debug|x64.Build.0 = Debug|x64
+		{BF1B986D-EE6B-4B8A-BE7F-0F64E0EDB686}.Debug|x86.ActiveCfg = Debug|Win32
+		{BF1B986D-EE6B-4B8A-BE7F-0F64E0EDB686}.Debug|x86.Build.0 = Debug|Win32
+		{BF1B986D-EE6B-4B8A-BE7F-0F64E0EDB686}.Release|x64.ActiveCfg = Release|x64
+		{BF1B986D-EE6B-4B8A-BE7F-0F64E0EDB686}.Release|x64.Build.0 = Release|x64
+		{BF1B986D-EE6B-4B8A-BE7F-0F64E0EDB686}.Release|x86.ActiveCfg = Release|Win32
+		{BF1B986D-EE6B-4B8A-BE7F-0F64E0EDB686}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

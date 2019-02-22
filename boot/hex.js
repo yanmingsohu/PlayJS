@@ -12,9 +12,11 @@ for (var i=0; i<str.length; ++i) {
 }
 
 
-function printHex(b, lineC) {
+function printHex(b, lineC, maxlength) {
     if (!lineC) lineC = 16;
-    for (var i = 0; i < b.length;) {
+    let len = maxlength ? Math.min(b.length, maxlength) : b.length;
+
+    for (var i = 0; i < len;) {
         var a = Math.min(b.length - i, lineC);
         var s = b.slice(i, i + a);
         var line = [];

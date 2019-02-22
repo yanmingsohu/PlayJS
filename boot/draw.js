@@ -137,7 +137,7 @@ function createWindow(w, h, title) {
   // 绑定键盘事件
   //
   function onKey(keycode, state, data, callback) {
-    key_listener.push([keycode, state || gl.GLFW_PRESS, callback, data]);
+    key_listener.push([keycode, state || 0, callback, data]);
   }
 
   //
@@ -331,6 +331,7 @@ function createBasicDrawObject(programObj) {
     addVertices,
     addVerticesElements,
     loadTexImage,
+    bindTexImage,
     bindBuffer,
     setModelData,
     setSkeleton,
@@ -348,18 +349,37 @@ function createBasicDrawObject(programObj) {
   function loadTexImage(file) {
     image.flip_vertically_on_load(true);
     let img = image.load(file);
+    bindTexImage(img.data, img.x, img.y, gl.GL_RGB, gl.GL_UNSIGNED_BYTE);
+  }
+
+  //
+  // format - GL_RED, GL_RG, GL_RGB, GL_BGR, GL_RGBA, GL_BGRA, 
+  //    GL_RED_INTEGER, GL_RG_INTEGER, GL_RGB_INTEGER, GL_BGR_INTEGER, 
+  //    GL_RGBA_INTEGER, GL_BGRA_INTEGER, GL_STENCIL_INDEX, GL_DEPTH_COMPONENT, 
+  //    GL_DEPTH_STENCIL
+  //
+  // vtype - GL_UNSIGNED_BYTE, GL_BYTE, GL_UNSIGNED_SHORT, GL_SHORT, 
+  //    GL_UNSIGNED_INT, GL_INT, GL_HALF_FLOAT, GL_FLOAT, 
+  //    GL_UNSIGNED_BYTE_3_3_2, GL_UNSIGNED_BYTE_2_3_3_REV, 
+  //    GL_UNSIGNED_SHORT_5_6_5, GL_UNSIGNED_SHORT_5_6_5_REV, 
+  //    GL_UNSIGNED_SHORT_4_4_4_4, GL_UNSIGNED_SHORT_4_4_4_4_REV, 
+  //    GL_UNSIGNED_SHORT_5_5_5_1, GL_UNSIGNED_SHORT_1_5_5_5_REV, 
+  //    GL_UNSIGNED_INT_8_8_8_8, GL_UNSIGNED_INT_8_8_8_8_REV, 
+  //    GL_UNSIGNED_INT_10_10_10_2, and GL_UNSIGNED_INT_2_10_10_10_REV
+  //
+  function bindTexImage(buffer, width, height, format, vtype) {
     let texture = gl.glGenTextures(1);
     gl.glBindTexture(gl.GL_TEXTURE_2D, texture);  
 
-    gl.glTexParameteri(gl.GL_TEXTURE_2D, 
-      gl.GL_TEXTURE_WRAP_S, gl.GL_MIRRORED_REPEAT);
-    gl.glTexParameteri(gl.GL_TEXTURE_2D, 
-      gl.GL_TEXTURE_MIN_FILTER, gl.GL_LINEAR_MIPMAP_LINEAR);
-    gl.glTexParameteri(gl.GL_TEXTURE_2D, 
-      gl.GL_TEXTURE_MAG_FILTER, gl.GL_LINEAR);
+    // gl.glTexParameteri(gl.GL_TEXTURE_2D, 
+    //   gl.GL_TEXTURE_WRAP_S, gl.GL_MIRRORED_REPEAT);
+    // gl.glTexParameteri(gl.GL_TEXTURE_2D, 
+    //   gl.GL_TEXTURE_MIN_FILTER, gl.GL_LINEAR_MIPMAP_LINEAR);
+    // gl.glTexParameteri(gl.GL_TEXTURE_2D, 
+    //   gl.GL_TEXTURE_MAG_FILTER, gl.GL_LINEAR);
     
     gl.glTexImage2D(gl.GL_TEXTURE_2D, 0, gl.GL_RGB, 
-            img.x, img.y, 0, gl.GL_RGB, gl.GL_UNSIGNED_BYTE, img.data);
+      width, height, 0, format, vtype, buffer);
     gl.glGenerateMipmap(gl.GL_TEXTURE_2D);
   }
 
