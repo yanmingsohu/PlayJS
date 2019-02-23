@@ -524,6 +524,14 @@ GL_FUNC(glGenTextures, args, ac) {
 }
 
 
+GL_FUNC(glDeleteTextures, args, ac) {
+    GL_CHK_ARG(1, glDeleteTextures(size));
+    callJsWithNumOrArr<GLsizei, GLuint, int>(
+        args[1], glDeleteTextures, intValue, 0);
+    return 0;
+}
+
+
 GL_FUNC(glTexImage2D, args, ac) {
     GL_CHK_ARG(9, glTexImage2D(target, mipmap_level, internalformat, width, height, border, format, type, data));
     GLenum target = intValue(args[1]);
@@ -588,6 +596,7 @@ void installGLCore(VM* vm, LocalVal& gl) {
     GL_BIND(glGenTextures);
     GL_BIND(glTexImage2D);
     GL_BIND(glGenerateMipmap);
+    GL_BIND(glDeleteTextures);
 
     GL_BIND(glDrawElements);
     GL_BIND(glGetIntegerv);

@@ -358,6 +358,7 @@ const char* const getJsTypeName(const JsValueType type) {
         case JsTypedArray:  return "TypedArray";
         case JsDataView:    return "JsDataView";
     }
+    return "UnknowJsType";
 }
 
 

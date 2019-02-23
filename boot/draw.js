@@ -11,6 +11,7 @@ export default {
   createShader,
   createProgram,
   createBasicDrawObject,
+  createTexture,
   delayDraw,
   showRate,
 };
@@ -153,6 +154,7 @@ function createWindow(w, h, title) {
 // 创建着色器
 //
 function createShader(txtCode, type) {
+  // 如果 glfw 没有初始化会崩溃
   var shader = gl.glCreateShader(type);
   gl.glShaderSource(shader, txtCode);
   gl.glCompileShader(shader);
@@ -322,6 +324,7 @@ function createBasicDrawObject(programObj) {
   let vertices_count = 0;
   let element_count = 0;
   let skeleton;
+  let texture = createTexture();
 
   const thiz = {
     draw,               
@@ -330,57 +333,25 @@ function createBasicDrawObject(programObj) {
     setAttrI,
     addVertices,
     addVerticesElements,
-    loadTexImage,
-    bindTexImage,
     bindBuffer,
     setModelData,
     setSkeleton,
     getSkeleton,
     free,
+    getTexture,
     setAttrF : setAttr,
     program  : programObj,
   };
   return thiz;
 
-
+  
   function prepareDraw() {}
 
-
-  function loadTexImage(file) {
-    image.flip_vertically_on_load(true);
-    let img = image.load(file);
-    bindTexImage(img.data, img.x, img.y, gl.GL_RGB, gl.GL_UNSIGNED_BYTE);
-  }
-
   //
-  // format - GL_RED, GL_RG, GL_RGB, GL_BGR, GL_RGBA, GL_BGRA, 
-  //    GL_RED_INTEGER, GL_RG_INTEGER, GL_RGB_INTEGER, GL_BGR_INTEGER, 
-  //    GL_RGBA_INTEGER, GL_BGRA_INTEGER, GL_STENCIL_INDEX, GL_DEPTH_COMPONENT, 
-  //    GL_DEPTH_STENCIL
+  // 返回绑定的纹理对象
   //
-  // vtype - GL_UNSIGNED_BYTE, GL_BYTE, GL_UNSIGNED_SHORT, GL_SHORT, 
-  //    GL_UNSIGNED_INT, GL_INT, GL_HALF_FLOAT, GL_FLOAT, 
-  //    GL_UNSIGNED_BYTE_3_3_2, GL_UNSIGNED_BYTE_2_3_3_REV, 
-  //    GL_UNSIGNED_SHORT_5_6_5, GL_UNSIGNED_SHORT_5_6_5_REV, 
-  //    GL_UNSIGNED_SHORT_4_4_4_4, GL_UNSIGNED_SHORT_4_4_4_4_REV, 
-  //    GL_UNSIGNED_SHORT_5_5_5_1, GL_UNSIGNED_SHORT_1_5_5_5_REV, 
-  //    GL_UNSIGNED_INT_8_8_8_8, GL_UNSIGNED_INT_8_8_8_8_REV, 
-  //    GL_UNSIGNED_INT_10_10_10_2, and GL_UNSIGNED_INT_2_10_10_10_REV
-  //
-  function bindTexImage(buffer, width, height, format, vtype) {
-    let texture = gl.glGenTextures(1);
-    gl.glBindTexture(gl.GL_TEXTURE_2D, texture);  
-
-    // gl.glTexParameteri(gl.GL_TEXTURE_2D, 
-    //   gl.GL_TEXTURE_WRAP_S, gl.GL_MIRRORED_REPEAT);
-    // gl.glTexParameteri(gl.GL_TEXTURE_2D, 
-    //   gl.GL_TEXTURE_MIN_FILTER, gl.GL_LINEAR_MIPMAP_LINEAR);
-    // gl.glTexParameteri(gl.GL_TEXTURE_2D, 
-    //   gl.GL_TEXTURE_MAG_FILTER, gl.GL_LINEAR);
-    
-    gl.glTexImage2D(gl.GL_TEXTURE_2D, 0, gl.GL_RGB, 
-      width, height, 0, format, vtype, buffer);
-    gl.glGenerateMipmap(gl.GL_TEXTURE_2D);
+  function getTexture() {
+    return texture;
   }
 
   //
@@ -505,16 +476,18 @@ function createBasicDrawObject(programObj) {
   }
 
 
-  function draw1() {
+  function draw1(u, t) {
     gl.glUseProgram(program);
     gl.glBindVertexArray(VAO);
+    texture.draw(u, t);
     gl.glDrawArrays(gl.GL_TRIANGLES, 0, vertices_count);
   }
 
 
-  function draw2() {
+  function draw2(u, t) {
     gl.glUseProgram(program);
     gl.glBindVertexArray(VAO);
+    texture.draw(u, t);
     gl.glDrawElements(gl.GL_TRIANGLES, element_count, gl.GL_UNSIGNED_INT, 0)
   }
 
@@ -535,7 +508,93 @@ function createBasicDrawObject(programObj) {
       gl.glDeleteBuffers(buffers[i]);
     }
     gl.glDeleteVertexArrays(VAO);
+    texture.free();
     console.debug("VAO and VBO delete");
+  }
+}
+
+
+//
+// 创建一个纹理, 该纹理始终绑定一个纹理缓冲区
+// 纹理可以释放或切换到其他图片, 切换时之前管理的缓冲区将被释放.
+//
+function createTexture() {
+  let _texture = -1;
+  let _target;
+
+  const thiz = {
+    bindTexImage,
+    loadTexImage,
+    setParameter,
+    bindCubeMap,
+    draw,
+    free,
+  };
+  return thiz;
+  
+  //
+  // format - GL_RED, GL_RG, GL_RGB, GL_BGR, GL_RGBA, GL_BGRA, 
+  //    GL_RED_INTEGER, GL_RG_INTEGER, GL_RGB_INTEGER, GL_BGR_INTEGER, 
+  //    GL_RGBA_INTEGER, GL_BGRA_INTEGER, GL_STENCIL_INDEX, GL_DEPTH_COMPONENT, 
+  //    GL_DEPTH_STENCIL
+  //
+  // vtype - GL_UNSIGNED_BYTE, GL_BYTE, GL_UNSIGNED_SHORT, GL_SHORT, 
+  //    GL_UNSIGNED_INT, GL_INT, GL_HALF_FLOAT, GL_FLOAT, 
+  //    GL_UNSIGNED_BYTE_3_3_2, GL_UNSIGNED_BYTE_2_3_3_REV, 
+  //    GL_UNSIGNED_SHORT_5_6_5, GL_UNSIGNED_SHORT_5_6_5_REV, 
+  //    GL_UNSIGNED_SHORT_4_4_4_4, GL_UNSIGNED_SHORT_4_4_4_4_REV, 
+  //    GL_UNSIGNED_SHORT_5_5_5_1, GL_UNSIGNED_SHORT_1_5_5_5_REV, 
+  //    GL_UNSIGNED_INT_8_8_8_8, GL_UNSIGNED_INT_8_8_8_8_REV, 
+  //    GL_UNSIGNED_INT_10_10_10_2, and GL_UNSIGNED_INT_2_10_10_10_REV
+  //
+  function bindTexImage(buffer, width, height, format, vtype) {
+    free();
+    _texture = gl.glGenTextures(1);
+    _target = gl.GL_TEXTURE_2D;
+    gl.glBindTexture(_target, _texture);
+    gl.glTexImage2D(_target, 0, gl.GL_RGB, width, height, 0, format, vtype, buffer);
+    gl.glGenerateMipmap(_target);
+  }
+
+  //
+  // TODO: 设置天空盒纹理
+  //
+  function bindCubeMap() {
+    throw new Error("未实现");
+    _target = gl.GL_TEXTURE_CUBE_MAP;
+  }
+
+  //
+  // 设置纹理属性
+  //
+  function setParameter(name, param) {
+    gl.glBindTexture(_target, _texture);
+    gl.glTexParameteri(_target, name, param);
+    // gl.glTexParameteri(gl.GL_TEXTURE_2D, 
+    //   gl.GL_TEXTURE_WRAP_S, gl.GL_MIRRORED_REPEAT);
+    // gl.glTexParameteri(gl.GL_TEXTURE_2D, 
+    //   gl.GL_TEXTURE_MIN_FILTER, gl.GL_LINEAR_MIPMAP_LINEAR);
+    // gl.glTexParameteri(gl.GL_TEXTURE_2D, 
+    //   gl.GL_TEXTURE_MAG_FILTER, gl.GL_LINEAR);
+  }
+
+  function loadTexImage(file) {
+    image.flip_vertically_on_load(true);
+    let img = image.load(file);
+    texture.bindTexImage(img.data, img.x, img.y, gl.GL_RGB, gl.GL_UNSIGNED_BYTE);
+  }
+
+  function draw() {
+    if (_texture > 0) {
+      gl.glBindTexture(gl.GL_TEXTURE_2D, _texture);
+    }
+  }
+
+  function free() {
+    if (_texture > 0) {
+      gl.glDeleteTextures(_texture);
+      _texture = null;
+    }
   }
 }
 
