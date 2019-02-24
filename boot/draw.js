@@ -47,6 +47,7 @@ function createWindow(w, h, title) {
     setClearColor,
     nextFrame,
     add,
+    remove,
     shouldClose,
     prepareDraw,
   };
@@ -57,6 +58,20 @@ function createWindow(w, h, title) {
   function add(drawable) {
     if (!drawable.draw) throw new Error("not drawable");
     draw_list.push(drawable);
+  }
+
+  //
+  // 删除绘制对象, 成功返回 true.
+  // 找不到该对象返回 false.
+  //
+  function remove(drawable) {
+    for (let i=0, len=draw_list.length; i<len; ++i) {
+      if (draw_list[i] == drawable) {
+        draw_list.splice(i, 1);
+        return true;
+      }
+    }
+    return false;
   }
 
   //
