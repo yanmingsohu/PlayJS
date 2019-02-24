@@ -325,6 +325,9 @@ function createBasicDrawObject(programObj) {
   let element_count = 0;
   let skeleton;
   let texture = createTexture();
+  let drawMode = gl.GL_TRIANGLES;
+  // 顶点索引数组类型
+  let index_ele_type;
 
   const thiz = {
     draw,               
@@ -337,6 +340,7 @@ function createBasicDrawObject(programObj) {
     setModelData,
     setSkeleton,
     getSkeleton,
+    setMode,
     free,
     getTexture,
     setAttrF : setAttr,
@@ -397,7 +401,7 @@ function createBasicDrawObject(programObj) {
   //    attr.usage  -- 默认 gl.GL_STATIC_DRAW
   //    attr.type   -- 默认 gl.GL_FLOAT
   //    attr.vsize  -- 每个顶点的单元数量, 必须是 1,2,3,4
-  //    attr.stride -- 字节, 顶点之间的间隙长度
+  //    attr.stride -- 字节, 顶点之间的间隙长度, 字节
   //    attr.normalized -- 默认 false
   //    attr.index  -- 顶点属性索引
   //    attr.offset -- 数据指针偏移
@@ -424,7 +428,7 @@ function createBasicDrawObject(programObj) {
     _check_attr(attr);
     gl.glVertexAttribIPointer(
       attr.index,
-      attr.visize,
+      attr.vsize,
       attr.type || gl.GL_INT,
       attr.stride,
       attr.offset || 0);
@@ -441,7 +445,7 @@ function createBasicDrawObject(programObj) {
 
 
   function _vertices(vertices, usage) {
-    var VBO = gl.glGenBuffers(1);
+    let VBO = gl.glGenBuffers(1);
     buffers.push(VBO);
     gl.glBindBuffer(gl.GL_ARRAY_BUFFER, VBO);  
     gl.glBufferData(gl.GL_ARRAY_BUFFER, vertices, usage);
@@ -449,6 +453,7 @@ function createBasicDrawObject(programObj) {
 
 
   function _indices(indices, usage) {
+    index_ele_type = _check_index_ele_type(indices);
     var EBO = gl.glGenBuffers(1);
     buffers.push(EBO);
     gl.glBindBuffer(gl.GL_ELEMENT_ARRAY_BUFFER, EBO);
@@ -480,7 +485,7 @@ function createBasicDrawObject(programObj) {
     gl.glUseProgram(program);
     gl.glBindVertexArray(VAO);
     texture.draw(u, t);
-    gl.glDrawArrays(gl.GL_TRIANGLES, 0, vertices_count);
+    gl.glDrawArrays(drawMode, 0, vertices_count);
   }
 
 
@@ -488,7 +493,30 @@ function createBasicDrawObject(programObj) {
     gl.glUseProgram(program);
     gl.glBindVertexArray(VAO);
     texture.draw(u, t);
-    gl.glDrawElements(gl.GL_TRIANGLES, element_count, gl.GL_UNSIGNED_INT, 0)
+    gl.glDrawElements(drawMode, element_count, index_ele_type, 0)
+  }
+
+
+  function _check_index_ele_type(t) {
+    if (t.constructor === Uint32Array) {
+      return gl.GL_UNSIGNED_INT;
+    }
+    if (t.constructor === Uint8Array) {
+      return gl.GL_UNSIGNED_BYTE;
+    }
+    if (t.constructor === Uint16Array) {
+      return gl.GL_UNSIGNED_SHORT;
+    }
+    throw new TypeError("Index Array "
+      +"Must be Uint32Array or Uint8Array or Uint16Array");
+  }
+
+
+  //
+  // 模式: GL_POINTS, GL_LINES, GL_TRIANGLES(默认), GL_TRIANGLE_STRIP
+  //
+  function setMode(mode) {
+    drawMode = mode;
   }
 
 
