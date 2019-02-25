@@ -54,7 +54,7 @@ template<>
 class SharedResourceDeleter<FILE> {
 public:
     virtual void operator()(FILE* fd) {
-        println("FILE closed", 0, LDEBUG);
+        // println("FILE closed", 0, LDEBUG);
         fclose(fd);
     }
 };
@@ -180,6 +180,22 @@ JSS_FUNC(read_txt, args, ac) {
 }
 
 
+JSS_FUNC(read_dir, args, ac) {
+    JSS_CHK_ARG(1, read_dir(path));
+    auto dirname = stringValue(args[1]);
+    if (! fs::is_directory(dirname)) {
+        pushException(dirname +" is not directory");
+        return 0;
+    }
+    LocalArray files;
+    for (auto& it : fs::directory_iterator(dirname)) {
+        std::string dir = it.path().string();
+        files.push( wrapJs(dir.c_str(), dir.size()) );
+    }
+    return files;
+}
+
+
 void installFileSystem(VM *vm) {
     DEF_GLOBAL(vm, fs);
 
@@ -206,4 +222,5 @@ void installFileSystem(VM *vm) {
     DEF_JS_FUNC(vm, vm, fs, fileSize, js_file_size);
     DEF_JS_FUNC(vm, vm, fs, exists, js_exists);
     DEF_JS_FUNC(vm, vm, fs, read_txt, js_read_txt);
+    DEF_JS_FUNC(vm, vm, fs, read_dir, js_read_dir);
 }

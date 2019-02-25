@@ -34,10 +34,10 @@ function createWindow(w, h, title) {
   gl.glEnable(gl.GL_MULTISAMPLE);  
   gl.glViewport(0, 0, w, h);
 
-  var clearFlag = gl.GL_DEPTH_BUFFER_BIT | gl.GL_COLOR_BUFFER_BIT;
-  var key_listener = [];
-  var draw_list = [];
-  var timeValue, used, lastTime = gl.glfwGetTime();
+  let clearFlag = gl.GL_DEPTH_BUFFER_BIT | gl.GL_COLOR_BUFFER_BIT;
+  let inputs = createInput(window);
+  let draw_list = [];
+  let timeValue, used, lastTime = gl.glfwGetTime();
 
   return {
     fullscreen,
@@ -50,6 +50,7 @@ function createWindow(w, h, title) {
     remove,
     shouldClose,
     prepareDraw,
+    input,
   };
 
   //
@@ -101,20 +102,11 @@ function createWindow(w, h, title) {
   // 绘制下一帧, 如果窗口需要关闭返回 false.
   //
   function nextFrame() {
-    if (gl.glfwWindowShouldClose(window))
-      return false;
-
     timeValue = gl.glfwGetTime();
     used = timeValue - lastTime;
     lastTime = timeValue;
     
-    for (var i=key_listener.length-1; i>=0; --i) {
-      var li = key_listener[i];
-      if (gl.glfwGetKey(window, li[0]) == li[1]) {
-        li[2](li[3]);
-      }
-    }
-
+    inputs.check(used, timeValue);
     gl.glClear(clearFlag);
 
     for (var len = draw_list.length, i=0; i<len; ++i) {
@@ -123,7 +115,7 @@ function createWindow(w, h, title) {
 
     gl.glfwSwapBuffers(window);
     gl.glfwPollEvents();
-    return true;
+    return !gl.glfwWindowShouldClose(window);
   }
 
   //
@@ -153,7 +145,14 @@ function createWindow(w, h, title) {
   // 绑定键盘事件
   //
   function onKey(keycode, state, data, callback) {
-    key_listener.push([keycode, state || 0, callback, data]);
+    inputs.onKey(keycode, state, data, callback);
+  }
+
+  //
+  // 返回用户输入对象
+  //
+  function input() {
+    return inputs;
   }
 
   //
@@ -385,12 +384,13 @@ function createBasicDrawObject(programObj) {
 
   //
   // vertices : Float32Array 对象, 存储顶点
+  // a_vertices_count: 顶点数量 (每个顶点可以存储多种数据)
   // attr : 属性配置, 
   //
-  function addVertices(vertices, _vertices_count, usage) {
+  function addVertices(vertices, a_vertices_count, usage) {
     gl.glBindVertexArray(VAO);
     _vertices(vertices, usage || gl.GL_STATIC_DRAW);
-    vertices_count = _vertices_count;
+    vertices_count = a_vertices_count;
     thiz.draw = draw1;
   }
 
@@ -552,7 +552,7 @@ function createBasicDrawObject(programObj) {
     }
     gl.glDeleteVertexArrays(VAO);
     texture.free();
-    console.debug("VAO and VBO delete");
+    // console.debug("VAO and VBO delete");
   }
 }
 
@@ -624,7 +624,7 @@ function createTexture() {
   function loadTexImage(file) {
     image.flip_vertically_on_load(true);
     let img = image.load(file);
-    texture.bindTexImage(img.data, img.x, img.y, gl.GL_RGB, gl.GL_UNSIGNED_BYTE);
+    bindTexImage(img.data, img.x, img.y, gl.GL_RGB, gl.GL_UNSIGNED_BYTE);
   }
 
   function draw() {
@@ -638,6 +638,54 @@ function createTexture() {
       gl.glDeleteTextures(_texture);
       _texture = null;
     }
+  }
+}
+
+
+function createInput(window) {
+  let key_listener = [];
+
+  const thiz = {
+    check,
+    onKey,
+    pressOnce,
+  };
+  return thiz;
+
+  //
+  // 由系统调用
+  //
+  function check(u, t) {
+    for (var i=key_listener.length-1; i>=0; --i) {
+      var li = key_listener[i];
+      if (gl.glfwGetKey(window, li[0]) == li[1]) {
+        li[2](li[3]);
+      }
+    }
+  }
+
+  //
+  // 绑定一个键盘事件的回调函数
+  //
+  function onKey(keycode, state, data, callback) {
+    key_listener.push([keycode, state || 0, callback, data]);
+  }
+
+  //
+  // 绑定一个键盘按键, 在按下后释放前只触发一次.
+  //
+  function pressOnce(key, fn) {
+    let notrel = 0;
+  
+    onKey(key, gl.GLFW_PRESS, 0, function() {
+      if (notrel) return;
+      notrel = true;
+      fn();
+    });
+  
+    onKey(key, gl.GLFW_RELEASE, 0, function() {
+      notrel = false;
+    });
   }
 }
 

@@ -296,6 +296,9 @@ public:
         init();
     }
 
+    //
+    // 创建一个 Array JS 对象
+    //
     LocalArray(int size = 0) : LocalVal(0) {
         JsCreateArray(size, &jsv);
         init();
@@ -317,7 +320,7 @@ public:
     JsValueRef push(JsValueRef v) {
         JsValueRef arg[] = { jsv, v };
         JsValueRef result = 0;
-        JsCallFunction(fpop, arg, 2, &result);
+        JsCallFunction(fpush, arg, 2, &result);
         return result;
     }
 

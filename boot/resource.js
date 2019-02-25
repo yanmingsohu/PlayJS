@@ -16,6 +16,8 @@ const Yaml = Node.load('boot/js-yaml.js');
 export default {
   context,
   createCache,
+  createLimitCache,
+  localBuffer,
 };
 
 
@@ -143,7 +145,6 @@ function context(program, _animlib) {
       throw new Error("Load resource: "+ e.stack);
     }
   }
-
 }
 
 
@@ -172,6 +173,96 @@ function createCache(creator) {
   //
   function free() {
     __free(pool);
+  }
+}
+
+
+//
+// 创建一个带有数量上限的对象缓存区, 当缓存达到上限
+// 之前的对象会被调用 deleter 被释放.
+//
+// creator : Function(id, _create_data)
+// deleter : Function(id, data)
+//
+function createLimitCache(creator, deleter, _limit) {
+  if (!creator) throw new Error("creator is null");
+  if (!deleter) throw new Error("deleter is null");
+  const limit = _limit >= 0 ? _limit : 10;
+  const cache = [];
+  let cptr = 0;
+
+  return {
+    get,
+    free,
+  };
+
+  function _find(id) {
+    for (let i=0; i<limit; ++i) {
+      if (cache[i] && cache[i].id == id) {
+        // console.log("get room from cache", id);
+        return cache[i];
+      }
+    }
+  }
+
+  //
+  // 尝试获得一个对象, id 是对象识别字符串,
+  //  _create_data 用于创建对象的扩展数据可以空.
+  //
+  function get(id, _create_data) {
+    let c = _find(id);
+    if (c) return c.p;
+
+    let p = creator(id, _create_data);
+    if (!p) return;
+    
+    if (cache[cptr]) {
+      _delete(cptr);
+    }
+
+    cache[cptr] = { p, id };
+    if (++cptr >= limit) cptr = 0;
+    return p;
+  }
+
+  function _delete(i) {
+    deleter(cache[i].id, cache[i].p);
+    cache[i] = null;
+  }
+
+  function free() {
+    for (let i=0; i<limit; ++i) {
+      _delete(i);
+    }
+  }
+}
+
+
+//
+// 创建一个共用缓冲区对象, 该对象始终返回唯一创建的缓冲区, 尽可能复用内存, 
+// 适合缓冲区仅在一个函数中分配, 函数结束缓冲区不再使用的情况.
+// 缓冲区无需释放.
+//
+function localBuffer() {
+  let swap_buf;
+
+  return {
+    // 分配一个 Float32 内存, len 单位是 Float32
+    float32(len) {
+      return new Float32Array(_get(len << 2), 0, len);
+    },
+
+    // 分配 ArrayBuffer 内存, len 单位是 byte
+    array(len) {
+      return _get(len);
+    },
+  };
+
+  function _get(bytelen) {
+    if (!swap_buf || swap_buf.byteLength < bytelen) {
+      swap_buf = new ArrayBuffer(bytelen);
+    }
+    return swap_buf;
   }
 }
 

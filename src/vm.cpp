@@ -62,7 +62,8 @@ JsErrorCode iFetchImportedModuleCallBack(
     LocalVal spec(specifier);
     full.append(spec.toString());
     if (!exists(full)) {
-        return JsErrorInvalidArgument;
+        println("Script File not exists: "+ spec.toString(), 0, LERROR);
+        return JsErrorScriptException;
     }
 
     auto lmod = loaded.find(canonical(full).string());
@@ -73,6 +74,7 @@ JsErrorCode iFetchImportedModuleCallBack(
 
     string content;
     if (readTxtFile(full.string(), content) == FAILED) {
+        println("Cannot open Script file: "+ full.string(), 0, LERROR);
         return JsErrorInvalidArgument;
     }
 
