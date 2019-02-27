@@ -205,26 +205,58 @@ function createCamera(program, operator) {
 //
 // 创建精灵对象, 多个精灵可以引用同一个可绘制对象(模型)
 // 精灵对象本身可绘制, 
-// 要求着色器变量: `mat4 model`,
+// 要求着色器变量: `mat4 model`, 或者提供绑定的着色器变量 _shader_var
 // operator{draw:Function(used, time, sprite)} 操作者对象, draw 在每一帧上被调用
 //
-function createSprite(drawObj, operator) {
-  const modelUi = drawObj.program.getUniform('model');
+function createSprite(drawObj, operator, _shader_var) {
+  const modelUi = drawObj.program.getUniform(_shader_var || 'model');
+  const draw_arr = [ drawObj ];
   if (!operator) operator = DEF_OP;
+  let hidden = false;
 
   const sp = Transformation({
-    draw : draw,
+    draw,
+    free,
+    add,
+    hide,
+    show,
   }); 
   return sp;
+
+  //
+  // 一个精灵可以有多个可绘制对象组成
+  //
+  function add(drawable) {
+    if (!drawable.draw) throw new Error("not drawable");
+    draw_arr.push(drawable);
+  }
 
   //
   // 由框架调用, 用户不要直接调用
   //
   function draw(used, time) {
+    if (hidden) return;
     modelUi.active();
     operator.draw(used, time, sp);
     modelUi.setMatrix4fv(1, gl.GL_FALSE, sp.objTr);
-    drawObj.draw(used);
+    for (let i=0, len=draw_arr.length; i<len; ++i) {
+      draw_arr[i].draw(used, time);
+    }
+  }
+
+  function free() {
+    for (let i=0, len=draw_arr.length; i<len; ++i) {
+      draw_arr[i].free();
+    }
+    draw_arr.length = 0;
+  }
+
+  function hide() {
+    hidden = true;
+  }
+
+  function show() {
+    hidden = false;
   }
 }
 
