@@ -4,7 +4,7 @@ const matrix = node.load('boot/gl-matrix.js');
 const yaml = node.load('boot/js-yaml.js');
 
 // 单位矩阵
-const ONE = matrix.mat4.create(1);
+const ONE = matrix.mat4.create();
 // 默认操作者
 const DEF_OP = { draw: function() {} };
 
@@ -49,7 +49,7 @@ function Vec3Transition(ctrl_vec3, speed) {
 //
 function Transformation(ext) {
   // 对象的变换矩阵
-  const objTr = matrix.mat4.create(1);
+  const objTr = matrix.mat4.create();
   // 对象的中心在模型上的偏移
   const center = matrix.vec3.create();
   // 对象的中心在时间上的偏移, 每次都生成新的数组造成内存浪费
@@ -58,6 +58,8 @@ function Transformation(ext) {
   var initTr  = ONE;
 
   const sp = {
+    fromTranslate,
+    fromRotate,
     translate,
     scale,
     reset,
@@ -70,9 +72,24 @@ function Transformation(ext) {
     where,
   };
   return Object.assign(sp, ext);
+
+  //
+  // 平移到指定位置 (绝对位移)
+  //
+  function fromTranslate(vec3pos) {
+    matrix.mat4.fromTranslation(objTr, vec3pos);
+  }
+
+  //
+  // 初始化一个单位矩阵并按照给定轴 vec3pos
+  // 旋转到指定弧度 rad (绝对角度旋转) 旋转单位: 弧度
+  //
+  function fromRotate(rad, vec3pos) {
+    matrix.mat4.fromRotation(objTr, rad, vec3pos);
+  }
   
   //
-  // 平移
+  // 平移 (在当前位置的基础上做相对运动)
   //
   function translate(vec3pos) {
     matrix.mat4.translate(objTr, objTr, vec3pos);

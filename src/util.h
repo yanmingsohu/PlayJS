@@ -24,7 +24,7 @@ void gbk2utf8(char* from, int fromLenth, std::string &out);
 // 输出字符串到控制台, 可以正确处理中文编码
 // 实现在 console.cpp
 //
-void println(const char *src_str, threadId id = 0, int level = LINFO);
+void println(const char *src_str, int len, threadId id = 0, int level = LINFO);
 void println(const std::string str, threadId id = 0, int level = LINFO);
 
 

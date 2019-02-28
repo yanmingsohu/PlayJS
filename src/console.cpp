@@ -33,8 +33,11 @@ static void checkCodePage() {
 //
 // 必须多线程同步, 否则线程写入的内容将互相覆盖
 //
-static void sys_out(const char *src_str) {
-    if (codePage != CP_UTF8) {
+static void sys_out(const char *src_str, int len) {
+    if (len <= 0) {
+        len = strlen(src_str);
+    }
+    if (len < 1000 && codePage != CP_UTF8) {
         static wchar_t buf1[2000];
         static char buf2[2000];
 
@@ -50,7 +53,7 @@ static void sys_out(const char *src_str) {
 static void checkCodePage() {
 }
 
-static void sys_out(const char *out) {
+static void sys_out(const char *out, int len) {
     printf("%s %s%c", head_buf, out, endch);
 }
 #endif
@@ -76,16 +79,16 @@ static void update_time(const int level, threadId id=0) {
 }
 
 
-void println(const char *out, threadId id, int level) {
+void println(const char *out, int len, threadId id, int level) {
     std::lock_guard<std::mutex> lock(log_lock);
     update_time(level, id);
     check_enter();
-    sys_out(out);
+    sys_out(out, len);
 }
 
 
 void println(const std::string str, threadId id, int level) {
-    println(str.c_str(), id, level);
+    println(str.c_str(), str.size(), id, level);
 }
 
 
@@ -106,7 +109,7 @@ static JsValueRef logfunc(JsValueRef *args, unsigned short ac, int level, thread
 
         if (buf_off > sizeof(content_buf)/2) {
             content_buf[buf_off] = 0;
-            sys_out(content_buf);
+            sys_out(content_buf, buf_off);
             buf_off = 0;
         } else {
             content_buf[buf_off++] = ' ';
@@ -115,7 +118,7 @@ static JsValueRef logfunc(JsValueRef *args, unsigned short ac, int level, thread
     
     if (buf_off > 0) {
         content_buf[buf_off] = 0;
-        sys_out(content_buf);
+        sys_out(content_buf, buf_off);
     }
     return 0;
 }

@@ -195,6 +195,7 @@ function createProgram() {
     readShader,
     readFragShader,
     readVertexShader,
+    readGeoShader,
     getLocationIndex,
     active,
     link,
@@ -221,6 +222,10 @@ function createProgram() {
 
   function readFragShader(filename) {
     return readShader(filename, gl.GL_FRAGMENT_SHADER);
+  }
+
+  function readGeoShader(filename) {
+    return readShader(filename, gl.GL_GEOMETRY_SHADER);
   }
 
   //
@@ -283,6 +288,7 @@ function Uniform(loc, program) {
     active,
     setMatrix4fv,
     setUniform4f,
+    setUniform3f,
     setUniform1f,
     setUniform1i,
     setUniform2uiv,
@@ -298,6 +304,10 @@ function Uniform(loc, program) {
 
   function setUniform4f(v1, v2, v3, v4) {
     gl.glUniform4f(loc, v1, v2, v3, v4);
+  }
+
+  function setUniform3f(v1, v2, v3) {
+    gl.glUniform3f(loc, v1, v2, v3);
   }
 
   function setUniform1f(v1) {
