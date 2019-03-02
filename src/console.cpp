@@ -37,7 +37,7 @@ static void sys_out(const char *src_str, int len) {
     if (len <= 0) {
         len = strlen(src_str);
     }
-    if (len < 1000 && codePage != CP_UTF8) {
+    if (len < 2000 && codePage != CP_UTF8) {
         static wchar_t buf1[2000];
         static char buf2[2000];
 
