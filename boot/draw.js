@@ -293,6 +293,7 @@ function Uniform(loc, program) {
     setUniform1i,
     setUniform2uiv,
     setUniform3fv,
+    setUniform4fv,
   };
 
   //
@@ -334,6 +335,13 @@ function Uniform(loc, program) {
       throw new Error("must Float32Array");
     }
     gl.glUniform3fv(loc, float32arr);
+  }
+
+  function setUniform4fv(float32arr) {
+    if (float32arr.constructor != Float32Array) {
+      throw new Error("must Float32Array");
+    }
+    gl.glUniform4fv(loc, float32arr);
   }
 }
 

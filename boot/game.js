@@ -13,6 +13,7 @@ export default {
   createSprite,
   createCamera,
   Vec3Transition,
+  Pos3Transition,
   readSkeleton,
   createAnimation,
 };
@@ -35,10 +36,39 @@ function Vec3Transition(ctrl_vec3, speed) {
   }
 
   function line(used, end_vec3) {
-    var f = speed / used;
+    let f = speed / used;
     ctrl_vec3[0] = ctrl_vec3[0] + (end_vec3[0] - ctrl_vec3[0])/f;
     ctrl_vec3[1] = ctrl_vec3[1] + (end_vec3[1] - ctrl_vec3[1])/f;
     ctrl_vec3[2] = ctrl_vec3[2] + (end_vec3[2] - ctrl_vec3[2])/f;
+  }
+}
+
+
+//
+// 向量的线性过渡, 用 xyz 属性表示
+//
+function Pos3Transition(ctrl_pos3, speed) {
+  if (!speed) speed = 1;
+  if (!ctrl_pos3) ctrl_pos3 = {x:0, y:0, z:0};
+  return {
+    line,
+    pos,
+    speed : _setSpeed,
+  };
+
+  function pos() {
+    return ctrl_pos3;
+  }
+
+  function _setSpeed(s) {
+    speed = s;
+  }
+
+  function line(used, end_pos3) {
+    let f = speed / used;
+    ctrl_pos3.x = ctrl_pos3.x + (end_pos3.x - ctrl_pos3.x)/f;
+    ctrl_pos3.y = ctrl_pos3.y + (end_pos3.y - ctrl_pos3.y)/f;
+    ctrl_pos3.z = ctrl_pos3.z + (end_pos3.z - ctrl_pos3.z)/f;
   }
 }
 
