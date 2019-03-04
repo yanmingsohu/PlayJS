@@ -211,6 +211,7 @@ function createCamera(program, operator) {
     lookAtSprite,
     lookWhere,
     pos,
+    up,
   });
   return thiz;
 
@@ -238,6 +239,10 @@ function createCamera(program, operator) {
   //
   function pos() {
     return cameraPos;
+  }
+
+  function up() {
+    return cameraUp;
   }
 
   function draw(used, time) {
