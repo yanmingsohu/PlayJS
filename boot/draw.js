@@ -692,17 +692,21 @@ function createInput(window) {
   //
   // 绑定一个键盘按键, 在按下后释放前只触发一次.
   //
-  function pressOnce(key, fn) {
+  function pressOnce(key, press, _release) {
     let notrel = 0;
+    if (press == null && _release == null)
+      throw new Error("set press or release callback function");
   
     onKey(key, gl.GLFW_PRESS, 0, function() {
       if (notrel) return;
       notrel = true;
-      fn();
+      press && press();
     });
   
     onKey(key, gl.GLFW_RELEASE, 0, function() {
+      if (!notrel) return;
       notrel = false;
+      _release && _release();
     });
   }
 }
