@@ -49,6 +49,7 @@ function createWindow(w, h, title) {
     add,
     remove,
     shouldClose,
+    notClosed,
     prepareDraw,
     input,
   };
@@ -123,6 +124,13 @@ function createWindow(w, h, title) {
   //
   function shouldClose() {
     gl.glfwSetWindowShouldClose(window, gl.GL_TRUE);
+  }
+
+  //
+  // 不应该退出返回 true.
+  //
+  function notClosed() {
+    return !gl.glfwWindowShouldClose(window);
   }
   
   //
@@ -661,12 +669,15 @@ function createTexture() {
 
 
 function createInput(window) {
-  let key_listener = [];
+  const key_listener = [];
+  let paused = false;
 
   const thiz = {
     check,
     onKey,
     pressOnce,
+    pause,
+    unbind,
   };
   return thiz;
 
@@ -674,12 +685,20 @@ function createInput(window) {
   // 由系统调用
   //
   function check(u, t) {
-    for (var i=key_listener.length-1; i>=0; --i) {
+    if (paused) return;
+    for (var i=0; i<key_listener.length; ++i) {
       var li = key_listener[i];
       if (gl.glfwGetKey(window, li[0]) == li[1]) {
         li[2](li[3]);
       }
     }
+  }
+
+  //
+  // bool 为 true 时暂停输入判断, 默认为 false
+  //
+  function pause(bool) {
+    paused = (true == bool);
   }
 
   //
@@ -708,6 +727,18 @@ function createInput(window) {
       notrel = false;
       _release && _release();
     });
+  }
+
+  //
+  // 解除按键绑定的回调函数
+  //
+  function unbind(keycode) {
+    for (var i=key_listener.length-1; i>=0; --i) {
+      var li = key_listener[i];
+      if (li[0] === keycode) {
+        key_listener.splice(i, 1);
+      }
+    }
   }
 }
 
