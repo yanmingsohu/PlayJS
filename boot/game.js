@@ -2,9 +2,10 @@ import node from '../boot/node.js'
 
 const matrix = node.load('boot/gl-matrix.js');
 const yaml = node.load('boot/js-yaml.js');
+const { mat4, vec3, vec4 } = matrix;
 
 // 单位矩阵
-const ONE = matrix.mat4.create();
+const ONE = mat4.create();
 // 默认操作者
 const DEF_OP = { draw: function() {} };
 
@@ -80,11 +81,11 @@ function Pos3Transition(ctrl_pos3, speed) {
 //
 function Transformation(ext) {
   // 对象的变换矩阵
-  const objTr = matrix.mat4.create();
+  const objTr = mat4.create();
   // 对象的中心在模型上的偏移
-  const center = matrix.vec3.create();
+  const center = vec3.create();
   // 对象的中心在时间上的偏移, 每次都生成新的数组造成内存浪费
-  const _where = matrix.vec3.create();
+  const _where = vec3.create();
   // 变换矩阵初始状态
   var initTr  = ONE;
 
@@ -108,7 +109,7 @@ function Transformation(ext) {
   // 平移到指定位置 (绝对位移)
   //
   function fromTranslate(vec3pos) {
-    matrix.mat4.fromTranslation(objTr, vec3pos);
+    mat4.fromTranslation(objTr, vec3pos);
   }
 
   //
@@ -116,14 +117,14 @@ function Transformation(ext) {
   // 旋转到指定弧度 rad (绝对角度旋转) 旋转单位: 弧度
   //
   function fromRotate(rad, vec3pos) {
-    matrix.mat4.fromRotation(objTr, rad, vec3pos);
+    mat4.fromRotation(objTr, rad, vec3pos);
   }
   
   //
   // 平移 (在当前位置的基础上做相对运动)
   //
   function translate(vec3pos) {
-    matrix.mat4.translate(objTr, objTr, vec3pos);
+    mat4.translate(objTr, objTr, vec3pos);
   }
 
   //
@@ -131,28 +132,28 @@ function Transformation(ext) {
   // vec3s: [x, y, z]
   //
   function scale(vec3s) {
-    matrix.mat4.scale(objTr, objTr, vec3s); // 缩放
+    mat4.scale(objTr, objTr, vec3s); // 缩放
   }
 
   //
   // 在 x 轴上旋转 rad 弧度.
   //
   function rotateX(rad) {
-    matrix.mat4.rotateX(objTr, objTr, rad);
+    mat4.rotateX(objTr, objTr, rad);
   }
 
   //
   // 在 y 轴上旋转 rad 弧度.
   //
   function rotateY(rad) {
-    matrix.mat4.rotateY(objTr, objTr, rad);
+    mat4.rotateY(objTr, objTr, rad);
   }
 
   //
   // 在 z 轴上旋转 rad 弧度.
   //
   function rotateZ(rad) {
-    matrix.mat4.rotateY(objTr, objTr, rad);
+    mat4.rotateY(objTr, objTr, rad);
   }
 
   //
@@ -160,21 +161,21 @@ function Transformation(ext) {
   // axis: [x, y, z]
   //
   function rotate(rad, axis) {
-    matrix.mat4.retate(objTr, objTr, rad, axis);
+    mat4.retate(objTr, objTr, rad, axis);
   }
 
   //
   // 设置对象中心在模型中的偏移
   //
   function setCenter(x, y, z) {
-    matrix.vec3.set(center, x, y, z);
+    vec3.set(center, x, y, z);
   }
 
   //
   // 返回对象在世界中的位置
   //
   function where() {
-    matrix.vec3.transformMat4(_where, center, objTr);
+    vec3.transformMat4(_where, center, objTr);
     return _where;
   }
 
@@ -184,10 +185,10 @@ function Transformation(ext) {
   //
   function reset(mat4) {
     if (mat4) {
-      matrix.mat4.copy(objTr, mat4);
+      mat4.copy(objTr, mat4);
       initTr = mat4;
     } else {
-      matrix.mat4.copy(objTr, initTr);
+      mat4.copy(objTr, initTr);
     }
   }
 }
@@ -201,9 +202,9 @@ function createCamera(program, operator) {
   if (!operator) operator = DEF_OP;
   const cameraUi = program.getUniform('camera');
 
-  const cameraPos   = matrix.vec3.fromValues(0.0, 1.0,  3.0);
-  const cameraFront = matrix.vec3.fromValues(0.0, 0.0, -1.0);
-  const cameraUp    = matrix.vec3.fromValues(0.0, 1.0,  0.0);
+  const cameraPos   = vec3.fromValues(0.0, 1.0,  3.0);
+  const cameraFront = vec3.fromValues(0.0, 0.0, -1.0);
+  const cameraUp    = vec3.fromValues(0.0, 1.0,  0.0);
 
   const thiz = Transformation({
     draw,
@@ -213,19 +214,20 @@ function createCamera(program, operator) {
     lookWhere,
     pos,
     up,
+    transform,
   });
   return thiz;
 
   function setPos(x, y, z) {
-    matrix.vec3.set(cameraPos, x, y, z);
+    vec3.set(cameraPos, x, y, z);
   }
 
   function lookAt(x, y, z) {
-    matrix.vec3.set(cameraFront, x, y, z);
+    vec3.set(cameraFront, x, y, z);
   }
 
   function lookAtSprite(sp) {
-    matrix.vec3.copy(cameraFront, sp.where());
+    vec3.copy(cameraFront, sp.where());
   }
 
   //
@@ -249,8 +251,16 @@ function createCamera(program, operator) {
   function draw(used, time) {
     cameraUi.active();
     operator.draw(used, time, thiz);
-    matrix.mat4.lookAt(thiz.objTr, cameraPos, cameraFront, cameraUp);
+    mat4.lookAt(thiz.objTr, cameraPos, cameraFront, cameraUp);
     cameraUi.setMatrix4fv(1, gl.GL_FALSE, thiz.objTr);
+  }
+
+  //
+  // 使用相机矩阵变换顶点坐标
+  //
+  function transform(outv4, srcv4) {
+    mat4.lookAt(thiz.objTr, cameraPos, cameraFront, cameraUp);
+    vec4.transformMat4(outv4, srcv4, thiz.objTr);
   }
 }
 

@@ -193,13 +193,15 @@ function createShader(txtCode, type) {
 // 创建着色器程序, 并连接多个着色器
 //
 function createProgram() {
-  var program = gl.glCreateProgram();
-  var uniformMap = {};
+  const proj = matrix.mat4.create(1);
+  const program = gl.glCreateProgram();
+  const uniformMap = {};
 
   return {
     attach,
     getUniform,
     setProjection,
+    getProjection,
     readShader,
     readFragShader,
     readVertexShader,
@@ -269,11 +271,14 @@ function createProgram() {
   }
 
   function setProjection(fovy, aspect, near, far) {
-    var proj = matrix.mat4.create(1);
     matrix.mat4.perspective(proj, fovy, aspect, near, far);
     var projectionVar = getUniform('projection');
     projectionVar.active();
     projectionVar.setMatrix4fv(1, gl.GL_FALSE, proj);
+  }
+
+  function getProjection() {
+    return proj;
   }
 
   //
@@ -616,12 +621,15 @@ function createTexture() {
   //    GL_UNSIGNED_INT_8_8_8_8, GL_UNSIGNED_INT_8_8_8_8_REV, 
   //    GL_UNSIGNED_INT_10_10_10_2, and GL_UNSIGNED_INT_2_10_10_10_REV
   //
-  function bindTexImage(buffer, width, height, format, vtype) {
+  // _internal - GL_RGB(默认), GL_RGBA
+  //
+  function bindTexImage(buffer, width, height, format, vtype, _internal) {
     free();
     _texture = gl.glGenTextures(1);
     _target = gl.GL_TEXTURE_2D;
     gl.glBindTexture(_target, _texture);
-    gl.glTexImage2D(_target, 0, gl.GL_RGB, width, height, 0, format, vtype, buffer);
+    gl.glTexImage2D(_target, 0, _internal || gl.GL_RGB,
+        width, height, 0, format, vtype, buffer);
     gl.glGenerateMipmap(_target);
   }
 
