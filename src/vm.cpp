@@ -535,9 +535,16 @@ JSS_FUNC(loadModule, args, ac) {
 }
 
 
+JSS_FUNC(gc, args, ac) {
+    JVM->gc();
+    return 0;
+}
+
+
 JSS_INIT_MODULE(installVM) {
     JSS_MOD(vm);
     JSS_BIND(loadModule);
+    JSS_BIND(gc);
 }
 
 

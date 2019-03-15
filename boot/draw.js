@@ -258,12 +258,16 @@ function createProgram() {
     }
   }
 
-  function getUniform(name) {
+  function getUniform(name, ignore_errors) {
     var uni = uniformMap[name];
     if (!uni) { 
       var loc = gl.glGetUniformLocation(program, name);
       if (loc < 0) {
-        throw new Error("Uniform '"+ name +"' not exists in shader");
+        if (!ignore_errors) {
+          throw new Error("Uniform '"+ name +"' not exists in shader");
+        } else {
+          console.warn("Uniform '"+ name +"' not exists in shader");
+        }
       }
       uni = uniformMap[name] = Uniform(loc, program);
     }

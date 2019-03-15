@@ -338,20 +338,20 @@ public:
 
 class VM {
 private:
-	JsRuntimeHandle runtime;
-	JsContextRef context;
+	  JsRuntimeHandle runtime;
+	  JsContextRef context;
     threadId _tid;
 
     void initModule();
 
 public:
 
-	VM(threadId& tid) : _tid(tid) {
-		JsCreateRuntime(JsRuntimeAttributeNone, nullptr, &runtime);
-		JsCreateContext(runtime, &context);
-		JsSetCurrentContext(context);
+    VM(threadId& tid) : _tid(tid) {
+	      JsCreateRuntime(JsRuntimeAttributeNone, nullptr, &runtime);
+	      JsCreateContext(runtime, &context);
+	      JsSetCurrentContext(context);
         initModule();
-	}
+    }
 
 
     ~VM() {
@@ -369,23 +369,23 @@ public:
 
 
     LocalVal eval(std::string code, std::string surl) {
-		JsValueRef result;
-		JsValueRef script;
-		JsValueRef url;
-		JsCreateString(code.c_str(), code.length(), &script);
-		JsCreateString(surl.c_str(), surl.length(), &url);
-		JsRun(script, nextSourceContext(), url,
-			JsParseScriptAttributeNone, &result);
+		    JsValueRef result;
+		    JsValueRef script;
+		    JsValueRef url;
+		    JsCreateString(code.c_str(), code.length(), &script);
+		    JsCreateString(surl.c_str(), surl.length(), &url);
+		    JsRun(script, nextSourceContext(), url,
+			  JsParseScriptAttributeNone, &result);
 
-		JsValueRef err = checkError();
-		if (err) return err;
-		return result;
-	}
+		    JsValueRef err = checkError();
+		    if (err) return err;
+		    return result;
+	  }
 
 
-	JsValueRef checkError() {
+	  JsValueRef checkError() {
         return ::checkError();
-	}
+	  }
 
 
     LocalVal getGlobal() {
@@ -399,6 +399,15 @@ public:
         JsValueRef o = 0;
         JsCreateObject(&o);
         return o;
+    }
+
+
+    void gc() {
+        JsErrorCode r = JsCollectGarbage(runtime);
+        if (r != JsNoError) {
+          const char* msg = parseJsErrCode(r);
+          pushException(msg, r);
+        }
     }
 
 
