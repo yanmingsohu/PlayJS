@@ -4,6 +4,14 @@
 #include <atomic>
 #include <system_error>
 
+//
+// 下载并编译依赖 glew 在 `/deps/glew` 目录中
+//
+#pragma comment(lib, "glew32s.lib")
+#ifdef WIN32
+#pragma comment(lib, "Opengl32.lib")
+#endif
+
 
 static std::atomic<int> gl_count = 0;
 

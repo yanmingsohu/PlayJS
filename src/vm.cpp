@@ -6,6 +6,14 @@
 #include <filesystem>
 #include <atomic>
 
+//
+// 下载并编译依赖 ChakraCore 在 `/deps/ChakraCore` 目录中
+//
+#ifdef WIN32
+#pragma comment(lib, "ChakraCore.lib")
+#endif
+
+
 using namespace std;
 using namespace experimental::filesystem::v1; 
 

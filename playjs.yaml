@@ -2,6 +2,7 @@
 # 主引导脚本
 #
 main-script: bio2/index.js
+#main-script: demo/basic.js
 
 #
 # 分辨率设置

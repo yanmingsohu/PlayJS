@@ -2,6 +2,12 @@
 #include "gldeleter.h"
 
 
+//
+// 下载并编译依赖 glfw 在 `/deps/glfw` 目录中
+//
+#pragma comment(lib, "glfw3.lib")
+
+
 GL_FUNC(glfwGetVersion, args, ac) {
     int major, minor, rev;
     glfwGetVersion(&major, &minor, &rev);

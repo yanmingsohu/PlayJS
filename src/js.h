@@ -62,6 +62,13 @@
 
 
 //
+// 将属性绑定到模块, _val 必须是简单类型或字符串
+//
+#define JSS_ATTR(_name, _val) \
+    mod.put(#_name, wrapJs(_val))
+
+
+//
 // 创建模块, 并绑定到全局
 //
 #define JSS_MOD(_name) \
@@ -84,3 +91,9 @@
 // 定义一个函数, 用于js模块初始化
 //
 #define JSS_INIT_MODULE(name)  void name(VM* vm)
+
+
+//
+// 定义一个函数, 用于卸载 js 模块.
+//
+#define JSS_UNINIT_MODULE(name) void name(VM* vm)

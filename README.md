@@ -48,3 +48,4 @@ feature
 * (骨骼动画)[https://www.khronos.org/opengl/wiki/Skeletal_Animation]
 * (资产导入)[https://github.com/assimp/assimp]
 * (着色器指南)[https://github.com/wshxbqq/GLSL-Card]
+* (跨平台图形引擎)[https://github.com/bkaradzic/bgfx]

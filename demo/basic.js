@@ -8,4 +8,5 @@ export default {}
 // import t5 from './draw.js';
 // import t6 from './ply-model.js';
 // import t8 from './class-speed.js';
-import t7 from './camera.js';
+// import t7 from './camera.js';
+import t9 from './audio.js'

@@ -24,6 +24,7 @@ void installJsLibrary(T *data) {
     JSS_DECLARE_MODULE(installModelParser);
     JSS_DECLARE_MODULE(installGlobal);
     JSS_DECLARE_MODULE(installSpecial);
+    JSS_DECLARE_MODULE(installAudio);
 }
 
 
@@ -32,5 +33,6 @@ void unstallJsLIbrary(T *data) {
     JSS_DECLARE_MODULE(unstallGL);
     JSS_DECLARE_MODULE(destoryEvents);
     JSS_DECLARE_MODULE(unstallGlobal);
+    JSS_DECLARE_MODULE(uninstallAudio);
 }
 
