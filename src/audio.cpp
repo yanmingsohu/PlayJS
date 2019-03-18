@@ -33,8 +33,8 @@ template<> struct SharedResourceDeleter<sl::Soloud> {
 };
 
 
-template<> struct SharedResourceDeleter<sl::Wav> {
-  virtual void operator()(sl::Wav* w) {
+template<> struct SharedResourceDeleter<sl::AudioSource> {
+  virtual void operator()(sl::AudioSource* w) {
     w->stop();
     delete w;
   }
@@ -57,22 +57,22 @@ static char* so_error(sl::result aErrorCode) {
 
 
 JSS_FUNC(createWavSource, args, ac) {
-  sl::Wav *wav = new sl::Wav();
-  return make_shared_js_handle(wav);
+  return make_shared_js_handle<sl::AudioSource>(new sl::Wav());
 }
 
 
-JSS_FUNC(releaseWavSource, args, ac) {
+JSS_FUNC(releaseSource, args, ac) {
   JSS_CHK_ARG(1, releaseWavSource(wavHandle));
   int handle = intValue(args[1], 0);
-  release_shared_resource<sl::Wav>(handle);
+  release_shared_resource<sl::AudioSource>(handle);
   return 0;
 }
 
 
 JSS_FUNC(load, args, ac) {
   JSS_CHK_ARG(2, load(wavHandle, filename));
-  JS_HANDLE(wav, args[1], sl::Wav);
+  JS_HANDLE(src, args[1], sl::AudioSource);
+  sl::Wav* wav = (sl::Wav*) src.get();
   auto filename = stringValue(args[2]);
   auto ret = wav->load(filename.c_str());
   if (ret != sl::SO_NO_ERROR) {
@@ -82,9 +82,23 @@ JSS_FUNC(load, args, ac) {
 }
 
 
+JSS_FUNC(loadMem, args, ac) {
+  JSS_CHK_ARG(2, load(wavHandle, buffer));
+  JS_HANDLE(src, args[1], sl::AudioSource);
+  sl::Wav* wav = (sl::Wav*) src.get();
+  LocalTypedArray buffer(args[2]);
+  auto ret = wav->loadMem(buffer.bytes(), buffer.length(), false, false);
+  if (ret != sl::SO_NO_ERROR) {
+    pushException(so_error(ret), ret);
+  }
+  return 0;
+}
+
+
 JSS_FUNC(getLength, args, ac) {
   JSS_CHK_ARG(1, getLength(wavHandle));
-  JS_HANDLE(wav, args[1], sl::Wav);
+  JS_HANDLE(src, args[1], sl::AudioSource);
+  sl::Wav* wav = (sl::Wav*) src.get();
   return wrapJs(wav->getLength());
 }
 
@@ -114,18 +128,48 @@ JSS_FUNC(createSoloud, args, ac) {
     delete core;
     return 0;
   }
-
   return make_shared_js_handle(core);
 }
 
 
-JSS_FUNC(playWav, args, ac) {
-  // TODO: 完整参数
-  JSS_CHK_ARG(2, play(soloudHandle, wavHandle));
+JSS_FUNC(play, args, ac) {
+  JSS_CHK_ARG(2, play(soloudHandle, wavHandle, volume, pan, paused, bus));
   JS_HANDLE(sol, args[1], sl::Soloud);
-  JS_HANDLE(wav, args[2], sl::Wav);
-  auto playhandle = sol->play(*wav);
-  return wrapJs(playhandle);
+  JS_HANDLE(src, args[2], sl::AudioSource);
+  float volume = ac > 3 ? floatValue(args[3], 1.0f) : 1.0f;
+  float    pan = ac > 4 ? floatValue(args[4], 0) : 0;
+  bool  paused = ac > 5 ? boolValue(args[5], false) : false;
+  int      bus = ac > 6 ? intValue(args[6], 0) : 0;
+  return wrapJs(sol->play(*src, volume, pan, paused, bus));
+}
+
+
+JSS_FUNC(stop, args, ac) {
+  JSS_CHK_ARG(2, stop(soloudHandle, sourceHandle));
+  JS_HANDLE(sol, args[1], sl::Soloud);
+  unsigned int source = intValue(args[2]);
+  sol->stop(source);
+  return 0;
+}
+
+
+JSS_FUNC(setPause, args, ac) {
+  JSS_CHK_ARG(3, setPause(soloudHandle, sourceHandle, pause));
+  JS_HANDLE(sol, args[1], sl::Soloud);
+  auto handle = intValue(args[2]);
+  bool pause = boolValue(args[3]);
+  sol->setPause(handle, pause);
+  return 0;
+}
+
+
+JSS_FUNC(setLooping, args, ac) {
+  JSS_CHK_ARG(3, setLooping(soloudHandle, sourceHandle, loop));
+  JS_HANDLE(sol, args[1], sl::Soloud);
+  auto handle = intValue(args[2]);
+  bool loop = boolValue(args[3]);
+  sol->setLooping(handle, loop);
+  return 0;
 }
 
 
@@ -141,11 +185,15 @@ JSS_INIT_MODULE(installAudio) {
   JSS_MOD(audio);
   JSS_BIND(createSoloud);
   JSS_BIND(releaseSoloud);
-  JSS_BIND(playWav);
+  JSS_BIND(play);
+  JSS_BIND(stop);
+  JSS_BIND(setPause);
+  JSS_BIND(setLooping);
 
   JSS_BIND(createWavSource);
-  JSS_BIND(releaseWavSource);
+  JSS_BIND(releaseSource);
   JSS_BIND(load);
+  JSS_BIND(loadMem);
   JSS_BIND(getLength);
 
   JSS_ATTR(FILTERS_PER_STREAM, FILTERS_PER_STREAM);

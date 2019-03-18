@@ -246,6 +246,10 @@ public:
         return (char*)_buf;
     }
 
+    inline unsigned char* bytes() {
+        return _buf;
+    }
+
     //
     // 数组的长度, 总字节数
     //

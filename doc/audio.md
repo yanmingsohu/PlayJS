@@ -8,26 +8,33 @@
 
 # API
 
-## audio.createSoloud(flag, backend, samplerate, buffersize, channels)
+## soloudHandle audio.createSoloud(flag, backend, samplerate, buffersize, channels)
 
 在脚本空间创建 SoLoud 引擎对象, 并返回句柄引用.
 
 
-## audio.releaseSoloud(soHandle)
+## audio.releaseSoloud(soloudHandle)
 
 释放脚本空间中的 SoLoud 对象.
 
 
-## audio.playWav(soloudHandle, wavHandle)
+## audio.stop(soloudHandle, sourceHandle)
 
 
-## audio.createWavSource();
+## wavHandle audio.createWavSource();
 
 
 ## audio.releaseWavSource(wavHandle);
 
 
+## sourceHandle audio.play(soloudHandle, wavHandle [, volume, pan, paused, bus])
+
+
 ## audio.load(wavHandle, filename)
+
+把文件加载到wav音源中, 错误的句柄类型会导致程序崩溃.
 
 
 ## audio.getLength(wavHandle)
+
+返回音源播放长度, 单位是秒, 浮点类型, 错误的句柄类型会导致程序崩溃.
