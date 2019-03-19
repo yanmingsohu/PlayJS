@@ -139,7 +139,12 @@ JS_FUNC_TPL(js_file_size, c, args, ac, info, d) {
         return 0;
     }
     std::string filename = toString(args[1]);
-    return wrapJs((int) fs::file_size(filename));
+    try {
+      return wrapJs((int) fs::file_size(filename));
+    } catch(fs::filesystem_error& err) {
+      pushException(err.what());
+      return 0;
+    }
 }
 
 

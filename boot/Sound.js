@@ -30,14 +30,18 @@ class Wav {
     this._wav = audio.createWavSource();
     this._core = core;
     this._so = core._so;
+    this._data = null;
   }
 
-  _bind() {
+  _bind(data) {
     if (!this._handle) {
       // 绑定后才能进行操作(播放等)
       this._handle = audio.play(this._so, this._wav, 1, 0, true);
       this._core.bind(this);
+    } else {
+      throw new Error("Can't bind again");
     }
+    this._data = data;
   }
 
   //
@@ -46,8 +50,25 @@ class Wav {
   fromBuffer(buf) {
     audio.loadMem(this._wav, buf);
     // 防止内存被释放, 核心会一直引用这段 js 缓冲区对象.
-    this.buf = buf; 
-    this._bind();
+    this._bind(buf);
+  }
+
+  rawBuffer(buf, rate, channel) {
+    let type;
+    if (buf.constructor === Uint8Array) {
+      type = audio.RAW_TYPE_8BIT;
+    } 
+    else if (buf.constructor == Int16Array) {
+      type = audio.RAW_TYPE_16BIT;
+    }
+    else if (buf.constructor == Float32Array) {
+      type = audio.RAW_TYPE_32FLOAT;
+    } 
+    else {
+      throw new Error("Unsupport "+ buf.constructor);
+    }
+    audio.loadRawWave(this._wav, buf, type, rate, channel);
+    this._bind(buf);
   }
 
   //
@@ -63,7 +84,7 @@ class Wav {
   free() {
     this._core.unbind(this);
     audio.releaseSource(this._wav);
-    delete this.buf;
+    delete this._data;
   }
 
   stop() {

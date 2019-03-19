@@ -95,6 +95,42 @@ JSS_FUNC(loadMem, args, ac) {
 }
 
 
+JSS_FUNC(loadRawWave, args, ac) {
+  JSS_CHK_ARG(5, loadRawWave(wavHandle, buffer, type, samplerate, channel));
+  JS_HANDLE(src, args[1], sl::AudioSource);
+  sl::Wav* wav = (sl::Wav*) src.get();
+  LocalTypedArray buffer(args[2]);
+
+  int type = intValue(args[3], 1);
+  float sr = floatValue(args[4], 44100.0f);
+  int ch = intValue(args[5], 1);
+  sl::result ret = sl::SO_NO_ERROR;
+
+  switch (type) {
+    case 1:
+      ret = wav->loadRawWave8(buffer.bytes(), buffer.length(), sr, ch);
+      break;
+
+    case 2:
+      ret = wav->loadRawWave16((short*) buffer.bytes(), buffer.length()>>1, sr, ch);
+      break;
+
+    case 3:
+      ret = wav->loadRawWave((float*) buffer.bytes(), buffer.length()>>2, sr, ch, false);
+      break;
+
+    default:
+      pushException("invaild type value");
+      break;
+  }
+
+  if (ret != sl::SO_NO_ERROR) {
+    pushException(so_error(ret), ret);
+  }
+  return 0;
+}
+
+
 JSS_FUNC(getLength, args, ac) {
   JSS_CHK_ARG(1, getLength(wavHandle));
   JS_HANDLE(src, args[1], sl::AudioSource);
@@ -194,6 +230,7 @@ JSS_INIT_MODULE(installAudio) {
   JSS_BIND(releaseSource);
   JSS_BIND(load);
   JSS_BIND(loadMem);
+  JSS_BIND(loadRawWave);
   JSS_BIND(getLength);
 
   JSS_ATTR(FILTERS_PER_STREAM, FILTERS_PER_STREAM);
@@ -201,6 +238,9 @@ JSS_INIT_MODULE(installAudio) {
   JSS_ATTR(VOICE_COUNT,        VOICE_COUNT);
   JSS_ATTR(MAX_CHANNELS,       MAX_CHANNELS);
   JSS_ATTR(SOLOUD_VERSION,     SOLOUD_VERSION);
+  JSS_ATTR(RAW_TYPE_8BIT,      1);
+  JSS_ATTR(RAW_TYPE_16BIT,     2);
+  JSS_ATTR(RAW_TYPE_32FLOAT,   3);
 
   SL_DEF(CLIP_ROUNDOFF);
   SL_DEF(ENABLE_VISUALIZATION);
