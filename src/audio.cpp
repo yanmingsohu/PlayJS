@@ -209,6 +209,68 @@ JSS_FUNC(setLooping, args, ac) {
 }
 
 
+JSS_FUNC(setLoopPoint, args, ac) {
+  JSS_CHK_ARG(3, setLoopPoint(soloudHandle, sourceHandle, secondAbs));
+  JS_HANDLE(sol, args[1], sl::Soloud);
+  auto handle = intValue(args[2]);
+  sl::time point = doubleValue(args[3]);
+  sol->setLoopPoint(handle, point);
+  return 0;
+}
+
+
+JSS_FUNC(setVolume, args, ac) {
+  JSS_CHK_ARG(3, setVolume(soloudHandle, sourceHandle, vol));
+  JS_HANDLE(sol, args[1], sl::Soloud);
+  auto src = intValue(args[2]);
+  float vol = floatValue(args[3]);
+  sol->setVolume(src, vol);
+  return 0;
+}
+
+
+JSS_FUNC(setPan, args, ac) {
+  JSS_CHK_ARG(3, setPan(soloudHandle, sourceHandle, pan));
+  JS_HANDLE(sol, args[1], sl::Soloud);
+  auto src = intValue(args[2]);
+  float pan = floatValue(args[3]);
+  sol->setPan(src, pan);
+  return 0;
+}
+
+
+JSS_FUNC(setPanAbsolute, args, ac) {
+  JSS_CHK_ARG(4, setPanAbsolute(soloudHandle, sourceHandle, left, right));
+  JS_HANDLE(sol, args[1], sl::Soloud);
+  auto src = intValue(args[2]);
+  float left = floatValue(args[3]);
+  float right = floatValue(args[4]);
+  sol->setPanAbsolute(src, left, right);
+  return 0;
+}
+
+
+JSS_FUNC(setProtectVoice, args, ac) {
+  JSS_CHK_ARG(3, setProtectVoice(soloudHandle, sourceHandle, protect));
+  JS_HANDLE(sol, args[1], sl::Soloud);
+  auto src = intValue(args[2]);
+  float isprotect = boolValue(args[3]);
+  sol->setProtectVoice(src, isprotect);
+  return 0;
+}
+
+
+JSS_FUNC(setInaudibleBehavior, args, ac) {
+  JSS_CHK_ARG(4, setInaudibleBehavior(soloudHandle, sourceHandle, aMustTick, aKill));
+  JS_HANDLE(sol, args[1], sl::Soloud);
+  auto src = intValue(args[2]);
+  bool tick = boolValue(args[3]);
+  bool kill = boolValue(args[4]);
+  sol->setInaudibleBehavior(src, tick, kill);
+  return 0;
+}
+
+
 JSS_FUNC(releaseSoloud, args, ac) {
   JSS_CHK_ARG(1, releaseSoloud(soLoudHandle));
   int handle = intValue(args[1], 0);
@@ -217,14 +279,69 @@ JSS_FUNC(releaseSoloud, args, ac) {
 }
 
 
+JSS_FUNC(fadeVolume, args, ac) {
+  JSS_CHK_ARG(4, fadeVolume(soloudHandle, sourceHandle, vol, time));
+  JS_HANDLE(sol, args[1], sl::Soloud);
+  auto src = intValue(args[2]);
+  double vol = doubleValue(args[3]);
+  double time = doubleValue(args[4]);
+  sol->fadeVolume(src, vol, time);
+  return 0;
+}
+
+
+JSS_FUNC(fadePan, args, ac) {
+  JSS_CHK_ARG(4, fadePan(soloudHandle, sourceHandle, pan, time));
+  JS_HANDLE(sol, args[1], sl::Soloud);
+  auto src = intValue(args[2]);
+  double pan = doubleValue(args[3]);
+  double time = doubleValue(args[4]);
+  sol->fadePan(src, pan, time);
+  return 0;
+}
+
+
+JSS_FUNC(fadeRelativePlaySpeed, args, ac) {
+  JSS_CHK_ARG(4, fadeRelativePlaySpeed(soloudHandle, sourceHandle, to, time));
+  JS_HANDLE(sol, args[1], sl::Soloud);
+  auto src = intValue(args[2]);
+  double to = doubleValue(args[3]);
+  double time = doubleValue(args[4]);
+  sol->fadeRelativePlaySpeed(src, to, time);
+  return 0;
+}
+
+
+JSS_FUNC(fadeGlobalVolume, args, ac) {
+  JSS_CHK_ARG(3, fadeGlobalVolume(soloudHandle, vol, time));
+  JS_HANDLE(sol, args[1], sl::Soloud);
+  double vol = doubleValue(args[2]);
+  double time = doubleValue(args[3]);
+  sol->fadeGlobalVolume(vol, time);
+  return 0;
+}
+
+
 JSS_INIT_MODULE(installAudio) {
   JSS_MOD(audio);
+
   JSS_BIND(createSoloud);
   JSS_BIND(releaseSoloud);
   JSS_BIND(play);
   JSS_BIND(stop);
   JSS_BIND(setPause);
   JSS_BIND(setLooping);
+  JSS_BIND(setLoopPoint);
+  JSS_BIND(setVolume);
+  JSS_BIND(setPan);
+  JSS_BIND(setPanAbsolute);
+  JSS_BIND(setProtectVoice);
+  JSS_BIND(setInaudibleBehavior);
+
+  JSS_BIND(fadeVolume);
+  JSS_BIND(fadePan);
+  JSS_BIND(fadeRelativePlaySpeed);
+  JSS_BIND(fadeGlobalVolume);
 
   JSS_BIND(createWavSource);
   JSS_BIND(releaseSource);

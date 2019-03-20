@@ -102,6 +102,46 @@ class Wav {
   loop(bool) {
     audio.setLooping(this._so, this._handle, bool);
   }
+
+  loopPoint(timeSec) {
+    audio.setLoopPoint(this._so, this._handle, timeSec);
+  }
+
+  volume(v) {
+    audio.setVolume(this._so, this._handle, v);
+  }
+
+  pan(p) {
+    audio.setPan(this._so, this._handle, p);
+  }
+
+  panAbs(l, r) {
+    audio.setPanAbsolute(this._so, this._handle, l, r);
+  }
+
+  protect(bool) {
+    audio.setProtectVoice(this._so, this._handle, bool);
+  }
+
+  inaudibleBehavior(timeTick, kill) {
+    audio.setInaudibleBehavior(this._so, this._handle, timeTick, kill);
+  }
+
+  fadeVolume(v, time) {
+    audio.fadeVolume(this._so, this._handle, v, time);
+  }
+
+  fadePan(p, time) {
+    audio.fadePan(this._so, this._handle, p, time);
+  }
+
+  fadeRelativePlaySpeed(toSpeed, time) {
+    audio.fadeRelativePlaySpeed(this._so, this._handle, toSpeed, time);
+  }
+
+  fadeGlobalVolume(vol, time) {
+    audio.fadeGlobalVolume(this._so, vol, time);
+  }
 }
 
 
