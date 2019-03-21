@@ -52,6 +52,7 @@ function createWindow(w, h, title) {
     notClosed,
     prepareDraw,
     input,
+    usedTime,
   };
 
   //
@@ -117,6 +118,13 @@ function createWindow(w, h, title) {
     gl.glfwSwapBuffers(window);
     gl.glfwPollEvents();
     return !gl.glfwWindowShouldClose(window);
+  }
+
+  //
+  // 返回最后一次执行 nextFrame 计算到的流逝时间
+  //
+  function usedTime() {
+    return used;
   }
 
   //
