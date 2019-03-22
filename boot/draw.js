@@ -719,6 +719,13 @@ function createInput(window) {
   //
   function pause(bool) {
     paused = (true == bool);
+    // 释放所有按键
+    for (var i=0; i<key_listener.length; ++i) {
+      var li = key_listener[i];
+      if (li[1] == gl.GLFW_RELEASE) {
+        li[2](li[3]);
+      }
+    }
   }
 
   //

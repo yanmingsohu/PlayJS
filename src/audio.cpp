@@ -271,6 +271,26 @@ JSS_FUNC(setInaudibleBehavior, args, ac) {
 }
 
 
+JSS_FUNC(setRelativePlaySpeed, args, ac) {
+  JSS_CHK_ARG(3, setInaudibleBehavior(soloudHandle, sourceHandle, speed));
+  JS_HANDLE(sol, args[1], sl::Soloud);
+  auto src = intValue(args[2]);
+  float speed = floatValue(args[3]);
+  sol->setRelativePlaySpeed(src, speed);
+  return 0;
+}
+
+
+JSS_FUNC(seek, args, ac) {
+  JSS_CHK_ARG(3, setInaudibleBehavior(soloudHandle, sourceHandle, time));
+  JS_HANDLE(sol, args[1], sl::Soloud);
+  auto src = intValue(args[2]);
+  float time = floatValue(args[3]);
+  sol->seek(src, time);
+  return 0;
+}
+
+
 JSS_FUNC(releaseSoloud, args, ac) {
   JSS_CHK_ARG(1, releaseSoloud(soLoudHandle));
   int handle = intValue(args[1], 0);
@@ -337,6 +357,8 @@ JSS_INIT_MODULE(installAudio) {
   JSS_BIND(setPanAbsolute);
   JSS_BIND(setProtectVoice);
   JSS_BIND(setInaudibleBehavior);
+  JSS_BIND(setRelativePlaySpeed);
+  JSS_BIND(seek);
 
   JSS_BIND(fadeVolume);
   JSS_BIND(fadePan);

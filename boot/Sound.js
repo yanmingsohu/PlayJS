@@ -26,8 +26,8 @@ class Core {
 
 
 class Wav {
-  constructor(core) {
-    this._wav = audio.createWavSource();
+  constructor(core, copyWav) {
+    this._wav = copyWav || audio.createWavSource();
     this._core = core;
     this._so = core._so;
     this._data = null;
@@ -42,6 +42,18 @@ class Wav {
       throw new Error("Can't bind again");
     }
     this._data = data;
+  }
+
+  //
+  // 创建一个同样的音频流用于播放, 该方法代价较小.
+  // 克隆对象无需释放资源, 当克隆主体被释放, 克隆体上的操作会崩溃.
+  //
+  clone() {
+    const cloned = new Wav(this._core, this._wav);
+    cloned._data = this._data;
+    cloned._handle = audio.play(this._so, this._wav, 1, 0, true);
+    cloned._copy_src_not_free = true;
+    return cloned;
   }
 
   //
@@ -82,6 +94,7 @@ class Wav {
   // 必须明确的释放对象
   //
   free() {
+    if (this._copy_src_not_free) return;
     this._core.unbind(this);
     audio.releaseSource(this._wav);
     delete this._data;
@@ -125,6 +138,14 @@ class Wav {
 
   inaudibleBehavior(timeTick, kill) {
     audio.setInaudibleBehavior(this._so, this._handle, timeTick, kill);
+  }
+
+  speed(s) {
+    audio.setRelativePlaySpeed(this._so, this._handle, s);
+  }
+
+  seek(s) {
+    audio.seek(this._so, this._handle, s);
   }
 
   fadeVolume(v, time) {
