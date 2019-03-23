@@ -272,7 +272,7 @@ function createCamera(program, operator) {
 // operator{draw:Function(used, time, sprite)} 操作者对象, draw 在每一帧上被调用
 //
 function createSprite(drawObj, operator, _shader_var) {
-  const modelUi = drawObj.program.getUniform(_shader_var || 'model');
+  const modelUi = drawObj.program.getUniform(_shader_var || 'model', true);
   const draw_arr = [ drawObj ];
   if (!operator) operator = DEF_OP;
   let hidden = false;
