@@ -13,6 +13,7 @@
 *.ipdb
 *.pdb
 *.tmp
+*.exp
 
 SG7.*
 SANGO7.*

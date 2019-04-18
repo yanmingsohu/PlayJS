@@ -15,7 +15,7 @@
 
 
 using namespace std;
-using namespace experimental::filesystem::v1; 
+namespace fs = experimental::filesystem::v1; 
 
 //
 // {模块:完整路径} (不包括文件名)
@@ -51,8 +51,8 @@ JsSourceContext nextSourceContext() {
 //
 void saveMod(JsModuleRecord m, string& fullpath) {
     //cout << m << " " << fullpath << endl;
-    modMap[m] = path(fullpath).parent_path().string();
-    loaded[canonical(fullpath).string()] = m;
+    modMap[m] = fs::path(fullpath).parent_path().string();
+    loaded[fs::canonical(fullpath).string()] = m;
 }
 
 
@@ -61,7 +61,7 @@ JsErrorCode iFetchImportedModuleCallBack(
     _In_ JsValueRef specifier,
     _Outptr_result_maybenull_ JsModuleRecord* dependentModuleRecord) 
 {
-    path full("./");
+    fs::path full("./");
     auto rmod = modMap.find(referencingModule);
     if (rmod != modMap.end()) {
         full.append(rmod->second);
@@ -69,12 +69,12 @@ JsErrorCode iFetchImportedModuleCallBack(
 
     LocalVal spec(specifier);
     full.append(spec.toString());
-    if (!exists(full)) {
+    if (!fs::exists(full)) {
         println("Script File not exists: "+ spec.toString(), 0, LERROR);
         return JsErrorScriptException;
     }
 
-    auto lmod = loaded.find(canonical(full).string());
+    auto lmod = loaded.find(fs::canonical(full).string());
     if (lmod != loaded.end()) {
         *dependentModuleRecord = lmod->second;
         return JsNoError;
@@ -121,7 +121,7 @@ JsErrorCode newModule(JsModuleRecord parent,
     JsSourceContext sourceContext = nextSourceContext();
     JsErrorCode err = JsNoError;
     JsValueRef spec;
-    std::string norfile = canonical(fileName).string();
+    std::string norfile = fs::canonical(fileName).string();
     err = JsCreateString(norfile.c_str(), norfile.length(), &spec);
     if (err) return err;
 

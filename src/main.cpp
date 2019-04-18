@@ -19,14 +19,17 @@
 #include "fs.h"
 #include "util.h"
 #include "threads.h"
+#include <physfs.h>
 
 static std::string bootscript = "boot/index.js";
 static const threadId ROOT_THREAD_ID = 0;
 
 
-int main() {
+int main(int argc, const char* argv[]) {
     Welcome w;
+    PHYSFS_init(argv[0]);
     loadScript(bootscript, ROOT_THREAD_ID);
     joinAll();
+    PHYSFS_deinit();
     return 0;
 }

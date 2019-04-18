@@ -90,8 +90,8 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
-    <IncludePath>$(MSBuildProjectDirectory)\..\deps;$(MSBuildProjectDirectory)\..\deps\ChakraCore\lib\Common;$(MSBuildProjectDirectory)\..\deps\soloud\include;$(IncludePath)</IncludePath>
-    <LibraryPath>$(MSBuildProjectDirectory)\..\deps\glfw\src\Release;$(MSBuildProjectDirectory)\..\deps\ChakraCore\Build\VcBuild\bin\x64_release;$(MSBuildProjectDirectory)\..\deps\glew\lib\Release\x64;$(MSBuildProjectDirectory)\$(IntDir);$(MSBuildProjectDirectory)\..\deps\soloud\lib;$(LibraryPath)</LibraryPath>
+    <IncludePath>$(MSBuildProjectDirectory)\..\deps;$(MSBuildProjectDirectory)\..\deps\ChakraCore\lib\Common;$(MSBuildProjectDirectory)\..\deps\soloud\include;$(MSBuildProjectDirectory)\..\deps\physfs\src;$(IncludePath)</IncludePath>
+    <LibraryPath>$(MSBuildProjectDirectory)\..\deps\glfw\src\Release;$(MSBuildProjectDirectory)\..\deps\ChakraCore\Build\VcBuild\bin\x64_release;$(MSBuildProjectDirectory)\..\deps\glew\lib\Release\x64;$(MSBuildProjectDirectory)\$(IntDir);$(MSBuildProjectDirectory)\..\deps\soloud\lib;$(MSBuildProjectDirectory)\..\deps\physfs\Release;$(LibraryPath)</LibraryPath>
     <OutDir>$(SolutionDir)..\</OutDir>
     <TargetName>playjs</TargetName>
   </PropertyGroup>

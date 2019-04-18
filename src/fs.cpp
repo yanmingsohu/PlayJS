@@ -9,6 +9,14 @@
 
 namespace fs = std::experimental::filesystem::v1;
 
+//
+// 下载并编译依赖 https://icculus.org/physfs
+// 在 `/deps/physfs/Release` 目录中
+//
+#ifdef WIN32
+#pragma comment(lib, "physfs-static.lib")
+#endif
+
 
 #define GET_FD_FROM_JS(_name_, _js_obj_) \
     FILE* _name_ = 0; \
@@ -45,7 +53,7 @@ size_t readTxtFile(std::string& fileName, std::string &content) {
     if (len > 0) {
         content.append(buf, len);
     }
-    delete[] buf;
+    if (buf) delete[] buf;
     return len;
 }
 
