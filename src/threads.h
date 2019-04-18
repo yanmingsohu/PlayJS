@@ -1,6 +1,7 @@
 #pragma once
 
 #include <thread>
+#include <string>
 
 typedef int threadId;
 
