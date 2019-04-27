@@ -183,10 +183,10 @@ function Transformation(ext) {
   // 还原到 ma4 状态并记忆该状态;
   // 如果 mat4 为空, 则使用最近一次记忆的状态, 默认状态为单位矩阵
   //
-  function reset(mat4) {
+  function reset(m4) {
     if (mat4) {
-      mat4.copy(objTr, mat4);
-      initTr = mat4;
+      mat4.copy(objTr, m4);
+      initTr = m4;
     } else {
       mat4.copy(objTr, initTr);
     }

@@ -1,5 +1,8 @@
 # PlayJS 
 
+![screen1](https://github.com/yanmingsohu/PlayJS-release/blob/master/screen/s1.jpg)
+![screen2](https://github.com/yanmingsohu/PlayJS-release/blob/master/screen/s2.jpg)
+
 基于 javascript 的游戏引擎.
 The Javascript Game engine.
 
@@ -14,7 +17,12 @@ feature
 6. 不安全的高性能. Unsafe high performance.
 
 
-## 待实现 Pending
+# 游戏
+
+[生化危机2 重生 / Resident Evil 2 Rebirth](https://github.com/yanmingsohu/PlayJS-BIO2)
+
+
+# 待实现 Pending
 
 * [x] 控制台输出乱码
 * [x] 启动新线程
@@ -29,21 +37,21 @@ feature
   * [ ] 集成一个用户界面库
   * [ ] 骨骼动画
 * [ ] 音频api
-  * [ ] 播放音乐和音效
+  * [x] 播放音乐和音效
   * [ ] 3D声场
-* [ ] 控制api
+* [x] 控制api
 * [ ] AI 逻辑api
 * [ ] 物理引擎api
 * [ ] 文档
 * [ ] 基础api
   * [ ] 定时器
   * [ ] 启动参数
-  * [ ] YAML 解析
+  * [x] YAML 解析
   * [ ] 当前文件路径 __dirname/__filename
   * [ ] 压缩/解压缩
   
 
-## 外部资源
+# 外部资源
 
 * (骨骼动画)[https://www.khronos.org/opengl/wiki/Skeletal_Animation]
 * (资产导入)[https://github.com/assimp/assimp]
