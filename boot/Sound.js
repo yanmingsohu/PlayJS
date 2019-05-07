@@ -65,21 +65,22 @@ class Wav {
     this._bind(buf);
   }
 
-  rawBuffer(buf, rate, channel) {
-    let type;
-    if (buf.constructor === Uint8Array) {
-      type = audio.RAW_TYPE_8BIT;
-    } 
-    else if (buf.constructor == Int16Array) {
-      type = audio.RAW_TYPE_16BIT;
+  rawBuffer(buf, rate, channel, _type) {
+    if (!_type) {
+      if (buf.constructor === Uint8Array) {
+        _type = audio.RAW_TYPE_8BIT;
+      } 
+      else if (buf.constructor == Int16Array) {
+        _type = audio.RAW_TYPE_16BIT;
+      }
+      else if (buf.constructor == Float32Array) {
+        _type = audio.RAW_TYPE_32FLOAT;
+      } 
+      else {
+        throw new Error("Unsupport "+ buf.constructor);
+      }
     }
-    else if (buf.constructor == Float32Array) {
-      type = audio.RAW_TYPE_32FLOAT;
-    } 
-    else {
-      throw new Error("Unsupport "+ buf.constructor);
-    }
-    audio.loadRawWave(this._wav, buf, type, rate, channel);
+    audio.loadRawWave(this._wav, buf, _type, rate, channel);
     this._bind(buf);
   }
 
