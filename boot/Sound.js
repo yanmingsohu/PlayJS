@@ -45,6 +45,20 @@ class Wav {
   }
 
   //
+  // 在读取数据前设置有效
+  //
+  setFilter(slotID, typeEnum) {
+    audio.setFilter(this._wav, slotID, typeEnum);
+  }
+
+  //
+  // 在读取数据之后设置有效
+  //
+  setFilterParam(slotID, paramEnum, value) {
+    audio.setFilterParameter(this._so, this._handle, slotID, paramEnum, value);
+  }
+
+  //
   // 创建一个同样的音频流用于播放, 该方法代价较小.
   // 克隆对象无需释放资源, 当克隆主体被释放, 克隆体上的操作会崩溃.
   //

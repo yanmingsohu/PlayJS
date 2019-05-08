@@ -3,8 +3,20 @@
 #include "shared.h"
 
 #include <soloud.h>
-#include <soloud_error.h>
 #include <soloud_wav.h>
+#include <soloud_filter.h>
+#include <soloud_error.h>
+#include "audio-plugin.h"
+
+#include <soloud_bassboostfilter.h>
+#include <soloud_biquadresonantfilter.h>
+#include <soloud_dcremovalfilter.h>
+#include <soloud_echofilter.h>
+#include <soloud_fftfilter.h>
+#include <soloud_flangerfilter.h>
+#include <soloud_lofifilter.h>
+#include <soloud_robotizefilter.h>
+#include <soloud_waveshaperfilter.h>
 
 
 //
@@ -20,6 +32,26 @@
 //
 #define SL_DEF(_name) \
    JSS_ATTR(_name, sl::Soloud::_name)
+
+//
+// 枚举定义
+//
+#define SO_ENUM(_prefix, _namespace, _name) \
+  JSS_ATTR(_prefix##_##_name, _namespace##::##_name)
+
+
+enum SOL_FILTER_TYPE {
+  BiquadResonantFilter = 1,
+  EchoFilter,
+  LofiFilter,
+  FlangerFilter,
+  DCRemovalFilter,
+  FFTFilter,
+  BassboostFilter,
+  WaveShaperFilter,
+  SoundPitchFilter,
+  RobotizeFilter,
+};
 
 
 namespace sl = SoLoud;
@@ -53,6 +85,64 @@ static char* so_error(sl::result aErrorCode) {
     /*case UNKNOWN_ERROR: return "Other error";*/
   }
   return "Other error";
+}
+
+
+static SoLoud::Filter* getFilterFactory(const int type) {
+  switch (type) {
+    case SOL_FILTER_TYPE::BiquadResonantFilter: {
+      static SoLoud::BiquadResonantFilter _biq;
+      return &_biq;
+    }
+
+    case SOL_FILTER_TYPE::BassboostFilter: {
+      static SoLoud::BassboostFilter _bass;
+      return &_bass;
+    }
+
+    case SOL_FILTER_TYPE::DCRemovalFilter: {
+      static SoLoud::DCRemovalFilter _dc;
+      return &_dc;
+    }
+
+    case SOL_FILTER_TYPE::EchoFilter: {
+      static SoLoud::EchoFilter _echo;
+      return &_echo;
+    }
+
+    case SOL_FILTER_TYPE::FFTFilter: {
+      static SoLoud::FFTFilter _fft;
+      return &_fft;
+    }
+
+    case SOL_FILTER_TYPE::FlangerFilter: {
+      static SoLoud::FlangerFilter _fla;
+      return &_fla;
+    }
+
+    case SOL_FILTER_TYPE::LofiFilter: {
+      static SoLoud::LofiFilter _lofi;
+      return &_lofi;
+    }
+
+    case SOL_FILTER_TYPE::SoundPitchFilter: {
+      static SoundPitchFilterFact _pitch;
+      return &_pitch;
+    }
+
+    case SOL_FILTER_TYPE::WaveShaperFilter: {
+      static SoLoud::WaveShaperFilter _wave;
+      return &_wave;
+    }
+
+    case SOL_FILTER_TYPE::RobotizeFilter: {
+      static SoLoud::RobotizeFilter _rob;
+      return &_rob;
+    }
+
+    default:
+      return NULL;
+  }
 }
 
 
@@ -342,8 +432,45 @@ JSS_FUNC(fadeGlobalVolume, args, ac) {
 }
 
 
+JSS_FUNC(setFilterParameter, args, ac) {
+  JSS_CHK_ARG(5, setFilterParameter(soloudHandle, sourceHandle, aFilterId, aAttributeId, aValue));
+  JS_HANDLE(sol, args[1], sl::Soloud);
+  auto src = intValue(args[2]);
+  unsigned int filterid = intValue(args[3]);
+  unsigned int attributeid = intValue(args[4]);
+  float value = floatValue(args[5]);
+  sol->setFilterParameter(src, filterid, attributeid, value);
+  return 0;
+}
+
+
+JSS_FUNC(setFilter, args, ac) {
+  JSS_CHK_ARG(3, setFilter(wavHandle, aFilterId, FilterType));
+  JS_HANDLE(src, args[1], sl::AudioSource);
+  int filterId = intValue(args[2]);
+  int type = intValue(args[3]);
+  auto ff = getFilterFactory(type);
+  if (ff == NULL) {
+    pushException("bad filter id");
+    return 0;
+  }
+  src->setFilter(filterId, ff);
+  return 0;
+}
+
+
+JSS_FUNC(clearFilter, args, ac) {
+  JSS_CHK_ARG(2, clearFilter(wavHandle, aFilterId));
+  JS_HANDLE(src, args[1], sl::AudioSource);
+  int filterId = intValue(args[2]);
+  src->setFilter(filterId, NULL);
+  return 0;
+}
+
+
 JSS_INIT_MODULE(installAudio) {
   JSS_MOD(audio);
+  installAudioPlugin(mod, vm);
 
   JSS_BIND(createSoloud);
   JSS_BIND(releaseSoloud);
@@ -359,6 +486,9 @@ JSS_INIT_MODULE(installAudio) {
   JSS_BIND(setInaudibleBehavior);
   JSS_BIND(setRelativePlaySpeed);
   JSS_BIND(seek);
+  JSS_BIND(setFilterParameter);
+  JSS_BIND(setFilter);
+  JSS_BIND(clearFilter);
 
   JSS_BIND(fadeVolume);
   JSS_BIND(fadePan);
@@ -372,6 +502,7 @@ JSS_INIT_MODULE(installAudio) {
   JSS_BIND(loadRawWave);
   JSS_BIND(getLength);
 
+  // 常量枚举
   JSS_ATTR(FILTERS_PER_STREAM, FILTERS_PER_STREAM);
   JSS_ATTR(SAMPLE_GRANULARITY, SAMPLE_GRANULARITY);
   JSS_ATTR(VOICE_COUNT,        VOICE_COUNT);
@@ -380,6 +511,49 @@ JSS_INIT_MODULE(installAudio) {
   JSS_ATTR(RAW_TYPE_8BIT,      1);
   JSS_ATTR(RAW_TYPE_16BIT,     2);
   JSS_ATTR(RAW_TYPE_32FLOAT,   3);
+
+  // 过滤器类型枚举
+  SO_ENUM(F, SOL_FILTER_TYPE, BassboostFilter);
+  SO_ENUM(F, SOL_FILTER_TYPE, BiquadResonantFilter);
+  SO_ENUM(F, SOL_FILTER_TYPE, DCRemovalFilter);
+  SO_ENUM(F, SOL_FILTER_TYPE, EchoFilter);
+  SO_ENUM(F, SOL_FILTER_TYPE, FFTFilter);
+  SO_ENUM(F, SOL_FILTER_TYPE, FlangerFilter);
+  SO_ENUM(F, SOL_FILTER_TYPE, LofiFilter);
+  SO_ENUM(F, SOL_FILTER_TYPE, RobotizeFilter);
+  SO_ENUM(F, SOL_FILTER_TYPE, SoundPitchFilter);
+  SO_ENUM(F, SOL_FILTER_TYPE, WaveShaperFilter);
+
+  // 各个过滤器参数枚举
+  SO_ENUM(PITCH, SoundPitchFilterFact, RATE);
+  SO_ENUM(PITCH, SoundPitchFilterFact, TEMPO);
+  SO_ENUM(PITCH, SoundPitchFilterFact, PITCH);
+  SO_ENUM(PITCH, SoundPitchFilterFact, PITCH_OCT);
+  SO_ENUM(PITCH, SoundPitchFilterFact, PITCH_SEMI);
+  SO_ENUM(PITCH, SoundPitchFilterFact, CHANNELS);
+  SO_ENUM(PITCH, SoundPitchFilterFact, SAMPLERATE);
+
+  SO_ENUM(BIQUAD, SoLoud::BiquadResonantFilter, NONE);
+  SO_ENUM(BIQUAD, SoLoud::BiquadResonantFilter, LOWPASS);
+  SO_ENUM(BIQUAD, SoLoud::BiquadResonantFilter, HIGHPASS);
+  SO_ENUM(BIQUAD, SoLoud::BiquadResonantFilter, BANDPASS);
+  SO_ENUM(BIQUAD, SoLoud::BiquadResonantFilter, WET);
+  SO_ENUM(BIQUAD, SoLoud::BiquadResonantFilter, SAMPLERATE);
+  SO_ENUM(BIQUAD, SoLoud::BiquadResonantFilter, FREQUENCY);
+  SO_ENUM(BIQUAD, SoLoud::BiquadResonantFilter, RESONANCE);
+
+  SO_ENUM(BIQUAD, SoLoud::BassboostFilter, WET);
+  SO_ENUM(BIQUAD, SoLoud::BassboostFilter, BOOST);
+
+  SO_ENUM(BIQUAD, SoLoud::FlangerFilter, WET);
+  SO_ENUM(BIQUAD, SoLoud::FlangerFilter, DELAY);
+  SO_ENUM(BIQUAD, SoLoud::FlangerFilter, FREQ);
+
+  SO_ENUM(BIQUAD, SoLoud::LofiFilter, WET);
+  SO_ENUM(BIQUAD, SoLoud::LofiFilter, SAMPLERATE);
+  SO_ENUM(BIQUAD, SoLoud::LofiFilter, BITDEPTH);
+
+  SO_ENUM(BIQUAD, SoLoud::RobotizeFilter, WET);
 
   SL_DEF(CLIP_ROUNDOFF);
   SL_DEF(ENABLE_VISUALIZATION);

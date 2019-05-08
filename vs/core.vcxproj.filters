@@ -61,6 +61,9 @@
     <ClCompile Include="..\src\audio.cpp">
       <Filter>core</Filter>
     </ClCompile>
+    <ClCompile Include="..\src\audio-plugin.cpp">
+      <Filter>core</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\src\export-js.h">
@@ -94,6 +97,9 @@
       <Filter>core</Filter>
     </ClInclude>
     <ClInclude Include="..\src\model-ply.h">
+      <Filter>core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\audio-plugin.h">
       <Filter>core</Filter>
     </ClInclude>
   </ItemGroup>

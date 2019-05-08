@@ -90,8 +90,8 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
-    <IncludePath>$(MSBuildProjectDirectory)\..\deps;$(MSBuildProjectDirectory)\..\deps\ChakraCore\lib\Common;$(MSBuildProjectDirectory)\..\deps\soloud\include;$(MSBuildProjectDirectory)\..\deps\physfs\src;$(IncludePath)</IncludePath>
-    <LibraryPath>$(MSBuildProjectDirectory)\..\deps\glfw\src\Release;$(MSBuildProjectDirectory)\..\deps\ChakraCore\Build\VcBuild\bin\x64_release;$(MSBuildProjectDirectory)\..\deps\glew\lib\Release\x64;$(MSBuildProjectDirectory)\$(IntDir);$(MSBuildProjectDirectory)\..\deps\soloud\lib;$(MSBuildProjectDirectory)\..\deps\physfs\Release;$(LibraryPath)</LibraryPath>
+    <IncludePath>$(MSBuildProjectDirectory)\..\deps;$(MSBuildProjectDirectory)\..\deps\ChakraCore\lib\Common;$(MSBuildProjectDirectory)\..\deps\soloud\include;$(MSBuildProjectDirectory)\..\deps\physfs\src;$(MSBuildProjectDirectory)\..\deps\soundtouch\include;$(IncludePath)</IncludePath>
+    <LibraryPath>$(MSBuildProjectDirectory)\..\deps\glfw\src\Release;$(MSBuildProjectDirectory)\..\deps\ChakraCore\Build\VcBuild\bin\x64_release;$(MSBuildProjectDirectory)\..\deps\glew\lib\Release\x64;$(MSBuildProjectDirectory)\$(IntDir);$(MSBuildProjectDirectory)\..\deps\soloud\lib;$(MSBuildProjectDirectory)\..\deps\physfs\Release;$(MSBuildProjectDirectory)\..\deps\soundtouch\lib;$(LibraryPath)</LibraryPath>
     <OutDir>$(SolutionDir)..\</OutDir>
     <TargetName>playjs</TargetName>
   </PropertyGroup>
@@ -179,6 +179,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="..\src-auto\glauto.h" />
+    <ClInclude Include="..\src\audio-plugin.h" />
     <ClInclude Include="..\src\export-js.h" />
     <ClInclude Include="..\src\fs.h" />
     <ClInclude Include="..\src\gl.h" />
@@ -194,6 +195,7 @@
     <ClCompile Include="..\src-auto\const.cc" />
     <ClCompile Include="..\src-auto\glew.h.cc" />
     <ClCompile Include="..\src-auto\glfw3.h.cc" />
+    <ClCompile Include="..\src\audio-plugin.cpp" />
     <ClCompile Include="..\src\audio.cpp" />
     <ClCompile Include="..\src\console.cpp" />
     <ClCompile Include="..\src\events.cpp" />
