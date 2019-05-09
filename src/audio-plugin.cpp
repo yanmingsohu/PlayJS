@@ -63,58 +63,108 @@ void outputSamplesBufferFinalizeCallback(_In_opt_ void* data) {
 }
 
 
-void toFloatSample(const short* in, float* out, const int count) {
-  const float x = 1.0/32768.0;
+template<class T>
+void toFloatSample(const T* in, float* out, const int count) {
+  const auto x = 1.0/((1 << (sizeof(T) * 8)) - 1);
   for (int i = 0; i < count; ++i) {
     out[i] = in[i] * x;
   }
 }
 
 
-void toIntSample(const float* in, short* out, const int count) {
+template<class T>
+void toIntSample(const float* in, T* out, const int count) {
+  const auto c = (1 << (sizeof(T)*8)) - 1;
   for (int i = 0; i < count; ++i) {
-    out[i] = in[i] * 32768.0;
+    out[i] = in[i] * c;
   }
 }
 
 
+// pitch, pitchOct, pitchSemi 只有一个按顺序生效
 JSS_FUNC(pitchSound, args, ac) {
-  JSS_CHK_ARG(8, pitchSound(raw, channel, sampleRate, rate, tempo, pitch, pitchOct, pitchSemi));
+  JSS_CHK_ARG(10, pitchSound(raw, channel, sampleRate, rate, tempo, \
+      pitch, pitchOct, pitchSemi, inputType, outputType));
   LocalTypedArray raw(args[1]);
-  int channel = intValue(args[2]);
-  int sampleRate = intValue(args[3]);
-  double rate = doubleValue(args[4]);
-  double tempo = doubleValue(args[5]);
-  double pitch = doubleValue(args[6]);
-  double oct = doubleValue(args[7]);
-  double semi = doubleValue(args[8]);
+  const int channel = intValue(args[2]);
+  const int sampleRate = intValue(args[3]);
+  const double rate = doubleValue(args[4]);
+  const double tempo = doubleValue(args[5]);
+  const double pitch = doubleValue(args[6]);
+  const double oct = doubleValue(args[7]);
+  const double semi = doubleValue(args[8]);
+  const int itype = intValue(args[9]);
+  const int otype = intValue(args[10]);
 
   soundtouch::SoundTouch st;
   st.setChannels(channel);
   st.setSampleRate(sampleRate);
   st.setRate(rate);
   st.setTempo(tempo);
-  st.setPitch(pitch);
-  st.setPitchOctaves(oct);
-  st.setPitchSemiTones(semi);
+  
+  if (pitch != 1) st.setPitch(pitch);
+  else if (oct != 0) st.setPitchOctaves(oct);
+  else if (semi != 0) st.setPitchSemiTones(semi);
 
-  const int samplesCont = raw.length() / 2;
-  int size = st.getInputOutputSampleRatio() * samplesCont;
-  float* input = new float[samplesCont];
-  toFloatSample((short*)raw.bytes(), input, samplesCont);
+  int samplesCont = 0;
+  float* srcData = 0;
+  std::unique_ptr<float[]> _src_del;
 
-  st.putSamples(input, samplesCont);
+  switch (itype) {
+  case AUDIO_RAW_TYPE::RAW_TYPE_8BIT:
+    samplesCont = raw.length();
+    srcData = new float[samplesCont];
+    _src_del.reset(srcData);
+    toFloatSample(raw.bytes(), srcData, samplesCont);
+    break;
+
+  case AUDIO_RAW_TYPE::RAW_TYPE_16BIT:
+    samplesCont = raw.length() / 2;
+    srcData = new float[samplesCont];
+    _src_del.reset(srcData);
+    toFloatSample((short*)raw.bytes(), srcData, samplesCont);
+    break;
+
+  case AUDIO_RAW_TYPE::RAW_TYPE_32FLOAT:
+    samplesCont = raw.length() / 4;
+    srcData = (float*) raw.bytes();
+    break;
+  }
+
+  st.putSamples(srcData, samplesCont);
   st.flush();
-  float* output = new float[size];
-  st.receiveSamples(output, size);
 
-  short* quan = new short[size];
-  toIntSample(output, quan, size);
-  delete [] output;
-  delete [] input;
+  int dst_size = st.getInputOutputSampleRatio() * samplesCont;
+  float* output = new float[dst_size];
+  std::unique_ptr<float[]> _out_del;
+  st.receiveSamples(output, dst_size);
+
+  void* ext_arr = 0;
+  int ext_size = 0;
+
+  switch (otype) {
+  case AUDIO_RAW_TYPE::RAW_TYPE_8BIT:
+    _out_del.reset(output);
+    ext_size = dst_size;
+    ext_arr = new byte[ext_size];
+    toIntSample(output, (byte*)ext_arr, dst_size);
+    break;
+
+  case AUDIO_RAW_TYPE::RAW_TYPE_16BIT:
+    _out_del.reset(output);
+    ext_size = dst_size * 2;
+    ext_arr = new short[dst_size];
+    toIntSample(output, (short*) ext_arr, dst_size);
+    break;
+
+  case AUDIO_RAW_TYPE::RAW_TYPE_32FLOAT:
+    ext_size = dst_size * 4;
+    ext_arr = output;
+    break;
+  }
 
   JsValueRef ret;
-  JsCreateExternalArrayBuffer(quan, size * sizeof(short),
+  JsCreateExternalArrayBuffer(ext_arr, ext_size,
       outputSamplesBufferFinalizeCallback, 0, &ret);
   return ret;
 }
