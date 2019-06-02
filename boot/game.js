@@ -68,9 +68,11 @@ function Pos3Transition(ctrl_pos3, speed) {
 
   function line(used, end_pos3) {
     let f = speed / used;
+    // console.log(ctrl_pos3.y, end_pos3.y, f, speed, used, '*');
     ctrl_pos3.x = ctrl_pos3.x + (end_pos3.x - ctrl_pos3.x)/f;
     ctrl_pos3.y = ctrl_pos3.y + (end_pos3.y - ctrl_pos3.y)/f;
     ctrl_pos3.z = ctrl_pos3.z + (end_pos3.z - ctrl_pos3.z)/f;
+    // console.log(ctrl_pos3.y, end_pos3.y, f, speed, used);
   }
 }
 
