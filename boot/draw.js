@@ -698,6 +698,7 @@ function createInput(window) {
     pressOnce,
     pause,
     unbind,
+    isKeyPress,
   };
   return thiz;
 
@@ -712,6 +713,11 @@ function createInput(window) {
         li[2](li[3]);
       }
     }
+  }
+
+  function isKeyPress(key) {
+    // console.log('==============', gl.glfwGetKey(window, key));
+    return gl.glfwGetKey(window, key) == gl.GLFW_PRESS;
   }
 
   //
