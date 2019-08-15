@@ -1,7 +1,7 @@
 # PlayJS 
 
-https://github.com/yanmingsohu/PlayJS-release
-[English] (https://github.com/yanmingsohu/PlayJS/README.md)
+[发布的二进制文件](https://github.com/yanmingsohu/PlayJS-release)
+[English](https://github.com/yanmingsohu/PlayJS/README.md)
 
 ![screen1](https://github.com/yanmingsohu/PlayJS-release/blob/master/screen/s1.jpg)
 ![screen2](https://github.com/yanmingsohu/PlayJS-release/blob/master/screen/s2.jpg)
