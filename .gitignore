@@ -38,6 +38,7 @@ deps/**
 !sanguo7.5
 !deps/*.cmd
 !deps/*.sh
+!deps/*.md
 !*.sln
 !*.vcxproj
 !*.filters

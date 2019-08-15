@@ -34,7 +34,7 @@ The Javascript Game/Multimedia engine.
   * [ ] Sharing objects between threads
   * [ ] Js objects are mapped to binary buffers (passed between threads)
 * [ ] Graphics API
-  * [ ] Integrated 3D a renderer, cross-platform
+  * [x] Integrated 3D a renderer, cross-platform (OpenGL/glfw/glew)
   * [ ] Integrate a video decoder
   * [ ] Integrate a user interface library
   * [ ] skeletal animation
