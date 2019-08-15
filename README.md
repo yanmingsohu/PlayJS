@@ -1,61 +1,61 @@
 # PlayJS 
 
 https://github.com/yanmingsohu/PlayJS-release
+[中文版说明] (https://github.com/yanmingsohu/PlayJS/README_cn.md)
 
 ![screen1](https://github.com/yanmingsohu/PlayJS-release/blob/master/screen/s1.jpg)
 ![screen2](https://github.com/yanmingsohu/PlayJS-release/blob/master/screen/s2.jpg)
 
-基于 javascript 的游戏引擎.
-The Javascript Game engine.
-
-特征:
-feature
-
-1. 支持多线程. Support for multi-threading.
-2. 支持线程间消息传递. Support inter-thread messaging.
-3. 文本使用 UTF-8 编码. The text uses UTF-8 encoding.
-4. 无复制的线程间数据共享. Data sharing between threads without replication.
-5. 底层函数和高级函数共存. The underlying function and the advanced function coexist.
-6. 不安全的高性能. Unsafe high performance.
+The Javascript Game/Multimedia engine.
 
 
-# 游戏
+# feature
 
-[生化危机2 重生 / Resident Evil 2 Rebirth](https://github.com/yanmingsohu/PlayJS-BIO2)
+1. Support for multi-threading.
+2. Support inter-thread messaging.
+3. The text uses UTF-8 encoding.
+4. Data sharing between threads without replication.
+5. The underlying function and the advanced function coexist.
+6. Unsafe high performance.
 
 
-# 待实现 Pending
+# Games
 
-* [x] 控制台输出乱码
-* [x] 启动新线程
-* [ ] 线程数据共享(无复制)
-  * [x] 在线程间传递消息
-  * [ ] 在线程间共享缓冲区
-  * [ ] 在线程间共享对象
-  * [ ] js 对象映射到二进制缓冲区(线程间传递)
-* [ ] 图形api
-  * [ ] 集成 3D 一个渲染器, 跨平台
-  * [ ] 集成一个视频解码器
-  * [ ] 集成一个用户界面库
-  * [ ] 骨骼动画
-* [ ] 音频api
-  * [x] 播放音乐和音效
-  * [ ] 3D声场
-* [x] 控制api
-* [ ] AI 逻辑api
-* [ ] 物理引擎api
-* [ ] 文档
-* [ ] 基础api
-  * [ ] 定时器
-  * [ ] 启动参数
-  * [x] YAML 解析
-  * [ ] 当前文件路径 __dirname/__filename
-  * [ ] 压缩/解压缩
+[Resident Evil 2 Rebirth](https://github.com/yanmingsohu/PlayJS-BIO2)
+
+
+# TODO list:
+
+* [x] Console output garbled
+* [x] Start a new thread
+* [ ] Thread data sharing (no replication)
+  * [x] Passing messages between threads
+  * [ ] Share buffers between threads
+  * [ ] Sharing objects between threads
+  * [ ] Js objects are mapped to binary buffers (passed between threads)
+* [ ] Graphics API
+  * [ ] Integrated 3D a renderer, cross-platform
+  * [ ] Integrate a video decoder
+  * [ ] Integrate a user interface library
+  * [ ] skeletal animation
+* [ ] Audio API
+  * [x] Play music and sound effects
+  * [ ] 3D sound
+* [x] control/input api
+* [ ] AI logic lib
+* [ ] physics engine
+* [ ] document
+* [ ] Basic api
+  * [ ] timer
+  * [ ] Startup parameters
+  * [x] YAML parsing
+  * [ ] current file path __dirname/__filename
+  * [ ] compression/decompression
   
 
-# 外部资源
+# Resource reference
 
-* (骨骼动画)[https://www.khronos.org/opengl/wiki/Skeletal_Animation]
-* (资产导入)[https://github.com/assimp/assimp]
-* (着色器指南)[https://github.com/wshxbqq/GLSL-Card]
-* (跨平台图形引擎)[https://github.com/bkaradzic/bgfx]
+* (Skeletal animation)[https://www.khronos.org/opengl/wiki/Skeletal_Animation]
+* (Asset introduction)[https://github.com/assimp/assimp]
+* (Shader guide)[https://github.com/wshxbqq/GLSL-Card]
+* (Cross-platform graphics engine)[https://github.com/bkaradzic/bgfx]
