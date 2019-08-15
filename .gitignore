@@ -43,3 +43,6 @@ deps/**
 !*.filters
 !*.user
 !art/**
+
+bio2/**
+sanguo7.5/**
