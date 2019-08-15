@@ -55,7 +55,7 @@ The Javascript Game/Multimedia engine.
 
 # Resource reference
 
-* (Skeletal animation)[https://www.khronos.org/opengl/wiki/Skeletal_Animation]
-* (Asset introduction)[https://github.com/assimp/assimp]
-* (Shader guide)[https://github.com/wshxbqq/GLSL-Card]
-* (Cross-platform graphics engine)[https://github.com/bkaradzic/bgfx]
+* [Skeletal animation](https://www.khronos.org/opengl/wiki/Skeletal_Animation)
+* [Asset introduction](https://github.com/assimp/assimp)
+* [Shader guide](https://github.com/wshxbqq/GLSL-Card)
+* [Cross-platform graphics engine](https://github.com/bkaradzic/bgfx)
