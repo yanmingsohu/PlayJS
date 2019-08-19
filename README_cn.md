@@ -18,6 +18,13 @@
 6. 不安全的高性能. 
 
 
+# Demo
+
+* [简单三角形](https://github.com/yanmingsohu/PlayJS-release/blob/master/demo/draw.js)
+* [读取模型并播放动画](https://github.com/yanmingsohu/PlayJS-release/blob/master/demo/camera.js)
+* [从WAV文件播放声音](https://github.com/yanmingsohu/PlayJS-release/blob/master/demo/audio.js)
+
+
 # 游戏
 
 [生化危机2 重生](https://github.com/yanmingsohu/PlayJS-BIO2)

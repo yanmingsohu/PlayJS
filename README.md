@@ -19,6 +19,13 @@ The Javascript Game/Multimedia engine.
 6. Unsafe high performance.
 
 
+# Demo
+
+* [Triangle](https://github.com/yanmingsohu/PlayJS-release/blob/master/demo/draw.js)
+* [Loading model](https://github.com/yanmingsohu/PlayJS-release/blob/master/demo/camera.js)
+* [Play sound from wav](https://github.com/yanmingsohu/PlayJS-release/blob/master/demo/audio.js)
+
+
 # Games
 
 [Resident Evil 2 Rebirth](https://github.com/yanmingsohu/PlayJS-BIO2)
