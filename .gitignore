@@ -44,6 +44,7 @@ deps/**
 !*.filters
 !*.user
 !art/**
+!screen/**
 
 bio2/**
 sanguo7.5/**
