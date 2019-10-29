@@ -1,6 +1,5 @@
 # PlayJS 
 
-[Binary Release](https://github.com/yanmingsohu/PlayJS-release)  
 [中文版说明](https://github.com/yanmingsohu/PlayJS/blob/master/README_cn.md)
 
 ![screen1](https://github.com/yanmingsohu/PlayJS-release/blob/master/screen/s1.jpg)
