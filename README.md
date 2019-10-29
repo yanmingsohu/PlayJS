@@ -2,8 +2,8 @@
 
 [中文版说明](https://github.com/yanmingsohu/PlayJS/blob/master/README_cn.md)
 
-![screen1](https://github.com/yanmingsohu/PlayJS/blob/master/screen/s1.jpg)
-![screen2](https://github.com/yanmingsohu/PlayJS/blob/master/screen/s2.jpg)
+![screen1](https://github.com/yanmingsohu/PlayJS/raw/master/screen/s1.jpg)
+![screen2](https://github.com/yanmingsohu/PlayJS/raw/master/screen/s2.jpg)
 
 The Javascript Game/Multimedia engine.
 
