@@ -27,7 +27,7 @@ The Javascript Game/Multimedia engine.
 
 # Games
 
-[Resident Evil 2 Rebirth](https://github.com/yanmingsohu/PlayJS-BIO2)
+[Resident Evil 2 Rebirth](https://github.com/yanmingsohu/Biohazard2)
 
 
 # TODO list:

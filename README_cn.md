@@ -26,7 +26,7 @@
 
 # 游戏
 
-[生化危机2 重生](https://github.com/yanmingsohu/PlayJS-BIO2)
+[生化危机2 重生](https://github.com/yanmingsohu/Biohazard2)
 
 
 # 待实现 Pending
