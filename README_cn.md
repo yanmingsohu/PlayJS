@@ -2,8 +2,8 @@
 
 [English](https://github.com/yanmingsohu/PlayJS)
 
-![screen1](https://github.com/yanmingsohu/PlayJS/raw/master/screen/s1.jpg)
-![screen2](https://github.com/yanmingsohu/PlayJS/raw/master/screen/s2.jpg)
+![screen1](https://github.com/yanmingsohu/PlayJS/blob/master/screen/s1.jpg)
+![screen2](https://github.com/yanmingsohu/PlayJS/blob/master/screen/s2.jpg)
 
 基于 javascript 的多媒体引擎.
 
