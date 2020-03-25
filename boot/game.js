@@ -15,6 +15,7 @@ export default {
   createCamera,
   Vec3Transition,
   Pos3Transition,
+  Pos3TransitionLine,
   readSkeleton,
   createAnimation,
   Transformation,
@@ -47,7 +48,7 @@ function Vec3Transition(ctrl_vec3, speed) {
 
 
 //
-// 向量的线性过渡, 用 xyz 属性表示
+// 向量的线性过渡, 用 xyz 属性表示, 该方法在远离目标时速度快, 接近后速度变慢.
 //
 function Pos3Transition(ctrl_pos3, speed) {
   if (!speed) speed = 1;
@@ -67,12 +68,53 @@ function Pos3Transition(ctrl_pos3, speed) {
   }
 
   function line(used, end_pos3) {
-    let f = speed / used;
+    let f = used / speed;
     // console.log(ctrl_pos3.y, end_pos3.y, f, speed, used, '*');
-    ctrl_pos3.x = ctrl_pos3.x + (end_pos3.x - ctrl_pos3.x)/f;
-    ctrl_pos3.y = ctrl_pos3.y + (end_pos3.y - ctrl_pos3.y)/f;
-    ctrl_pos3.z = ctrl_pos3.z + (end_pos3.z - ctrl_pos3.z)/f;
+    ctrl_pos3.x = ctrl_pos3.x + (end_pos3.x - ctrl_pos3.x)*f;
+    ctrl_pos3.y = ctrl_pos3.y + (end_pos3.y - ctrl_pos3.y)*f;
+    ctrl_pos3.z = ctrl_pos3.z + (end_pos3.z - ctrl_pos3.z)*f;
     // console.log(ctrl_pos3.y, end_pos3.y, f, speed, used);
+  }
+}
+
+
+//
+// 向量的线性过渡, 用 xyz 属性表示, 该方法在任何距离上都是线性移动.
+//
+function Pos3TransitionLine(ctrl_pos3, speed) {
+  if (!speed) speed = 1;
+  if (!ctrl_pos3) ctrl_pos3 = {x:0, y:0, z:0};
+  let last_pos = {x:0, y:0, z:0};
+
+  return {
+    line,
+    pos,
+    speed : _setSpeed,
+    update,
+  };
+
+  function pos() {
+    return ctrl_pos3;
+  }
+
+  function _setSpeed(s) {
+    speed = s;
+  }
+
+  function line(used, end_pos3) {
+    let f = used / speed;
+    // console.log(ctrl_pos3.y, end_pos3.y, f, speed, used, '*');
+    ctrl_pos3.x = last_pos.x + (end_pos3.x - last_pos.x)*f;
+    ctrl_pos3.y = last_pos.y + (end_pos3.y - last_pos.y)*f;
+    ctrl_pos3.z = last_pos.z + (end_pos3.z - last_pos.z)*f;
+    // console.log(ctrl_pos3.y, end_pos3.y, f, speed, used);
+  }
+
+  function update(pos3) {
+    if (!pos3) pos3 = ctrl_pos3;
+    last_pos.x = pos3.x;
+    last_pos.y = pos3.y;
+    last_pos.z = pos3.z;
   }
 }
 
